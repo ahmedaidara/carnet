@@ -413,6 +413,11 @@
             opacity: .2;
             transition: 0s;
         }
+      
+      @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
     </style>
 </head>
 <body>
@@ -1141,18 +1146,250 @@
             loadCategories();
         }
 
-        async function loadCategoryContent() {
-            const container = document.getElementById('content-area');
-            container.innerHTML = `
-                <div style="text-align: center; padding: 40px; opacity: 0.7;">
-                    <p>Ajoutez du contenu à vos catégories pour ${currentTab}</p>
-                    <button class="btn btn-primary" onclick="showAddContentModal()" style="margin-top: 16px;">
-                        Ajouter du contenu
+       async function loadCategoryContent() {
+    const categories = await dbAction('categories', 'getAll');
+    const subjectCategories = categories.filter(c => c.subjectId === currentSubjectId && c.type === currentTab);
+    const items = await dbAction('items', 'getAll');
+    
+    const container = document.getElementById('content-area');
+    
+    if (subjectCategories.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                <p>Créez d'abord une catégorie pour ajouter du contenu ${currentTab}</p>
+                <button class="btn btn-primary" onclick="showAddCategoryModal()" style="margin-top: 16px;">
+                    Créer une catégorie
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h4>Contenu ${currentTab.toUpperCase()}</h4>
+            <button class="btn btn-primary" onclick="showAddContentModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                Ajouter
+            </button>
+        </div>
+    `;
+    
+    subjectCategories.forEach(category => {
+        const categoryItems = items.filter(item => item.categoryId === category.id)
+                                  .sort((a, b) => a.order - b.order);
+        
+        html += `
+            <div class="card" style="margin-bottom: 20px;">
+                <h5 style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                    ${category.name}
+                    <span class="badge">${categoryItems.length} élément(s)</span>
+                </h5>
+                <div id="category-${category.id}-content">
+                    ${renderCategoryItems(categoryItems)}
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function renderCategoryItems(items) {
+    if (items.length === 0) {
+        return '<p style="text-align: center; opacity: 0.7; padding: 20px;">Aucun contenu dans cette catégorie</p>';
+    }
+    
+    let html = '<div style="display: grid; gap: 12px;">';
+    
+    items.forEach(item => {
+        html += `
+            <div class="card" style="padding: 16px; display: flex; justify-content: space-between; align-items: start;">
+                <div style="flex: 1;">
+                    <h6 style="margin-bottom: 8px;">${item.title}</h6>
+                    ${renderItemContent(item)}
+                </div>
+                <div style="display: flex; gap: 8px; margin-left: 12px;">
+                    <button class="btn btn-secondary" onclick="moveItemUp(${item.id})" style="padding: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 14l5-5 5 5z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-secondary" onclick="moveItemDown(${item.id})" style="padding: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteContentItem(${item.id})" style="padding: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        </svg>
                     </button>
                 </div>
-            `;
-        }
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    return html;
+}
 
+function renderItemContent(item) {
+    switch(item.type) {
+        case 'note':
+            return `<p style="opacity: 0.8; font-size: 14px;">${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}</p>`;
+        
+        case 'photo':
+            if (item.fileBlob) {
+                const blob = new Blob([item.fileBlob], { type: item.fileType });
+                const url = URL.createObjectURL(blob);
+                return `
+                    <div style="margin-top: 8px;">
+                        <img src="${url}" style="max-width: 100px; max-height: 80px; border-radius: 8px; cursor: pointer;" 
+                             onclick="openFullscreenImage('${url}')" alt="${item.title}">
+                    </div>
+                `;
+            }
+            break;
+            
+        case 'video':
+            if (item.fileBlob) {
+                const blob = new Blob([item.fileBlob], { type: item.fileType });
+                const url = URL.createObjectURL(blob);
+                return `
+                    <div style="margin-top: 8px;">
+                        <video src="${url}" style="max-width: 100px; max-height: 80px; border-radius: 8px; cursor: pointer;" 
+                               controls onclick="openFullscreenVideo('${url}')"></video>
+                    </div>
+                `;
+            }
+            break;
+            
+        case 'document':
+            return `<p style="opacity: 0.8; font-size: 14px;">📄 ${item.fileName}</p>`;
+    }
+    
+    return '';
+}
+function openFullscreenImage(url) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
+            <img src="${url}" style="max-width: 100%; max-height: 100%; border-radius: 12px;">
+            <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))" 
+                    style="position: absolute; top: 20px; right: 20px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function openFullscreenVideo(url) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
+            <video src="${url}" controls autoplay style="max-width: 100%; max-height: 100%; border-radius: 12px;"></video>
+            <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))" 
+                    style="position: absolute; top: 20px; right: 20px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function moveItemUp(itemId) {
+    const items = await dbAction('items', 'getAll');
+    const item = items.find(i => i.id === itemId);
+    const categoryItems = items.filter(i => i.categoryId === item.categoryId)
+                              .sort((a, b) => a.order - b.order);
+    
+    const currentIndex = categoryItems.findIndex(i => i.id === itemId);
+    if (currentIndex > 0) {
+        // Échanger avec l'élément précédent
+        const tempOrder = categoryItems[currentIndex].order;
+        categoryItems[currentIndex].order = categoryItems[currentIndex - 1].order;
+        categoryItems[currentIndex - 1].order = tempOrder;
+        
+        await dbAction('items', 'put', categoryItems[currentIndex]);
+        await dbAction('items', 'put', categoryItems[currentIndex - 1]);
+        
+        loadCategoryContent();
+    }
+}
+
+async function moveItemDown(itemId) {
+    const items = await dbAction('items', 'getAll');
+    const item = items.find(i => i.id === itemId);
+    const categoryItems = items.filter(i => i.categoryId === item.categoryId)
+                              .sort((a, b) => a.order - b.order);
+    
+    const currentIndex = categoryItems.findIndex(i => i.id === itemId);
+    if (currentIndex < categoryItems.length - 1) {
+        // Échanger avec l'élément suivant
+        const tempOrder = categoryItems[currentIndex].order;
+        categoryItems[currentIndex].order = categoryItems[currentIndex + 1].order;
+        categoryItems[currentIndex + 1].order = tempOrder;
+        
+        await dbAction('items', 'put', categoryItems[currentIndex]);
+        await dbAction('items', 'put', categoryItems[currentIndex + 1]);
+        
+        loadCategoryContent();
+    }
+}
+
+async function deleteContentItem(itemId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+        const confirmation = prompt('Tapez "SUPPRIMER" pour confirmer :');
+        if (confirmation === 'SUPPRIMER') {
+            // Soft delete - déplacer vers la corbeille
+            const item = await dbAction('items', 'get', itemId);
+            const trashItem = {
+                originalStore: 'items',
+                originalData: item,
+                deletedAt: new Date()
+            };
+            
+            await dbAction('trash', 'add', trashItem);
+            await dbAction('items', 'delete', itemId);
+            
+            loadCategoryContent();
+            showNotification('Élément déplacé vers la corbeille');
+        }
+    }
+}
+
+function showNotification(message) {
+    // Créer une notification toast
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--primary);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
         // =============================================================================
         // EMPLOI DU TEMPS
         // =============================================================================
@@ -1344,9 +1581,172 @@
             }
         }
 
-        function showAddContentModal() {
-            alert('Fonctionnalité à implémenter: Ajout de contenu');
+       function showAddContentModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Ajouter du contenu - ${currentTab.toUpperCase()}</h3>
+            <div class="form-group">
+                <label class="form-label">Titre</label>
+                <input type="text" id="content-title" class="form-input" placeholder="Titre du contenu">
+            </div>
+            
+            ${getContentFieldsByType()}
+            
+            <div class="form-group">
+                <label class="form-label">Catégorie</label>
+                <select id="content-category" class="form-input">
+                    <option value="">Sélectionner une catégorie</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="addContentItem()">Ajouter</button>
+                <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    loadCategoriesForModal();
+}
+
+function getContentFieldsByType() {
+    switch(currentTab) {
+        case 'photo':
+            return `
+                <div class="form-group">
+                    <label class="form-label">Image</label>
+                    <input type="file" id="content-file" class="form-input" accept="image/*" onchange="previewImage(this)">
+                    <div id="image-preview" style="margin-top: 10px;"></div>
+                </div>
+            `;
+        case 'video':
+            return `
+                <div class="form-group">
+                    <label class="form-label">Vidéo</label>
+                    <input type="file" id="content-file" class="form-input" accept="video/*" onchange="previewVideo(this)">
+                    <div id="video-preview" style="margin-top: 10px;"></div>
+                </div>
+            `;
+        case 'document':
+            return `
+                <div class="form-group">
+                    <label class="form-label">Document PDF</label>
+                    <input type="file" id="content-file" class="form-input" accept=".pdf">
+                </div>
+            `;
+        case 'note':
+            return `
+                <div class="form-group">
+                    <label class="form-label">Contenu de la note</label>
+                    <textarea id="content-text" class="form-input" placeholder="Écrivez votre note..." rows="6"></textarea>
+                </div>
+            `;
+        default:
+            return '';
+    }
+}
+
+async function loadCategoriesForModal() {
+    const categories = await dbAction('categories', 'getAll');
+    const subjectCategories = categories.filter(c => c.subjectId === currentSubjectId && c.type === currentTab);
+    const select = document.getElementById('content-category');
+    
+    subjectCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        select.appendChild(option);
+    });
+}
+async function addContentItem() {
+    const title = document.getElementById('content-title').value;
+    const categoryId = document.getElementById('content-category').value;
+    
+    if (!title.trim()) {
+        alert('Veuillez entrer un titre');
+        return;
+    }
+    
+    if (!categoryId) {
+        alert('Veuillez sélectionner une catégorie');
+        return;
+    }
+    
+    const contentItem = {
+        categoryId: parseInt(categoryId),
+        type: currentTab,
+        title: title.trim(),
+        content: '',
+        fileBlob: null,
+        order: 0,
+        createdAt: new Date()
+    };
+    
+    // Gestion spécifique selon le type
+    switch(currentTab) {
+        case 'note':
+            const noteContent = document.getElementById('content-text').value;
+            if (!noteContent.trim()) {
+                alert('Veuillez écrire le contenu de la note');
+                return;
+            }
+            contentItem.content = noteContent.trim();
+            break;
+            
+        case 'photo':
+        case 'video':
+        case 'document':
+            const fileInput = document.getElementById('content-file');
+            if (!fileInput.files[0]) {
+                alert(`Veuillez sélectionner un fichier ${currentTab}`);
+                return;
+            }
+            
+            const arrayBuffer = await fileInput.files[0].arrayBuffer();
+            contentItem.fileBlob = arrayBuffer;
+            contentItem.fileName = fileInput.files[0].name;
+            contentItem.fileType = fileInput.files[0].type;
+            break;
+    }
+    
+    await dbAction('items', 'add', contentItem);
+    hideModal(document.querySelector('.modal.active'));
+    loadCategoryContent(); // Recharger l'affichage du contenu
+}
+function previewImage(input) {
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = '';
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.maxWidth = '200px';
+            img.style.maxHeight = '150px';
+            img.style.borderRadius = '8px';
+            preview.appendChild(img);
         }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function previewVideo(input) {
+    const preview = document.getElementById('video-preview');
+    preview.innerHTML = '';
+    
+    if (input.files && input.files[0]) {
+        const video = document.createElement('video');
+        video.src = URL.createObjectURL(input.files[0]);
+        video.controls = true;
+        video.style.maxWidth = '200px';
+        video.style.maxHeight = '150px';
+        video.style.borderRadius = '8px';
+        preview.appendChild(video);
+    }
+}
 
         function showAddTimeslotModal() {
             alert('Fonctionnalité à implémenter: Ajout de créneau');
