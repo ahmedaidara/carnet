@@ -418,6 +418,64 @@
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
+      
+      .timetable-cell {
+    min-height: 80px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.timetable-cell:hover {
+    background: rgba(108, 99, 255, 0.05);
+}
+
+.time-slot {
+    padding: 6px 8px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.time-slot:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.timetable-header {
+    background: var(--primary);
+    color: white;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 12px;
+    position: sticky;
+    top: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .timetable {
+        font-size: 10px;
+    }
+    
+    .timetable-header {
+        padding: 8px 4px;
+        font-size: 10px;
+    }
+    
+    .time-slot {
+        padding: 4px 6px;
+        font-size: 9px;
+    }
+    
+    .timetable-cell {
+        min-height: 60px;
+    }
+}
     </style>
 </head>
 <body>
@@ -1393,26 +1451,218 @@ function showNotification(message) {
         // =============================================================================
         // EMPLOI DU TEMPS
         // =============================================================================
-        async function loadTimetablePage() {
-            const timetable = await dbAction('timetable', 'getAll');
-            const contextTimetable = timetable.filter(t => t.context === currentContext);
+       async function loadTimetablePage() {
+    const timetable = await dbAction('timetable', 'getAll');
+    const subjects = await dbAction('subjects', 'getAll');
+    const contextTimetable = timetable.filter(t => t.context === currentContext);
+    
+    const container = document.getElementById('timetable-container');
+    
+    if (contextTimetable.length === 0) {
+        container.innerHTML = `
+            <div class="card glass" style="text-align: center; padding: 40px;">
+                <h3>Aucun créneau programmé</h3>
+                <p style="margin: 16px 0; opacity: 0.7;">Commencez par ajouter votre premier créneau</p>
+                <button class="btn btn-primary" onclick="showAddTimeslotModal()">
+                    Ajouter un créneau
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = `
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h3>Emploi du temps - ${currentContext === 'school' ? 'École/Université' : 'Maison'}</h3>
+            <button class="btn btn-secondary" onclick="exportTimetable()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                Exporter
+            </button>
+        </div>
+        <div class="timetable">
+            <div class="timetable-header">Horaire</div>
+            <div class="timetable-header">Lundi</div>
+            <div class="timetable-header">Mardi</div>
+            <div class="timetable-header">Mercredi</div>
+            <div class="timetable-header">Jeudi</div>
+            <div class="timetable-header">Vendredi</div>
+            <div class="timetable-header">Samedi</div>
+            <div class="timetable-header">Dimanche</div>
             
-            const container = document.getElementById('timetable-container');
-            container.innerHTML = `
-                <div class="timetable">
-                    <div class="timetable-header"></div>
-                    <div class="timetable-header">Lun</div>
-                    <div class="timetable-header">Mar</div>
-                    <div class="timetable-header">Mer</div>
-                    <div class="timetable-header">Jeu</div>
-                    <div class="timetable-header">Ven</div>
-                    <div class="timetable-header">Sam</div>
-                    <div class="timetable-header">Dim</div>
-                    
-                    ${generateTimeSlots(contextTimetable)}
-                </div>
-            `;
+            ${generateTimetableGrid(contextTimetable, subjects)}
+        </div>
+    `;
+}
+
+function generateTimetableGrid(timetable, subjects) {
+    let html = '';
+    const timeSlots = generateTimeSlots();
+    const days = [1, 2, 3, 4, 5, 6, 7];
+    
+    timeSlots.forEach(timeSlot => {
+        const [startTime, endTime] = timeSlot.split('-');
+        html += `<div class="timetable-header">${timeSlot}</div>`;
+        
+        days.forEach(day => {
+            const slots = timetable.filter(t => 
+                t.day === day && 
+                t.startTime === startTime && 
+                t.endTime === endTime
+            );
+            
+            html += `<div class="timetable-cell" data-day="${day}" data-time="${timeSlot}">`;
+            
+            slots.forEach(slot => {
+                const subject = subjects.find(s => s.id === slot.subjectId);
+                const subjectName = subject ? subject.name : 'Sans matière';
+                const subjectColor = subject ? subject.color : '#6C63FF';
+                
+                html += `
+                    <div class="time-slot" 
+                         style="background: ${subjectColor}; cursor: pointer;"
+                         onclick="editTimeslot(${slot.id})"
+                         title="Cliquer pour modifier">
+                        <div style="font-weight: 600; margin-bottom: 2px;">${subjectName}</div>
+                        ${slot.room ? `<div style="font-size: 10px; opacity: 0.9;">${slot.room}</div>` : ''}
+                        ${slot.notes ? `<div style="font-size: 9px; opacity: 0.8; margin-top: 2px;">${slot.notes}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            // Ajouter un bouton pour ajouter un créneau dans cette cellule
+            if (slots.length === 0) {
+                html += `
+                    <button class="btn btn-secondary" 
+                            style="width: 100%; padding: 4px; font-size: 10px; margin-top: 4px;"
+                            onclick="addTimeslotToCell(${day}, '${startTime}', '${endTime}')">
+                        +
+                    </button>
+                `;
+            }
+            
+            html += `</div>`;
+        });
+    });
+    
+    return html;
+}
+
+function generateTimeSlots() {
+    const slots = [];
+    for (let hour = 8; hour <= 20; hour++) {
+        for (let minute of ['00', '30']) {
+            const startTime = `${hour.toString().padStart(2, '0')}:${minute}`;
+            let endHour = hour;
+            let endMinute = minute === '00' ? '30' : '00';
+            
+            if (minute === '30') {
+                endHour = hour + 1;
+                endMinute = '00';
+            }
+            
+            const endTime = `${endHour.toString().padStart(2, '0')}:${endMinute}`;
+            slots.push(`${startTime}-${endTime}`);
         }
+    }
+    return slots;
+}
+
+function addTimeslotToCell(day, startTime, endTime) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Nouveau créneau</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Jour: ${getDayName(day)}</label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Horaire: ${startTime} - ${endTime}</label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Matière</label>
+                <select id="cell-timeslot-subject" class="form-input">
+                    <option value="">Sélectionner une matière</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Salle/Lieu</label>
+                <input type="text" id="cell-timeslot-room" class="form-input" placeholder="Ex: Salle 201, Maison...">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea id="cell-timeslot-notes" class="form-input" placeholder="Notes supplémentaires..." rows="2"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveCellTimeslot(${day}, '${startTime}', '${endTime}')">
+                    Créer
+                </button>
+                <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Charger les matières
+    loadSubjectsForCellTimeslot();
+}
+
+function getDayName(dayNumber) {
+    const days = ['', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    return days[dayNumber];
+}
+
+async function loadSubjectsForCellTimeslot() {
+    const subjects = await dbAction('subjects', 'getAll');
+    const select = document.getElementById('cell-timeslot-subject');
+    
+    subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject.id;
+        option.textContent = subject.name;
+        select.appendChild(option);
+    });
+}
+
+async function saveCellTimeslot(day, startTime, endTime) {
+    const subjectId = document.getElementById('cell-timeslot-subject').value;
+    const room = document.getElementById('cell-timeslot-room').value;
+    const notes = document.getElementById('cell-timeslot-notes').value;
+    
+    if (!subjectId) {
+        alert('Veuillez sélectionner une matière');
+        return;
+    }
+    
+    const timeslot = {
+        context: currentContext,
+        day: day,
+        startTime: startTime,
+        endTime: endTime,
+        subjectId: parseInt(subjectId),
+        room: room.trim(),
+        notes: notes.trim(),
+        createdAt: new Date()
+    };
+    
+    await dbAction('timetable', 'add', timeslot);
+    hideModal(document.querySelector('.modal.active'));
+    loadTimetablePage();
+    showNotification('Créneau ajouté avec succès');
+}
+
+function exportTimetable() {
+    // Fonction d'export simplifiée
+    alert('Fonction d\'export à implémenter');
+}
 
         function generateTimeSlots(timetable) {
             let html = '';
@@ -1435,14 +1685,20 @@ function showNotification(message) {
             return html;
         }
 
-        function switchTimetableContext(context) {
-            currentContext = context;
-            document.getElementById('school-context-btn').classList.toggle('btn-primary', context === 'school');
-            document.getElementById('school-context-btn').classList.toggle('btn-secondary', context !== 'school');
-            document.getElementById('home-context-btn').classList.toggle('btn-primary', context === 'home');
-            document.getElementById('home-context-btn').classList.toggle('btn-secondary', context !== 'home');
-            loadTimetablePage();
-        }
+       function switchTimetableContext(context) {
+    currentContext = context;
+    document.getElementById('school-context-btn').classList.toggle('btn-primary', context === 'school');
+    document.getElementById('school-context-btn').classList.toggle('btn-secondary', context !== 'school');
+    document.getElementById('home-context-btn').classList.toggle('btn-primary', context === 'home');
+    document.getElementById('home-context-btn').classList.toggle('btn-secondary', context !== 'home');
+    
+    // Demander la permission pour les notifications au premier changement
+    if (Notification.permission === 'default') {
+        requestNotificationPermission();
+    }
+    
+    loadTimetablePage();
+}
 
         // =============================================================================
         // BIBLIOTHÈQUE PDF
@@ -1748,10 +2004,267 @@ function previewVideo(input) {
     }
 }
 
-        function showAddTimeslotModal() {
-            alert('Fonctionnalité à implémenter: Ajout de créneau');
+       function showAddTimeslotModal(editingSlot = null) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>${editingSlot ? 'Modifier' : 'Nouveau'} créneau</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Jour</label>
+                <select id="timeslot-day" class="form-input">
+                    <option value="1">Lundi</option>
+                    <option value="2">Mardi</option>
+                    <option value="3">Mercredi</option>
+                    <option value="4">Jeudi</option>
+                    <option value="5">Vendredi</option>
+                    <option value="6">Samedi</option>
+                    <option value="7">Dimanche</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Horaire de début</label>
+                <select id="timeslot-start" class="form-input">
+                    ${generateTimeOptions()}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Horaire de fin</label>
+                <select id="timeslot-end" class="form-input">
+                    ${generateTimeOptions()}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Matière</label>
+                <select id="timeslot-subject" class="form-input">
+                    <option value="">Sélectionner une matière</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Salle/Lieu</label>
+                <input type="text" id="timeslot-room" class="form-input" placeholder="Ex: Salle 201, Maison...">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea id="timeslot-notes" class="form-input" placeholder="Notes supplémentaires..." rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Rappel</label>
+                <input type="datetime-local" id="timeslot-reminder" class="form-input">
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveTimeslot(${editingSlot ? editingSlot.id : 'null'})">
+                    ${editingSlot ? 'Modifier' : 'Créer'}
+                </button>
+                <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
+                ${editingSlot ? `
+                    <button class="btn btn-danger" onclick="deleteTimeslot(${editingSlot.id})" style="margin-left: auto;">
+                        Supprimer
+                    </button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Charger les matières
+    loadSubjectsForTimeslot();
+    
+    // Pré-remplir si édition
+    if (editingSlot) {
+        document.getElementById('timeslot-day').value = editingSlot.day;
+        document.getElementById('timeslot-start').value = editingSlot.startTime;
+        document.getElementById('timeslot-end').value = editingSlot.endTime;
+        document.getElementById('timeslot-subject').value = editingSlot.subjectId || '';
+        document.getElementById('timeslot-room').value = editingSlot.room || '';
+        document.getElementById('timeslot-notes').value = editingSlot.notes || '';
+        
+        if (editingSlot.reminder) {
+            const reminderDate = new Date(editingSlot.reminder);
+            document.getElementById('timeslot-reminder').value = reminderDate.toISOString().slice(0, 16);
         }
+    } else {
+        // Définir l'heure de fin par défaut (1h après le début)
+        const startSelect = document.getElementById('timeslot-start');
+        const endSelect = document.getElementById('timeslot-end');
+        startSelect.addEventListener('change', function() {
+            const startTime = this.value;
+            if (startTime) {
+                const [hours, minutes] = startTime.split(':').map(Number);
+                let endHours = hours + 1;
+                if (endHours > 23) endHours = 23;
+                const endTime = `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                
+                if (endSelect.querySelector(`option[value="${endTime}"]`)) {
+                    endSelect.value = endTime;
+                }
+            }
+        });
+    }
+}
 
+function generateTimeOptions() {
+    let options = '';
+    for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            options += `<option value="${time}">${time}</option>`;
+        }
+    }
+    return options;
+}
+
+async function loadSubjectsForTimeslot() {
+    const subjects = await dbAction('subjects', 'getAll');
+    const select = document.getElementById('timeslot-subject');
+    
+    subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject.id;
+        option.textContent = subject.name;
+        select.appendChild(option);
+    });
+}
+      
+      async function saveTimeslot(editingId = null) {
+    const day = parseInt(document.getElementById('timeslot-day').value);
+    const startTime = document.getElementById('timeslot-start').value;
+    const endTime = document.getElementById('timeslot-end').value;
+    const subjectId = document.getElementById('timeslot-subject').value;
+    const room = document.getElementById('timeslot-room').value;
+    const notes = document.getElementById('timeslot-notes').value;
+    const reminder = document.getElementById('timeslot-reminder').value;
+    
+    // Validation
+    if (!day) {
+        alert('Veuillez sélectionner un jour');
+        return;
+    }
+    
+    if (!startTime || !endTime) {
+        alert('Veuillez sélectionner les horaires de début et de fin');
+        return;
+    }
+    
+    if (startTime >= endTime) {
+        alert('L\'heure de fin doit être après l\'heure de début');
+        return;
+    }
+    
+    // Vérifier les conflits d'horaire
+    const existingSlots = await dbAction('timetable', 'getAll');
+    const contextSlots = existingSlots.filter(slot => 
+        slot.context === currentContext && 
+        slot.day === day &&
+        slot.id !== editingId // Exclure le créneau en cours d'édition
+    );
+    
+    const hasConflict = contextSlots.some(slot => {
+        return (startTime < slot.endTime && endTime > slot.startTime);
+    });
+    
+    if (hasConflict) {
+        if (!confirm('Ce créneau chevauche un autre créneau existant. Voulez-vous quand même l\'enregistrer ?')) {
+            return;
+        }
+    }
+    
+    const timeslot = {
+        context: currentContext,
+        day: day,
+        startTime: startTime,
+        endTime: endTime,
+        subjectId: subjectId ? parseInt(subjectId) : null,
+        room: room.trim(),
+        notes: notes.trim(),
+        reminder: reminder ? new Date(reminder) : null,
+        createdAt: new Date()
+    };
+    
+    if (editingId) {
+        timeslot.id = editingId;
+        await dbAction('timetable', 'put', timeslot);
+        showNotification('Créneau modifié avec succès');
+    } else {
+        await dbAction('timetable', 'add', timeslot);
+        showNotification('Créneau ajouté avec succès');
+    }
+    
+    hideModal(document.querySelector('.modal.active'));
+    loadTimetablePage();
+    
+    // Planifier le rappel si défini
+    if (reminder) {
+        scheduleReminder(timeslot);
+    }
+}
+
+      async function deleteTimeslot(slotId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce créneau ?')) {
+        const confirmation = prompt('Tapez "SUPPRIMER" pour confirmer :');
+        if (confirmation === 'SUPPRIMER') {
+            // Soft delete
+            const slot = await dbAction('timetable', 'get', slotId);
+            const trashItem = {
+                originalStore: 'timetable',
+                originalData: slot,
+                deletedAt: new Date()
+            };
+            
+            await dbAction('trash', 'add', trashItem);
+            await dbAction('timetable', 'delete', slotId);
+            
+            hideModal(document.querySelector('.modal.active'));
+            loadTimetablePage();
+            showNotification('Créneau supprimé');
+        }
+    }
+}
+
+function editTimeslot(slotId) {
+    // Cette fonction sera appelée quand on clique sur un créneau
+    dbAction('timetable', 'get', slotId).then(slot => {
+        showAddTimeslotModal(slot);
+    });
+}
+
+function scheduleReminder(timeslot) {
+    if (!timeslot.reminder) return;
+    
+    const now = new Date();
+    const reminderTime = new Date(timeslot.reminder);
+    
+    if (reminderTime > now) {
+        const timeout = reminderTime.getTime() - now.getTime();
+        
+        setTimeout(() => {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Rappel - Carnet de l\'élève', {
+                    body: `Créneau: ${getSubjectName(timeslot.subjectId)} - ${timeslot.startTime} à ${timeslot.endTime}`,
+                    icon: '/icon.png',
+                    tag: `reminder-${timeslot.id}`
+                });
+            } else {
+                alert(`📚 Rappel: ${getSubjectName(timeslot.subjectId)} de ${timeslot.startTime} à ${timeslot.endTime}`);
+            }
+        }, timeout);
+    }
+}
+
+// Demander la permission pour les notifications
+function requestNotificationPermission() {
+    if ('Notification' in window) {
+        Notification.requestPermission();
+    }
+}
         function openPdf(id) {
             alert(`Ouvrir PDF ${id} - Fonctionnalité à implémenter`);
         }
