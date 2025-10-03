@@ -1,0 +1,2442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnet de l'élève</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --accent: #ff9e4a;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --pastel-blue: #d4e1f5;
+            --pastel-green: #d4f5e1;
+            --pastel-yellow: #f5f0d4;
+            --pastel-pink: #f5d4e1;
+            --border-radius: 8px;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --light: #343a40;
+            --dark: #f8f9fa;
+            --pastel-blue: #2a3b5a;
+            --pastel-green: #2a5a3b;
+            --pastel-yellow: #5a4f2a;
+            --pastel-pink: #5a2a3b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        nav {
+            background-color: var(--secondary);
+            padding: 0.5rem 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .nav-tabs li {
+            margin-right: 1rem;
+        }
+
+        .nav-tabs a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            display: block;
+            transition: var(--transition);
+        }
+
+        .nav-tabs a.active, .nav-tabs a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .card {
+            background-color: #495057;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-delete {
+            background-color: transparent;
+            color: #888;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-delete:hover {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] input, 
+        [data-theme="dark"] select, 
+        [data-theme="dark"] textarea {
+            background-color: #495057;
+            border-color: #6c757d;
+            color: var(--dark);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.25);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        [data-theme="dark"] .modal-content {
+            background-color: #495057;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        [data-theme="dark"] .close-modal {
+            color: var(--light);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 1.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .subject-card {
+            background-color: var(--pastel-blue);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .subject-card:nth-child(2n) {
+            background-color: var(--pastel-green);
+        }
+
+        .subject-card:nth-child(3n) {
+            background-color: var(--pastel-yellow);
+        }
+
+        .subject-card:nth-child(4n) {
+            background-color: var(--pastel-pink);
+        }
+
+        .subject-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .subject-coeff {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .subject-average {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .sparkline {
+            height: 40px;
+            margin: 10px 0;
+        }
+
+        .assignment-item, .grade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        [data-theme="dark"] .assignment-item, 
+        [data-theme="dark"] .grade-item {
+            border-bottom-color: #6c757d;
+        }
+
+        .assignment-item:last-child, .grade-item:last-child {
+            border-bottom: none;
+        }
+
+        .assignment-info, .grade-info {
+            flex: 1;
+        }
+
+        .assignment-title, .grade-assignment {
+            font-weight: 500;
+        }
+
+        .assignment-details, .grade-details {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .grade-score {
+            font-weight: bold;
+        }
+
+        .file-preview {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            max-width: 100px;
+            text-align: center;
+        }
+
+        .file-preview img {
+            max-width: 100%;
+            max-height: 80px;
+        }
+
+        .file-preview .file-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .onboarding {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .onboarding h1 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .onboarding p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #666;
+            margin: 1rem 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        [data-theme="dark"] .stat-card {
+            background-color: #495057;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .countdown {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+            
+            .print-only {
+                display: block;
+            }
+            
+            body {
+                background-color: white;
+                color: black;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="no-print">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Carnet de l'élève</div>
+                <div class="user-info">
+                    <span id="user-greeting">Bonjour</span>
+                    <button class="theme-toggle" id="theme-toggle">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="no-print">
+        <div class="container">
+            <ul class="nav-tabs">
+                <li><a href="#" class="nav-link active" data-section="dashboard">Tableau de bord</a></li>
+                <li><a href="#" class="nav-link" data-section="subjects">Matières</a></li>
+                <li><a href="#" class="nav-link" data-section="assignments">Devoirs</a></li>
+                <li><a href="#" class="nav-link" data-section="grades">Notes</a></li>
+                <li><a href="#" class="nav-link" data-section="bulletin">Bulletin</a></li>
+                <li><a href="#" class="nav-link" data-section="trash">Corbeille</a></li>
+                <li><a href="#" class="nav-link" data-section="settings">Paramètres</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <!-- Section Tableau de bord -->
+            <section id="dashboard" class="section active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title" id="dashboard-title">Tableau de bord</h2>
+                    </div>
+                    <div id="dashboard-content">
+                        <!-- Contenu dynamique -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Matières -->
+            <section id="subjects" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Matières</h2>
+                        <button class="btn" id="add-subject-btn">Ajouter une matière</button>
+                    </div>
+                    <div id="subjects-list">
+                        <!-- Liste des matières -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Devoirs -->
+            <section id="assignments" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Devoirs</h2>
+                        <button class="btn" id="add-assignment-btn">Ajouter un devoir</button>
+                    </div>
+                    <div id="assignments-list">
+                        <!-- Liste des devoirs -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Notes -->
+            <section id="grades" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Notes</h2>
+                        <button class="btn" id="add-grade-btn">Ajouter une note</button>
+                    </div>
+                    <div id="grades-list">
+                        <!-- Liste des notes -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Bulletin -->
+            <section id="bulletin" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Bulletin</h2>
+                        <button class="btn" id="print-bulletin-btn">Imprimer</button>
+                    </div>
+                    <div id="bulletin-content">
+                        <!-- Contenu du bulletin -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Corbeille -->
+            <section id="trash" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Corbeille</h2>
+                    </div>
+                    <div id="trash-content">
+                        <!-- Contenu de la corbeille -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Paramètres -->
+            <section id="settings" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Paramètres</h2>
+                    </div>
+                    <div id="settings-content">
+                        <!-- Contenu des paramètres -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="onboarding-modal" class="modal">
+        <div class="modal-content">
+            <div class="onboarding">
+                <h1>Bienvenue dans votre Carnet de l'élève</h1>
+                <p>Organisez vos matières, devoirs et notes en un seul endroit</p>
+                <p class="quote">"Chaque ligne apprise aujourd'hui allume une étoile pour demain."</p>
+                
+                <form id="onboarding-form">
+                    <div class="form-group">
+                        <label for="user-name">Votre nom</label>
+                        <input type="text" id="user-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user-role">Je suis</label>
+                        <select id="user-role" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="Écolier">Écolier</option>
+                            <option value="Étudiant">Étudiant</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user-class">Classe / Niveau</label>
+                        <input type="text" id="user-class" required>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Commencer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="subject-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="subject-modal-title">Ajouter une matière</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="subject-form">
+                <input type="hidden" id="subject-id">
+                <div class="form-group">
+                    <label for="subject-name">Nom de la matière</label>
+                    <input type="text" id="subject-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject-coefficient">Coefficient</label>
+                    <input type="number" id="subject-coefficient" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject-color">Couleur</label>
+                    <input type="color" id="subject-color" value="#4a6fa5">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="assignment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="assignment-modal-title">Ajouter un devoir</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="assignment-form">
+                <input type="hidden" id="assignment-id">
+                <div class="form-group">
+                    <label for="assignment-subject">Matière</label>
+                    <select id="assignment-subject" required>
+                        <option value="">Sélectionnez une matière</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assignment-title">Titre</label>
+                    <input type="text" id="assignment-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="assignment-type">Type</label>
+                    <select id="assignment-type" required>
+                        <option value="Devoir">Devoir</option>
+                        <option value="Composition">Composition</option>
+                        <option value="Examen">Examen</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assignment-coefficient">Coefficient</label>
+                    <input type="number" id="assignment-coefficient" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="assignment-due-date">Date d'échéance</label>
+                    <input type="date" id="assignment-due-date">
+                </div>
+                <div class="form-group">
+                    <label for="assignment-description">Description</label>
+                    <textarea id="assignment-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="assignment-attachments">Pièces jointes</label>
+                    <input type="file" id="assignment-attachments" multiple>
+                    <div id="assignment-attachments-preview"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="grade-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="grade-modal-title">Ajouter une note</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="grade-form">
+                <input type="hidden" id="grade-id">
+                <div class="form-group">
+                    <label for="grade-assignment">Devoir</label>
+                    <select id="grade-assignment" required>
+                        <option value="">Sélectionnez un devoir</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="grade-score">Note</label>
+                    <input type="number" id="grade-score" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="grade-max-score">Note maximale</label>
+                    <input type="number" id="grade-max-score" min="1" value="20" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirm-modal-title">Confirmation</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="confirm-modal-content">
+                <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="confirm-cancel">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirm-ok">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Suppression définitive</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="delete-confirm-content">
+                <p>Cette action est irréversible. Tapez <strong>SUPPRIMER</strong> pour confirmer.</p>
+                <div class="form-group">
+                    <input type="text" id="delete-confirm-input" placeholder="SUPPRIMER">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="delete-confirm-cancel">Annuler</button>
+                <button type="button" class="btn btn-danger" id="delete-confirm-ok" disabled>Supprimer définitivement</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="export-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Exporter les données</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="export-form">
+                <div class="form-group">
+                    <label for="export-password">Mot de passe (optionnel)</label>
+                    <input type="password" id="export-password" placeholder="Laissez vide pour exporter en clair">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Exporter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Importer des données</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="import-form">
+                <div class="form-group">
+                    <label for="import-file">Fichier à importer</label>
+                    <input type="file" id="import-file" required>
+                </div>
+                <div class="form-group">
+                    <label for="import-password">Mot de passe (si le fichier est chiffré)</label>
+                    <input type="password" id="import-password">
+                </div>
+                <div class="form-group">
+                    <label for="import-mode">Mode d'importation</label>
+                    <select id="import-mode">
+                        <option value="merge">Fusionner avec les données existantes</option>
+                        <option value="overwrite">Remplacer toutes les données</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Importer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="no-print">
+        <div class="container">
+            <p>Carnet de l'élève - Organisez votre réussite scolaire</p>
+        </div>
+    </footer>
+
+    <script>
+        // Structure de base de l'application
+        (function() {
+            'use strict';
+            
+            // Configuration
+            const CONFIG = {
+                trashRetentionDays: 30,
+                pbkdf2Iterations: 100000, // Peut être réduit à 1000 pour les tests
+                defaultMaxScore: 20
+            };
+            
+            // État de l'application
+            let appState = {
+                profile: null,
+                subjects: [],
+                assignments: [],
+                grades: [],
+                attachments: [],
+                trash: [],
+                currentSection: 'dashboard',
+                pendingAction: null
+            };
+            
+            // Références aux éléments DOM
+            const DOM = {
+                sections: document.querySelectorAll('.section'),
+                navLinks: document.querySelectorAll('.nav-link'),
+                modals: document.querySelectorAll('.modal'),
+                themeToggle: document.getElementById('theme-toggle'),
+                userGreeting: document.getElementById('user-greeting'),
+                dashboardContent: document.getElementById('dashboard-content'),
+                subjectsList: document.getElementById('subjects-list'),
+                assignmentsList: document.getElementById('assignments-list'),
+                gradesList: document.getElementById('grades-list'),
+                bulletinContent: document.getElementById('bulletin-content'),
+                trashContent: document.getElementById('trash-content'),
+                settingsContent: document.getElementById('settings-content')
+            };
+            
+            // Initialisation de la base de données
+            let db;
+            const DB_NAME = 'StudentNotebook';
+            const DB_VERSION = 1;
+            
+            // Stores IndexedDB
+            const DB_STORES = {
+                PROFILE: 'profile',
+                SUBJECTS: 'subjects',
+                ASSIGNMENTS: 'assignments',
+                GRADES: 'grades',
+                ATTACHMENTS: 'attachments',
+                BACKUPS: 'backups',
+                TRASH: 'trash',
+                LOGS: 'logs'
+            };
+            
+            // Initialisation de l'application
+            async function init() {
+                await initDB();
+                await loadAppData();
+                initEventListeners();
+                checkOnboarding();
+                updateUI();
+                
+                // Tenter de persister le stockage
+                if (navigator.storage && navigator.storage.persist) {
+                    navigator.storage.persist().then(granted => {
+                        if (granted) {
+                            console.log("Stockage persistant activé");
+                        }
+                    });
+                }
+                
+                // Exécuter les tests en mode développement
+                if (localStorage.getItem('devMode') === 'true') {
+                    selfTest();
+                }
+            }
+            
+            // Initialisation de la base de données
+            function initDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => {
+                        db = request.result;
+                        resolve(db);
+                    };
+                    
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        
+                        // Créer les stores s'ils n'existent pas
+                        if (!db.objectStoreNames.contains(DB_STORES.PROFILE)) {
+                            const profileStore = db.createObjectStore(DB_STORES.PROFILE, { keyPath: 'id', autoIncrement: true });
+                            profileStore.createIndex('createdAt', 'createdAt', { unique: false });
+                        }
+                        
+                        if (!db.objectStoreNames.contains(DB_STORES.SUBJECTS)) {
+                            const subjectsStore = db.createObjectStore(DB_STORES.SUBJECTS, { keyPath: 'id', autoIncrement: true });
+                            subjectsStore.createIndex('createdAt', 'createdAt', { unique: false });
+                        }
+                        
+                        if (!db.objectStoreNames.contains(DB_STORES.ASSIGNMENTS)) {
+                            const assignmentsStore = db.createObjectStore(DB_STORES.ASSIGNMENTS, { keyPath: 'id', autoIncrement: true });
+                            assignmentsStore.createIndex('subjectId', 'subjectId', { unique: false });
+                            assignmentsStore.createIndex('dueDate', 'dueDate', { unique: false });
+                            assignmentsStore.createIndex('createdAt', 'createdAt', { unique: false });
+                        }
+                        
+                        if (!db.objectStoreNames.contains(DB_STORES.GRADES)) {
+                            const gradesStore = db.createObjectStore(DB_STORES.GRADES, { keyPath: 'id', autoIncrement: true });
+                            gradesStore.createIndex('assignmentId', 'assignmentId', { unique: false });
+                            gradesStore.createIndex('createdAt', 'createdAt', { unique: false });
+                        }
+                        
+                        if (!db.objectStoreNames.contains(DB_STORES.ATTACHMENTS)) {
+                            const attachmentsStore = db.createObjectStore(DB_STORES.ATTACHMENTS, { keyPath: 'id', autoIncrement: true });
+                            attachmentsStore.createIndex('createdAt', 'createdAt', { unique: false });
+                        }
+                        
+                        if (!db.objectStoreNames.contains(DB_STORES.BACKUPS)) {
+                            const backupsStore = db.createObjectStore(DB_STORES.BACKUPS, { keyPath: 'id', autoIncrement: true });
+                            backupsStore.createIndex('createdAt', 'createdAt', { unique: false });
+                        }
+                        
+                        if (!db.objectStoreNames.contains(DB_STORES.TRASH)) {
+                            const trashStore = db.createObjectStore(DB_STORES.TRASH, { keyPath: 'id', autoIncrement: true });
+                            trashStore.createIndex('deletedAt', 'deletedAt', { unique: false });
+                            trashStore.createIndex('type', 'type', { unique: false });
+                        }
+                        
+                        if (!db.objectStoreNames.contains(DB_STORES.LOGS)) {
+                            const logsStore = db.createObjectStore(DB_STORES.LOGS, { keyPath: 'id', autoIncrement: true });
+                            logsStore.createIndex('createdAt', 'createdAt', { unique: false });
+                            logsStore.createIndex('action', 'action', { unique: false });
+                        }
+                    };
+                });
+            }
+            
+            // Charger les données de l'application
+            async function loadAppData() {
+                appState.profile = await getFromStore(DB_STORES.PROFILE, 'all');
+                appState.subjects = await getFromStore(DB_STORES.SUBJECTS, 'all');
+                appState.assignments = await getFromStore(DB_STORES.ASSIGNMENTS, 'all');
+                appState.grades = await getFromStore(DB_STORES.GRADES, 'all');
+                appState.attachments = await getFromStore(DB_STORES.ATTACHMENTS, 'all');
+                appState.trash = await getFromStore(DB_STORES.TRASH, 'all');
+                
+                // Charger les données de démonstration si la base est vide
+                if (appState.subjects.length === 0 && appState.assignments.length === 0) {
+                    await loadDemoData();
+                }
+            }
+            
+            // Charger les données de démonstration
+            async function loadDemoData() {
+                const demoSubjects = [
+                    { name: 'Mathématiques', coefficient: 3, color: '#4a6fa5' },
+                    { name: 'Français', coefficient: 3, color: '#6b8cbc' }
+                ];
+                
+                const demoAssignments = [
+                    { subjectId: 1, title: 'Devoir maison n°1', type: 'Devoir', coefficient: 1, dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] },
+                    { subjectId: 1, title: 'Contrôle sur les fonctions', type: 'Composition', coefficient: 2, dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] },
+                    { subjectId: 2, title: 'Commentaire de texte', type: 'Devoir', coefficient: 1, dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }
+                ];
+                
+                const demoGrades = [
+                    { assignmentId: 1, score: 15, maxScore: 20 },
+                    { assignmentId: 1, score: 17, maxScore: 20 },
+                    { assignmentId: 3, score: 12, maxScore: 20 }
+                ];
+                
+                for (const subject of demoSubjects) {
+                    await addToStore(DB_STORES.SUBJECTS, { ...subject, createdAt: new Date() });
+                }
+                
+                for (const assignment of demoAssignments) {
+                    await addToStore(DB_STORES.ASSIGNMENTS, { ...assignment, createdAt: new Date() });
+                }
+                
+                for (const grade of demoGrades) {
+                    await addToStore(DB_STORES.GRADES, { ...grade, createdAt: new Date() });
+                }
+                
+                // Recharger les données
+                await loadAppData();
+            }
+            
+            // Initialiser les écouteurs d'événements
+            function initEventListeners() {
+                // Navigation
+                DOM.navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const section = e.target.getAttribute('data-section');
+                        switchSection(section);
+                    });
+                });
+                
+                // Thème sombre/clair
+                DOM.themeToggle.addEventListener('click', toggleTheme);
+                
+                // Fermeture des modales
+                document.querySelectorAll('.close-modal').forEach(btn => {
+                    btn.addEventListener('click', closeAllModals);
+                });
+                
+                // Boutons d'ajout
+                document.getElementById('add-subject-btn').addEventListener('click', () => openModal('subject-modal'));
+                document.getElementById('add-assignment-btn').addEventListener('click', () => openModal('assignment-modal'));
+                document.getElementById('add-grade-btn').addEventListener('click', () => openModal('grade-modal'));
+                document.getElementById('print-bulletin-btn').addEventListener('click', printBulletin);
+                
+                // Formulaires
+                document.getElementById('onboarding-form').addEventListener('submit', handleOnboarding);
+                document.getElementById('subject-form').addEventListener('submit', handleSubjectForm);
+                document.getElementById('assignment-form').addEventListener('submit', handleAssignmentForm);
+                document.getElementById('grade-form').addEventListener('submit', handleGradeForm);
+                document.getElementById('export-form').addEventListener('submit', handleExport);
+                document.getElementById('import-form').addEventListener('submit', handleImport);
+                
+                // Confirmation de suppression
+                document.getElementById('confirm-ok').addEventListener('click', executePendingAction);
+                document.getElementById('confirm-cancel').addEventListener('click', cancelPendingAction);
+                
+                // Confirmation de suppression définitive
+                document.getElementById('delete-confirm-input').addEventListener('input', toggleDeleteConfirm);
+                document.getElementById('delete-confirm-ok').addEventListener('click', executeFinalDelete);
+                document.getElementById('delete-confirm-cancel').addEventListener('click', closeAllModals);
+                
+                // Gestion des fichiers
+                document.getElementById('assignment-attachments').addEventListener('change', handleFilePreview);
+            }
+            
+            // Vérifier si l'onboarding est nécessaire
+            function checkOnboarding() {
+                if (!appState.profile || appState.profile.length === 0) {
+                    openModal('onboarding-modal');
+                }
+            }
+            
+            // Mettre à jour l'interface utilisateur
+            function updateUI() {
+                updateGreeting();
+                updateDashboard();
+                updateSubjectsList();
+                updateAssignmentsList();
+                updateGradesList();
+                updateBulletin();
+                updateTrash();
+                updateSettings();
+            }
+            
+            // Mettre à jour le message de bienvenue
+            function updateGreeting() {
+                if (appState.profile && appState.profile.length > 0) {
+                    const profile = appState.profile[0];
+                    DOM.userGreeting.textContent = `Bonjour, ${profile.name}`;
+                    
+                    // Mettre à jour le titre du tableau de bord
+                    document.getElementById('dashboard-title').textContent = `Tableau de bord - ${profile.name}`;
+                }
+            }
+            
+            // Mettre à jour le tableau de bord
+            function updateDashboard() {
+                if (!appState.profile || appState.profile.length === 0) return;
+                
+                const profile = appState.profile[0];
+                const overallAverage = calculateOverallAverage();
+                const nextAssignment = getNextAssignment();
+                const countdown = nextAssignment ? getCountdown(nextAssignment.dueDate) : null;
+                const badges = getBadges();
+                
+                let content = `
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-value">${appState.subjects.length}</div>
+                            <div class="stat-label">Matières</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${appState.assignments.length}</div>
+                            <div class="stat-label">Devoirs</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${appState.grades.length}</div>
+                            <div class="stat-label">Notes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${overallAverage !== null ? overallAverage.toFixed(2) : '--'}</div>
+                            <div class="stat-label">Moyenne générale</div>
+                        </div>
+                    </div>
+                `;
+                
+                if (badges.length > 0) {
+                    content += `<div class="badges">`;
+                    badges.forEach(badge => {
+                        content += `<span class="badge">${badge}</span>`;
+                    });
+                    content += `</div>`;
+                }
+                
+                if (nextAssignment && countdown) {
+                    content += `
+                        <div class="countdown">
+                            Prochain devoir: ${nextAssignment.title} (${formatDate(nextAssignment.dueDate)})<br>
+                            ${countdown}
+                        </div>
+                    `;
+                }
+                
+                // Afficher une citation inspirante
+                const quotes = [
+                    "Chaque ligne apprise aujourd'hui allume une étoile pour demain.",
+                    "La persévérance transforme l'effort en excellence.",
+                    "Tes efforts d'aujourd'hui sont les succès de demain.",
+                    "Chaque note compte, chaque effort construit ton avenir."
+                ];
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                
+                content += `<p class="quote">${randomQuote}</p>`;
+                
+                // Afficher les matières avec leurs moyennes
+                content += `<h3>Moyennes par matière</h3>`;
+                content += `<div class="grid">`;
+                
+                appState.subjects.forEach(subject => {
+                    const average = calculateSubjectAverage(subject.id);
+                    const assignmentsCount = appState.assignments.filter(a => a.subjectId === subject.id).length;
+                    const gradesCount = appState.grades.filter(g => {
+                        const assignment = appState.assignments.find(a => a.id === g.assignmentId);
+                        return assignment && assignment.subjectId === subject.id;
+                    }).length;
+                    
+                    content += `
+                        <div class="subject-card" style="background-color: ${subject.color}20; border-left: 4px solid ${subject.color}">
+                            <div class="subject-name">${subject.name}</div>
+                            <div class="subject-coeff">Coefficient: ${subject.coefficient}</div>
+                            <div class="subject-average">${average !== null ? average.toFixed(2) : '--'}/20</div>
+                            <div class="subject-details">${assignmentsCount} devoir(s), ${gradesCount} note(s)</div>
+                        </div>
+                    `;
+                });
+                
+                content += `</div>`;
+                
+                DOM.dashboardContent.innerHTML = content;
+            }
+            
+            // Mettre à jour la liste des matières
+            function updateSubjectsList() {
+                let content = '';
+                
+                if (appState.subjects.length === 0) {
+                    content = '<p>Aucune matière enregistrée. Ajoutez votre première matière !</p>';
+                } else {
+                    appState.subjects.forEach(subject => {
+                        const average = calculateSubjectAverage(subject.id);
+                        const assignments = appState.assignments.filter(a => a.subjectId === subject.id);
+                        
+                        content += `
+                            <div class="card" style="border-left: 4px solid ${subject.color}">
+                                <div class="card-header">
+                                    <h3 class="card-title">${subject.name}</h3>
+                                    <div>
+                                        <button class="btn btn-small edit-subject" data-id="${subject.id}">Modifier</button>
+                                        <button class="btn btn-small btn-delete delete-subject" data-id="${subject.id}">Supprimer</button>
+                                    </div>
+                                </div>
+                                <p>Coefficient: ${subject.coefficient}</p>
+                                <p>Moyenne: ${average !== null ? average.toFixed(2) + '/20' : 'Aucune note'}</p>
+                                <p>Devoirs: ${assignments.length}</p>
+                            </div>
+                        `;
+                    });
+                }
+                
+                DOM.subjectsList.innerHTML = content;
+                
+                // Ajouter les écouteurs d'événements pour les boutons
+                document.querySelectorAll('.edit-subject').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        editSubject(id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-subject').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        confirmDelete('subject', id);
+                    });
+                });
+            }
+            
+            // Mettre à jour la liste des devoirs
+            function updateAssignmentsList() {
+                let content = '';
+                
+                if (appState.assignments.length === 0) {
+                    content = '<p>Aucun devoir enregistré. Ajoutez votre premier devoir !</p>';
+                } else {
+                    // Trier les devoirs par date d'échéance
+                    const sortedAssignments = [...appState.assignments].sort((a, b) => {
+                        if (!a.dueDate) return 1;
+                        if (!b.dueDate) return -1;
+                        return new Date(a.dueDate) - new Date(b.dueDate);
+                    });
+                    
+                    sortedAssignments.forEach(assignment => {
+                        const subject = appState.subjects.find(s => s.id === assignment.subjectId);
+                        const grades = appState.grades.filter(g => g.assignmentId === assignment.id);
+                        const average = grades.length > 0 ? 
+                            grades.reduce((sum, grade) => sum + (grade.score / grade.maxScore * 20), 0) / grades.length : null;
+                        
+                        content += `
+                            <div class="assignment-item">
+                                <div class="assignment-info">
+                                    <div class="assignment-title">${assignment.title}</div>
+                                    <div class="assignment-details">
+                                        ${subject ? subject.name : 'Matière inconnue'} • 
+                                        ${assignment.type} • 
+                                        Coefficient: ${assignment.coefficient}
+                                        ${assignment.dueDate ? ` • Échéance: ${formatDate(assignment.dueDate)}` : ''}
+                                        ${average !== null ? ` • Moyenne: ${average.toFixed(2)}/20` : ''}
+                                    </div>
+                                    ${assignment.description ? `<p>${assignment.description}</p>` : ''}
+                                </div>
+                                <div>
+                                    <button class="btn btn-small edit-assignment" data-id="${assignment.id}">Modifier</button>
+                                    <button class="btn btn-small btn-delete delete-assignment" data-id="${assignment.id}">Supprimer</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                DOM.assignmentsList.innerHTML = content;
+                
+                // Ajouter les écouteurs d'événements pour les boutons
+                document.querySelectorAll('.edit-assignment').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        editAssignment(id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-assignment').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        confirmDelete('assignment', id);
+                    });
+                });
+            }
+            
+            // Mettre à jour la liste des notes
+            function updateGradesList() {
+                let content = '';
+                
+                if (appState.grades.length === 0) {
+                    content = '<p>Aucune note enregistrée. Ajoutez votre première note !</p>';
+                } else {
+                    // Trier les notes par date de création (plus récentes en premier)
+                    const sortedGrades = [...appState.grades].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    
+                    sortedGrades.forEach(grade => {
+                        const assignment = appState.assignments.find(a => a.id === grade.assignmentId);
+                        const subject = assignment ? appState.subjects.find(s => s.id === assignment.subjectId) : null;
+                        const percentage = (grade.score / grade.maxScore * 100).toFixed(1);
+                        
+                        content += `
+                            <div class="grade-item">
+                                <div class="grade-info">
+                                    <div class="grade-assignment">${assignment ? assignment.title : 'Devoir inconnu'}</div>
+                                    <div class="grade-details">
+                                        ${subject ? subject.name : 'Matière inconnue'} • 
+                                        Note: ${grade.score}/${grade.maxScore} (${percentage}%)
+                                    </div>
+                                </div>
+                                <div class="grade-score">${(grade.score / grade.maxScore * 20).toFixed(2)}/20</div>
+                                <div>
+                                    <button class="btn btn-small edit-grade" data-id="${grade.id}">Modifier</button>
+                                    <button class="btn btn-small btn-delete delete-grade" data-id="${grade.id}">Supprimer</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                DOM.gradesList.innerHTML = content;
+                
+                // Ajouter les écouteurs d'événements pour les boutons
+                document.querySelectorAll('.edit-grade').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        editGrade(id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-grade').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        confirmDelete('grade', id);
+                    });
+                });
+            }
+            
+            // Mettre à jour le bulletin
+            function updateBulletin() {
+                let content = '';
+                const overallAverage = calculateOverallAverage();
+                
+                if (appState.subjects.length === 0) {
+                    content = '<p>Aucune matière enregistrée. Le bulletin ne peut pas être généré.</p>';
+                } else {
+                    content += `
+                        <div class="print-only">
+                            <h1>Bulletin Scolaire</h1>
+                            ${appState.profile && appState.profile.length > 0 ? `
+                                <p><strong>Élève:</strong> ${appState.profile[0].name}</p>
+                                <p><strong>Classe:</strong> ${appState.profile[0].class}</p>
+                                <p><strong>Période:</strong> ${new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
+                            ` : ''}
+                            <hr>
+                        </div>
+                    `;
+                    
+                    content += `<table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">`;
+                    content += `
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid #ddd;">Matière</th>
+                                <th style="text-align: center; padding: 0.5rem; border-bottom: 2px solid #ddd;">Coefficient</th>
+                                <th style="text-align: center; padding: 0.5rem; border-bottom: 2px solid #ddd;">Moyenne</th>
+                                <th style="text-align: center; padding: 0.5rem; border-bottom: 2px solid #ddd;">Appréciation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+                    
+                    appState.subjects.forEach(subject => {
+                        const average = calculateSubjectAverage(subject.id);
+                        const appreciation = getAppreciation(average);
+                        
+                        content += `
+                            <tr>
+                                <td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">${subject.name}</td>
+                                <td style="text-align: center; padding: 0.5rem; border-bottom: 1px solid #ddd;">${subject.coefficient}</td>
+                                <td style="text-align: center; padding: 0.5rem; border-bottom: 1px solid #ddd;">${average !== null ? average.toFixed(2) : '--'}</td>
+                                <td style="text-align: center; padding: 0.5rem; border-bottom: 1px solid #ddd;">${appreciation}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    content += `
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td style="padding: 0.5rem; border-top: 2px solid #ddd;" colspan="2"><strong>Moyenne générale</strong></td>
+                                <td style="text-align: center; padding: 0.5rem; border-top: 2px solid #ddd;"><strong>${overallAverage !== null ? overallAverage.toFixed(2) : '--'}</strong></td>
+                                <td style="text-align: center; padding: 0.5rem; border-top: 2px solid #ddd;"><strong>${getAppreciation(overallAverage)}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    `;
+                    
+                    // Ajouter le hash du bulletin comme preuve
+                    if (overallAverage !== null) {
+                        const bulletinData = {
+                            profile: appState.profile[0],
+                            subjects: appState.subjects.map(s => ({
+                                name: s.name,
+                                coefficient: s.coefficient,
+                                average: calculateSubjectAverage(s.id)
+                            })),
+                            overallAverage: overallAverage,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        generateSHA256(JSON.stringify(bulletinData)).then(hash => {
+                            content += `
+                                <div class="print-only">
+                                    <p style="font-size: 0.8rem; color: #666; margin-top: 2rem;">
+                                        Hash de vérification: ${hash}
+                                    </p>
+                                </div>
+                            `;
+                            DOM.bulletinContent.innerHTML = content;
+                        });
+                    } else {
+                        DOM.bulletinContent.innerHTML = content;
+                    }
+                }
+            }
+            
+            // Mettre à jour la corbeille
+            function updateTrash() {
+                let content = '';
+                
+                // Filtrer les éléments expirés
+                const now = new Date();
+                const validTrash = appState.trash.filter(item => {
+                    const deletedAt = new Date(item.deletedAt);
+                    const retentionDate = new Date(deletedAt.getTime() + CONFIG.trashRetentionDays * 24 * 60 * 60 * 1000);
+                    return now < retentionDate;
+                });
+                
+                if (validTrash.length === 0) {
+                    content = '<p>La corbeille est vide.</p>';
+                } else {
+                    content += `<p>Éléments dans la corbeille (conservés ${CONFIG.trashRetentionDays} jours):</p>`;
+                    
+                    validTrash.forEach(item => {
+                        const deletedDate = new Date(item.deletedAt);
+                        const retentionDate = new Date(deletedDate.getTime() + CONFIG.trashRetentionDays * 24 * 60 * 60 * 1000);
+                        const daysLeft = Math.ceil((retentionDate - now) / (24 * 60 * 60 * 1000));
+                        
+                        content += `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">${item.type}: ${getItemDisplayName(item)}</h3>
+                                    <div>
+                                        <button class="btn btn-small restore-item" data-id="${item.id}">Restaurer</button>
+                                        <button class="btn btn-small btn-delete delete-permanently" data-id="${item.id}">Supprimer définitivement</button>
+                                    </div>
+                                </div>
+                                <p>Supprimé le: ${formatDate(item.deletedAt)}</p>
+                                <p>Jours restants: ${daysLeft}</p>
+                            </div>
+                        `;
+                    });
+                }
+                
+                DOM.trashContent.innerHTML = content;
+                
+                // Ajouter les écouteurs d'événements pour les boutons
+                document.querySelectorAll('.restore-item').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        restoreFromTrash(id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-permanently').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        confirmFinalDelete(id);
+                    });
+                });
+            }
+            
+            // Mettre à jour les paramètres
+            function updateSettings() {
+                const isDevMode = localStorage.getItem('devMode') === 'true';
+                
+                let content = `
+                    <h3>Exportation et importation</h3>
+                    <p>Sauvegardez vos données ou importez des données précédemment exportées.</p>
+                    <div style="margin: 1rem 0;">
+                        <button class="btn" id="export-btn">Exporter les données</button>
+                        <button class="btn" id="import-btn">Importer des données</button>
+                    </div>
+                    
+                    <h3>Mode développeur</h3>
+                    <p>Activez le mode développeur pour exécuter des tests automatisés.</p>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="dev-mode-toggle" ${isDevMode ? 'checked' : ''}>
+                            Activer le mode développeur
+                        </label>
+                    </div>
+                    
+                    <h3>À propos</h3>
+                    <p>Carnet de l'élève - Version 1.0</p>
+                    <p>Application développée pour organiser votre réussite scolaire.</p>
+                `;
+                
+                DOM.settingsContent.innerHTML = content;
+                
+                // Ajouter les écouteurs d'événements
+                document.getElementById('export-btn').addEventListener('click', () => openModal('export-modal'));
+                document.getElementById('import-btn').addEventListener('click', () => openModal('import-modal'));
+                document.getElementById('dev-mode-toggle').addEventListener('change', (e) => {
+                    localStorage.setItem('devMode', e.target.checked);
+                    if (e.target.checked) {
+                        selfTest();
+                    }
+                });
+            }
+            
+            // Changer de section
+            function switchSection(sectionName) {
+                // Mettre à jour la navigation
+                DOM.navLinks.forEach(link => {
+                    if (link.getAttribute('data-section') === sectionName) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                
+                // Afficher la section active
+                DOM.sections.forEach(section => {
+                    if (section.id === sectionName) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                
+                appState.currentSection = sectionName;
+            }
+            
+            // Basculer le thème sombre/clair
+            function toggleTheme() {
+                const currentTheme = document.body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.body.setAttribute('data-theme', newTheme);
+                DOM.themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+                
+                localStorage.setItem('theme', newTheme);
+            }
+            
+            // Ouvrir une modale
+            function openModal(modalId) {
+                closeAllModals();
+                document.getElementById(modalId).classList.add('active');
+                
+                // Initialiser les sélecteurs si nécessaire
+                if (modalId === 'assignment-modal') {
+                    initSubjectSelector('assignment-subject');
+                } else if (modalId === 'grade-modal') {
+                    initAssignmentSelector('grade-assignment');
+                }
+            }
+            
+            // Fermer toutes les modales
+            function closeAllModals() {
+                DOM.modals.forEach(modal => modal.classList.remove('active'));
+                appState.pendingAction = null;
+            }
+            
+            // Gérer l'onboarding
+            function handleOnboarding(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('user-name').value;
+                const role = document.getElementById('user-role').value;
+                const userClass = document.getElementById('user-class').value;
+                
+                const profile = {
+                    name,
+                    role,
+                    class: userClass,
+                    createdAt: new Date()
+                };
+                
+                addToStore(DB_STORES.PROFILE, profile).then(() => {
+                    appState.profile = [profile];
+                    closeAllModals();
+                    updateUI();
+                });
+            }
+            
+            // Gérer le formulaire de matière
+            function handleSubjectForm(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('subject-id').value;
+                const name = document.getElementById('subject-name').value;
+                const coefficient = parseInt(document.getElementById('subject-coefficient').value);
+                const color = document.getElementById('subject-color').value;
+                
+                const subject = {
+                    name,
+                    coefficient,
+                    color,
+                    createdAt: new Date()
+                };
+                
+                if (id) {
+                    // Modification
+                    subject.id = parseInt(id);
+                    updateInStore(DB_STORES.SUBJECTS, subject).then(() => {
+                        loadAppData().then(updateUI);
+                        closeAllModals();
+                    });
+                } else {
+                    // Nouvelle matière
+                    addToStore(DB_STORES.SUBJECTS, subject).then(() => {
+                        loadAppData().then(updateUI);
+                        closeAllModals();
+                    });
+                }
+            }
+            
+            // Gérer le formulaire de devoir
+            function handleAssignmentForm(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('assignment-id').value;
+                const subjectId = parseInt(document.getElementById('assignment-subject').value);
+                const title = document.getElementById('assignment-title').value;
+                const type = document.getElementById('assignment-type').value;
+                const coefficient = parseInt(document.getElementById('assignment-coefficient').value);
+                const dueDate = document.getElementById('assignment-due-date').value;
+                const description = document.getElementById('assignment-description').value;
+                
+                const assignment = {
+                    subjectId,
+                    title,
+                    type,
+                    coefficient,
+                    dueDate: dueDate || null,
+                    description,
+                    attachments: [],
+                    createdAt: new Date()
+                };
+                
+                // Gérer les pièces jointes
+                const fileInput = document.getElementById('assignment-attachments');
+                if (fileInput.files.length > 0) {
+                    // Dans une implémentation complète, nous stockerions les fichiers dans IndexedDB
+                    // Pour cette démo, nous allons simplement enregistrer les noms
+                    assignment.attachments = Array.from(fileInput.files).map(file => file.name);
+                }
+                
+                if (id) {
+                    // Modification
+                    assignment.id = parseInt(id);
+                    updateInStore(DB_STORES.ASSIGNMENTS, assignment).then(() => {
+                        loadAppData().then(updateUI);
+                        closeAllModals();
+                    });
+                } else {
+                    // Nouveau devoir
+                    addToStore(DB_STORES.ASSIGNMENTS, assignment).then(() => {
+                        loadAppData().then(updateUI);
+                        closeAllModals();
+                    });
+                }
+            }
+            
+            // Gérer le formulaire de note
+            function handleGradeForm(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('grade-id').value;
+                const assignmentId = parseInt(document.getElementById('grade-assignment').value);
+                const score = parseFloat(document.getElementById('grade-score').value);
+                const maxScore = parseFloat(document.getElementById('grade-max-score').value);
+                
+                const grade = {
+                    assignmentId,
+                    score,
+                    maxScore,
+                    createdAt: new Date()
+                };
+                
+                if (id) {
+                    // Modification
+                    grade.id = parseInt(id);
+                    updateInStore(DB_STORES.GRADES, grade).then(() => {
+                        loadAppData().then(updateUI);
+                        closeAllModals();
+                    });
+                } else {
+                    // Nouvelle note
+                    addToStore(DB_STORES.GRADES, grade).then(() => {
+                        loadAppData().then(updateUI);
+                        closeAllModals();
+                    });
+                }
+            }
+            
+            // Modifier une matière
+            function editSubject(id) {
+                const subject = appState.subjects.find(s => s.id === id);
+                if (!subject) return;
+                
+                document.getElementById('subject-id').value = subject.id;
+                document.getElementById('subject-name').value = subject.name;
+                document.getElementById('subject-coefficient').value = subject.coefficient;
+                document.getElementById('subject-color').value = subject.color;
+                document.getElementById('subject-modal-title').textContent = 'Modifier la matière';
+                
+                openModal('subject-modal');
+            }
+            
+            // Modifier un devoir
+            function editAssignment(id) {
+                const assignment = appState.assignments.find(a => a.id === id);
+                if (!assignment) return;
+                
+                document.getElementById('assignment-id').value = assignment.id;
+                document.getElementById('assignment-title').value = assignment.title;
+                document.getElementById('assignment-type').value = assignment.type;
+                document.getElementById('assignment-coefficient').value = assignment.coefficient;
+                document.getElementById('assignment-due-date').value = assignment.dueDate || '';
+                document.getElementById('assignment-description').value = assignment.description || '';
+                document.getElementById('assignment-modal-title').textContent = 'Modifier le devoir';
+                
+                // Initialiser le sélecteur de matière
+                initSubjectSelector('assignment-subject', assignment.subjectId);
+                
+                openModal('assignment-modal');
+            }
+            
+            // Modifier une note
+            function editGrade(id) {
+                const grade = appState.grades.find(g => g.id === id);
+                if (!grade) return;
+                
+                document.getElementById('grade-id').value = grade.id;
+                document.getElementById('grade-score').value = grade.score;
+                document.getElementById('grade-max-score').value = grade.maxScore;
+                document.getElementById('grade-modal-title').textContent = 'Modifier la note';
+                
+                // Initialiser le sélecteur de devoir
+                initAssignmentSelector('grade-assignment', grade.assignmentId);
+                
+                openModal('grade-modal');
+            }
+            
+            // Initialiser le sélecteur de matière
+            function initSubjectSelector(selectId, selectedId = null) {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Sélectionnez une matière</option>';
+                
+                appState.subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.id;
+                    option.textContent = subject.name;
+                    option.selected = subject.id === selectedId;
+                    select.appendChild(option);
+                });
+            }
+            
+            // Initialiser le sélecteur de devoir
+            function initAssignmentSelector(selectId, selectedId = null) {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Sélectionnez un devoir</option>';
+                
+                appState.assignments.forEach(assignment => {
+                    const subject = appState.subjects.find(s => s.id === assignment.subjectId);
+                    const option = document.createElement('option');
+                    option.value = assignment.id;
+                    option.textContent = `${assignment.title} (${subject ? subject.name : 'Matière inconnue'})`;
+                    option.selected = assignment.id === selectedId;
+                    select.appendChild(option);
+                });
+            }
+            
+            // Confirmer la suppression
+            function confirmDelete(type, id) {
+                let itemName = '';
+                
+                switch (type) {
+                    case 'subject':
+                        const subject = appState.subjects.find(s => s.id === id);
+                        itemName = subject ? subject.name : 'Matière inconnue';
+                        break;
+                    case 'assignment':
+                        const assignment = appState.assignments.find(a => a.id === id);
+                        itemName = assignment ? assignment.title : 'Devoir inconnu';
+                        break;
+                    case 'grade':
+                        const grade = appState.grades.find(g => g.id === id);
+                        const gradeAssignment = grade ? appState.assignments.find(a => a.id === grade.assignmentId) : null;
+                        itemName = gradeAssignment ? `Note pour ${gradeAssignment.title}` : 'Note inconnue';
+                        break;
+                }
+                
+                document.getElementById('confirm-modal-title').textContent = `Supprimer ${type}`;
+                document.getElementById('confirm-modal-content').innerHTML = `
+                    <p>Êtes-vous sûr de vouloir supprimer "${itemName}" ?</p>
+                    <p>L'élément sera déplacé dans la corbeille et conservé ${CONFIG.trashRetentionDays} jours.</p>
+                `;
+                
+                appState.pendingAction = { type, id, itemName };
+                openModal('confirm-modal');
+            }
+            
+            // Exécuter l'action en attente
+            function executePendingAction() {
+                if (!appState.pendingAction) return;
+                
+                const { type, id, itemName } = appState.pendingAction;
+                
+                // Déplacer l'élément dans la corbeille
+                let itemData = null;
+                
+                switch (type) {
+                    case 'subject':
+                        itemData = appState.subjects.find(s => s.id === id);
+                        break;
+                    case 'assignment':
+                        itemData = appState.assignments.find(a => a.id === id);
+                        break;
+                    case 'grade':
+                        itemData = appState.grades.find(g => g.id === id);
+                        break;
+                }
+                
+                if (itemData) {
+                    const trashItem = {
+                        type,
+                        data: itemData,
+                        deletedAt: new Date()
+                    };
+                    
+                    addToStore(DB_STORES.TRASH, trashItem).then(() => {
+                        // Supprimer l'élément original
+                        deleteFromStore(type === 'subject' ? DB_STORES.SUBJECTS : 
+                                      type === 'assignment' ? DB_STORES.ASSIGNMENTS : 
+                                      DB_STORES.GRADES, id).then(() => {
+                            loadAppData().then(updateUI);
+                            closeAllModals();
+                        });
+                    });
+                }
+            }
+            
+            // Annuler l'action en attente
+            function cancelPendingAction() {
+                appState.pendingAction = null;
+                closeAllModals();
+            }
+            
+            // Confirmer la suppression définitive
+            function confirmFinalDelete(id) {
+                appState.pendingAction = { type: 'permanent', id };
+                openModal('delete-confirm-modal');
+            }
+            
+            // Activer/désactiver le bouton de confirmation de suppression
+            function toggleDeleteConfirm() {
+                const input = document.getElementById('delete-confirm-input');
+                const button = document.getElementById('delete-confirm-ok');
+                button.disabled = input.value !== 'SUPPRIMER';
+            }
+            
+            // Exécuter la suppression définitive
+            function executeFinalDelete() {
+                if (!appState.pendingAction || appState.pendingAction.type !== 'permanent') return;
+                
+                const { id } = appState.pendingAction;
+                
+                deleteFromStore(DB_STORES.TRASH, id).then(() => {
+                    loadAppData().then(updateUI);
+                    closeAllModals();
+                });
+            }
+            
+            // Restaurer depuis la corbeille
+            function restoreFromTrash(id) {
+                const trashItem = appState.trash.find(item => item.id === id);
+                if (!trashItem) return;
+                
+                // Restaurer l'élément dans son store d'origine
+                const store = trashItem.type === 'subject' ? DB_STORES.SUBJECTS :
+                             trashItem.type === 'assignment' ? DB_STORES.ASSIGNMENTS :
+                             DB_STORES.GRADES;
+                
+                addToStore(store, trashItem.data).then(() => {
+                    // Supprimer de la corbeille
+                    deleteFromStore(DB_STORES.TRASH, id).then(() => {
+                        loadAppData().then(updateUI);
+                    });
+                });
+            }
+            
+            // Aperçu des fichiers
+            function handleFilePreview() {
+                const fileInput = document.getElementById('assignment-attachments');
+                const previewContainer = document.getElementById('assignment-attachments-preview');
+                previewContainer.innerHTML = '';
+                
+                Array.from(fileInput.files).forEach(file => {
+                    const preview = document.createElement('div');
+                    preview.className = 'file-preview';
+                    
+                    if (file.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(file);
+                        preview.appendChild(img);
+                    } else if (file.type === 'application/pdf') {
+                        preview.innerHTML = '<div class="file-icon">📄</div>';
+                    } else if (file.type.startsWith('video/')) {
+                        preview.innerHTML = '<div class="file-icon">🎬</div>';
+                    } else {
+                        preview.innerHTML = '<div class="file-icon">📎</div>';
+                    }
+                    
+                    const fileName = document.createElement('div');
+                    fileName.textContent = file.name;
+                    fileName.style.fontSize = '0.8rem';
+                    preview.appendChild(fileName);
+                    
+                    previewContainer.appendChild(preview);
+                });
+            }
+            
+            // Gérer l'exportation
+            function handleExport(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('export-password').value;
+                const data = {
+                    profile: appState.profile,
+                    subjects: appState.subjects,
+                    assignments: appState.assignments,
+                    grades: appState.grades,
+                    attachments: appState.attachments,
+                    exportDate: new Date().toISOString()
+                };
+                
+                if (password) {
+                    // Chiffrer les données
+                    encryptJSON(password, data).then(encrypted => {
+                        const blob = new Blob([JSON.stringify(encrypted)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `carnet-eleve-${new Date().toISOString().split('T')[0]}.carnet`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        
+                        // Sauvegarder dans les backups
+                        addToStore(DB_STORES.BACKUPS, {
+                            data: encrypted,
+                            hash: '', // Serait calculé avec SHA-256
+                            createdAt: new Date()
+                        });
+                    });
+                } else {
+                    // Exporter en clair
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `carnet-eleve-${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+                
+                closeAllModals();
+            }
+            
+            // Gérer l'importation
+            function handleImport(e) {
+                e.preventDefault();
+                
+                const fileInput = document.getElementById('import-file');
+                const password = document.getElementById('import-password').value;
+                const mode = document.getElementById('import-mode').value;
+                
+                if (fileInput.files.length === 0) return;
+                
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = async (e) => {
+                    try {
+                        let data;
+                        const content = e.target.result;
+                        
+                        if (password) {
+                            // Déchiffrer les données
+                            const encrypted = JSON.parse(content);
+                            data = await decryptJSON(password, encrypted);
+                        } else {
+                            // Données en clair
+                            data = JSON.parse(content);
+                        }
+                        
+                        // Valider les données
+                        if (!data.profile || !data.subjects || !data.assignments || !data.grades) {
+                            throw new Error('Format de fichier invalide');
+                        }
+                        
+                        if (mode === 'overwrite') {
+                            // Supprimer toutes les données existantes
+                            await clearStore(DB_STORES.PROFILE);
+                            await clearStore(DB_STORES.SUBJECTS);
+                            await clearStore(DB_STORES.ASSIGNMENTS);
+                            await clearStore(DB_STORES.GRADES);
+                            await clearStore(DB_STORES.ATTACHMENTS);
+                        }
+                        
+                        // Importer les données
+                        for (const item of data.profile) {
+                            await addToStore(DB_STORES.PROFILE, { ...item, id: undefined });
+                        }
+                        
+                        for (const item of data.subjects) {
+                            await addToStore(DB_STORES.SUBJECTS, { ...item, id: undefined });
+                        }
+                        
+                        for (const item of data.assignments) {
+                            await addToStore(DB_STORES.ASSIGNMENTS, { ...item, id: undefined });
+                        }
+                        
+                        for (const item of data.grades) {
+                            await addToStore(DB_STORES.GRADES, { ...item, id: undefined });
+                        }
+                        
+                        if (data.attachments) {
+                            for (const item of data.attachments) {
+                                await addToStore(DB_STORES.ATTACHMENTS, { ...item, id: undefined });
+                            }
+                        }
+                        
+                        // Recharger les données et mettre à jour l'UI
+                        await loadAppData();
+                        updateUI();
+                        closeAllModals();
+                        
+                        alert('Importation réussie !');
+                    } catch (error) {
+                        console.error('Erreur lors de l\'importation:', error);
+                        alert('Erreur lors de l\'importation: ' + error.message);
+                    }
+                };
+                
+                reader.readAsText(file);
+            }
+            
+            // Imprimer le bulletin
+            function printBulletin() {
+                window.print();
+            }
+            
+            // Calculer la moyenne d'une matière
+            function calculateSubjectAverage(subjectId) {
+                const subjectAssignments = appState.assignments.filter(a => a.subjectId === subjectId);
+                if (subjectAssignments.length === 0) return null;
+                
+                let totalWeightedScore = 0;
+                let totalWeight = 0;
+                
+                subjectAssignments.forEach(assignment => {
+                    const assignmentGrades = appState.grades.filter(g => g.assignmentId === assignment.id);
+                    if (assignmentGrades.length > 0) {
+                        const assignmentAverage = assignmentGrades.reduce((sum, grade) => sum + (grade.score / grade.maxScore * 20), 0) / assignmentGrades.length;
+                        totalWeightedScore += assignmentAverage * assignment.coefficient;
+                        totalWeight += assignment.coefficient;
+                    }
+                });
+                
+                return totalWeight > 0 ? totalWeightedScore / totalWeight : null;
+            }
+            
+            // Calculer la moyenne générale
+            function calculateOverallAverage() {
+                let totalWeightedAverage = 0;
+                let totalWeight = 0;
+                
+                appState.subjects.forEach(subject => {
+                    const subjectAverage = calculateSubjectAverage(subject.id);
+                    if (subjectAverage !== null) {
+                        totalWeightedAverage += subjectAverage * subject.coefficient;
+                        totalWeight += subject.coefficient;
+                    }
+                });
+                
+                return totalWeight > 0 ? totalWeightedAverage / totalWeight : null;
+            }
+            
+            // Obtenir le prochain devoir
+            function getNextAssignment() {
+                const now = new Date();
+                const futureAssignments = appState.assignments
+                    .filter(a => a.dueDate && new Date(a.dueDate) > now)
+                    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                
+                return futureAssignments.length > 0 ? futureAssignments[0] : null;
+            }
+            
+            // Obtenir le compte à rebours
+            function getCountdown(dueDate) {
+                const now = new Date();
+                const due = new Date(dueDate);
+                const diffTime = due - now;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays < 0) return 'Échéance dépassée';
+                if (diffDays === 0) return 'Aujourd\'hui';
+                if (diffDays === 1) return 'Demain';
+                return `Dans ${diffDays} jour(s)`;
+            }
+            
+            // Obtenir les badges
+            function getBadges() {
+                const badges = [];
+                
+                if (appState.grades.length >= 10) {
+                    badges.push('📚 Collectionneur de notes');
+                }
+                
+                if (appState.subjects.length >= 5) {
+                    badges.push('🎓 Polyvalent');
+                }
+                
+                const overallAverage = calculateOverallAverage();
+                if (overallAverage !== null && overallAverage >= 16) {
+                    badges.push('⭐ Excellent');
+                } else if (overallAverage !== null && overallAverage >= 14) {
+                    badges.push('👍 Très bien');
+                }
+                
+                return badges;
+            }
+            
+            // Obtenir l'appréciation
+            function getAppreciation(average) {
+                if (average === null) return '--';
+                if (average >= 16) return 'Excellent';
+                if (average >= 14) return 'Très bien';
+                if (average >= 12) return 'Bien';
+                if (average >= 10) return 'Assez bien';
+                return 'Insuffisant';
+            }
+            
+            // Formater une date
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('fr-FR');
+            }
+            
+            // Obtenir le nom d'affichage d'un élément de la corbeille
+            function getItemDisplayName(trashItem) {
+                switch (trashItem.type) {
+                    case 'subject':
+                        return trashItem.data.name;
+                    case 'assignment':
+                        return trashItem.data.title;
+                    case 'grade':
+                        const assignment = appState.assignments.find(a => a.id === trashItem.data.assignmentId);
+                        return assignment ? `Note pour ${assignment.title}` : 'Note inconnue';
+                    default:
+                        return 'Élément inconnu';
+                }
+            }
+            
+            // Chiffrer un objet JSON
+            async function encryptJSON(password, obj) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(JSON.stringify(obj));
+                
+                // Générer une clé à partir du mot de passe
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw',
+                    encoder.encode(password),
+                    'PBKDF2',
+                    false,
+                    ['deriveKey']
+                );
+                
+                const salt = crypto.getRandomValues(new Uint8Array(16));
+                const key = await crypto.subtle.deriveKey(
+                    {
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: CONFIG.pbkdf2Iterations,
+                        hash: 'SHA-256'
+                    },
+                    keyMaterial,
+                    { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['encrypt']
+                );
+                
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const encrypted = await crypto.subtle.encrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv
+                    },
+                    key,
+                    data
+                );
+                
+                // Combiner salt, iv et données chiffrées
+                const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+                result.set(salt, 0);
+                result.set(iv, salt.length);
+                result.set(new Uint8Array(encrypted), salt.length + iv.length);
+                
+                return {
+                    ciphertext: btoa(String.fromCharCode(...result)),
+                    algorithm: 'PBKDF2->AES-GCM'
+                };
+            }
+            
+            // Déchiffrer un payload
+            async function decryptJSON(password, payload) {
+                try {
+                    const ciphertext = Uint8Array.from(atob(payload.ciphertext), c => c.charCodeAt(0));
+                    
+                    const salt = ciphertext.slice(0, 16);
+                    const iv = ciphertext.slice(16, 28);
+                    const encrypted = ciphertext.slice(28);
+                    
+                    const encoder = new TextEncoder();
+                    const keyMaterial = await crypto.subtle.importKey(
+                        'raw',
+                        encoder.encode(password),
+                        'PBKDF2',
+                        false,
+                        ['deriveKey']
+                    );
+                    
+                    const key = await crypto.subtle.deriveKey(
+                        {
+                            name: 'PBKDF2',
+                            salt: salt,
+                            iterations: CONFIG.pbkdf2Iterations,
+                            hash: 'SHA-256'
+                        },
+                        keyMaterial,
+                        { name: 'AES-GCM', length: 256 },
+                        false,
+                        ['decrypt']
+                    );
+                    
+                    const decrypted = await crypto.subtle.decrypt(
+                        {
+                            name: 'AES-GCM',
+                            iv: iv
+                        },
+                        key,
+                        encrypted
+                    );
+                    
+                    const decoder = new TextDecoder();
+                    return JSON.parse(decoder.decode(decrypted));
+                } catch (error) {
+                    throw new Error('Échec du déchiffrement - mot de passe incorrect ou données corrompues');
+                }
+            }
+            
+            // Générer un hash SHA-256
+            async function generateSHA256(data) {
+                const encoder = new TextEncoder();
+                const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+            
+            // Tests automatisés
+            function selfTest() {
+                console.log('=== Tests automatisés Carnet de l\'élève ===');
+                
+                // Test de calcul de moyenne
+                const testGrades = [
+                    { score: 15, maxScore: 20 },
+                    { score: 18, maxScore: 20 }
+                ];
+                
+                const testAverage = testGrades.reduce((sum, grade) => sum + (grade.score / grade.maxScore * 20), 0) / testGrades.length;
+                console.log(`Test de moyenne: ${testAverage.toFixed(2)}/20 (attendu: 16.50/20)`);
+                
+                // Test d'export/import
+                const testData = { test: 'données de test' };
+                const testPassword = 'motdepassetest';
+                
+                encryptJSON(testPassword, testData)
+                    .then(encrypted => {
+                        return decryptJSON(testPassword, encrypted);
+                    })
+                    .then(decrypted => {
+                        const success = JSON.stringify(decrypted) === JSON.stringify(testData);
+                        console.log(`Test chiffrement/déchiffrement: ${success ? 'SUCCÈS' : 'ÉCHEC'}`);
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du test de chiffrement:', error);
+                    });
+                
+                console.log('=== Fin des tests ===');
+            }
+            
+            // Fonctions utilitaires pour IndexedDB
+            function getFromStore(storeName, key) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readonly');
+                    const objectStore = transaction.objectStore(storeName);
+                    let request;
+                    
+                    if (key === 'all') {
+                        request = objectStore.getAll();
+                    } else {
+                        request = objectStore.get(key);
+                    }
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            
+            function addToStore(storeName, data) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readwrite');
+                    const objectStore = transaction.objectStore(storeName);
+                    const request = objectStore.add(data);
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            
+            function updateInStore(storeName, data) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readwrite');
+                    const objectStore = transaction.objectStore(storeName);
+                    const request = objectStore.put(data);
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            
+            function deleteFromStore(storeName, key) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readwrite');
+                    const objectStore = transaction.objectStore(storeName);
+                    const request = objectStore.delete(key);
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            
+            function clearStore(storeName) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readwrite');
+                    const objectStore = transaction.objectStore(storeName);
+                    const request = objectStore.clear();
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            
+            // Initialiser le thème au chargement
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            DOM.themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            
+            // Démarrer l'application
+            init();
+        })();
+    </script>
+</body>
+</html>
