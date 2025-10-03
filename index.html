@@ -6,240 +6,227 @@
     <title>Carnet de l'élève</title>
     <style>
         :root {
-            --primary: #4a6fa5;
-            --secondary: #6b8cbc;
-            --accent: #ff9e4a;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --pastel-blue: #d4e1f5;
-            --pastel-green: #d4f5e1;
-            --pastel-yellow: #f5f0d4;
-            --pastel-pink: #f5d4e1;
-            --border-radius: 8px;
-            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --primary: #6C63FF;
+            --secondary: #4FC3F7;
+            --accent: #FF6B9D;
+            --success: #4CD97B;
+            --warning: #FFB74D;
+            --danger: #FF5252;
+            --dark: #2D3047;
+            --light: #F9F7FE;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
 
-        [data-theme="dark"] {
-            --light: #343a40;
-            --dark: #f8f9fa;
-            --pastel-blue: #2a3b5a;
-            --pastel-green: #2a5a3b;
-            --pastel-yellow: #5a4f2a;
-            --pastel-pink: #5a2a3b;
+        .dark-mode {
+            --primary: #8B80F8;
+            --secondary: #66D3FA;
+            --accent: #FF8BB5;
+            --success: #6AE395;
+            --warning: #FFC870;
+            --danger: #FF6B6B;
+            --dark: #1A1C2B;
+            --light: #25283D;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light);
+            background: linear-gradient(135deg, var(--light) 0%, #E8EAF6 100%);
             color: var(--dark);
-            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 80px;
             transition: var(--transition);
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, var(--dark) 0%, #1E1F2E 100%);
+            color: var(--light);
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 20px;
         }
 
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 1rem 0;
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
             box-shadow: var(--shadow);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        nav {
-            background-color: var(--secondary);
-            padding: 0.5rem 0;
-        }
-
-        .nav-tabs {
-            display: flex;
-            list-style: none;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .nav-tabs li {
-            margin-right: 1rem;
-        }
-
-        .nav-tabs a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: var(--border-radius);
-            display: block;
-            transition: var(--transition);
-        }
-
-        .nav-tabs a.active, .nav-tabs a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        main {
-            padding: 2rem 0;
-            min-height: calc(100vh - 200px);
-        }
-
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
         }
 
         .card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
             transition: var(--transition);
         }
 
-        [data-theme="dark"] .card {
-            background-color: #495057;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: bold;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
 
         .btn {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background-color: var(--primary);
-            color: white;
+            padding: 12px 24px;
             border: none;
-            border-radius: var(--border-radius);
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
-            text-decoration: none;
             transition: var(--transition);
-            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn:hover {
-            background-color: var(--secondary);
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
 
-        .btn-success {
-            background-color: var(--success);
+        .btn-primary:hover {
+            background: #5A52E0;
+            transform: translateY(-2px);
         }
 
-        .btn-warning {
-            background-color: var(--warning);
-            color: var(--dark);
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
         }
 
         .btn-danger {
-            background-color: var(--danger);
+            background: var(--danger);
+            color: white;
+            opacity: 0.7;
         }
 
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
+        .btn-danger:hover {
+            opacity: 1;
         }
 
-        .btn-outline:hover {
-            background-color: var(--primary);
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--dark);
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            background: var(--primary);
             color: white;
         }
 
-        .btn-small {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.8rem;
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
         }
 
-        .btn-delete {
-            background-color: transparent;
-            color: #888;
-            border: none;
-            cursor: pointer;
-            font-size: 0.8rem;
+        .page {
+            display: none;
         }
 
-        .btn-delete:hover {
-            color: var(--danger);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
+        .page.active {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
+            animation: fadeIn 0.5s ease;
         }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .subject-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-color {
+            height: 4px;
+            background: var(--primary);
+            margin-bottom: 12px;
+            border-radius: 2px;
+        }
+
+        .sparkline {
+            height: 40px;
+            margin-top: 12px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
             transition: var(--transition);
+            white-space: nowrap;
         }
 
-        [data-theme="dark"] input, 
-        [data-theme="dark"] select, 
-        [data-theme="dark"] textarea {
-            background-color: #495057;
-            border-color: #6c757d;
-            color: var(--dark);
+        .tab.active {
+            background: var(--primary);
+            color: white;
         }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.25);
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 4px;
         }
 
         .modal {
@@ -247,10 +234,11 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
             align-items: center;
             justify-content: center;
         }
@@ -260,2183 +248,1158 @@
         }
 
         .modal-content {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            width: 90%;
+            background: var(--light);
+            border-radius: 20px;
+            padding: 30px;
             max-width: 500px;
+            width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 1.5rem;
         }
 
-        [data-theme="dark"] .modal-content {
-            background-color: #495057;
+        .dark-mode .modal-content {
+            background: var(--dark);
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: bold;
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: var(--glass);
             color: var(--dark);
+            transition: var(--transition);
         }
 
-        [data-theme="dark"] .close-modal {
+        .dark-mode .form-input {
             color: var(--light);
         }
 
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 1.5rem;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .subject-card {
-            background-color: var(--pastel-blue);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            position: relative;
-        }
-
-        .subject-card:nth-child(2n) {
-            background-color: var(--pastel-green);
-        }
-
-        .subject-card:nth-child(3n) {
-            background-color: var(--pastel-yellow);
-        }
-
-        .subject-card:nth-child(4n) {
-            background-color: var(--pastel-pink);
-        }
-
-        .subject-name {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .subject-coeff {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .subject-average {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 0.5rem 0;
-        }
-
-        .sparkline {
-            height: 40px;
-            margin: 10px 0;
-        }
-
-        .assignment-item, .grade-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        [data-theme="dark"] .assignment-item, 
-        [data-theme="dark"] .grade-item {
-            border-bottom-color: #6c757d;
-        }
-
-        .assignment-item:last-child, .grade-item:last-child {
-            border-bottom: none;
-        }
-
-        .assignment-info, .grade-info {
-            flex: 1;
-        }
-
-        .assignment-title, .grade-assignment {
-            font-weight: 500;
-        }
-
-        .assignment-details, .grade-details {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .grade-score {
-            font-weight: bold;
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
         }
 
         .file-preview {
-            display: inline-block;
-            margin: 5px;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            max-width: 100px;
-            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--glass);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
         }
 
-        .file-preview img {
-            max-width: 100%;
-            max-height: 80px;
-        }
-
-        .file-preview .file-icon {
-            font-size: 2rem;
-            margin-bottom: 5px;
-        }
-
-        .onboarding {
-            max-width: 600px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .onboarding h1 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .onboarding p {
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-        }
-
-        .quote {
-            font-style: italic;
-            color: #666;
-            margin: 1rem 0;
-        }
-
-        .stats {
+        .timetable {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: 60px repeat(7, 1fr);
+            gap: 1px;
+            background: var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
         }
 
-        .stat-card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 1rem;
+        .timetable-header {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
             text-align: center;
-            box-shadow: var(--shadow);
+            font-weight: 600;
         }
 
-        [data-theme="dark"] .stat-card {
-            background-color: #495057;
+        .timetable-cell {
+            background: var(--light);
+            padding: 8px;
+            min-height: 60px;
+            font-size: 12px;
         }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary);
+        .dark-mode .timetable-cell {
+            background: var(--dark);
         }
 
-        .stat-label {
-            font-size: 0.9rem;
-            color: #666;
+        .time-slot {
+            background: var(--secondary);
+            color: white;
+            padding: 6px 8px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .streak {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--glass);
+            border-radius: 20px;
+            margin-bottom: 20px;
         }
 
         .badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            background-color: var(--accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--accent);
             color: white;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-
-        .countdown {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent);
-            text-align: center;
-            margin: 1rem 0;
-        }
-
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 1rem 0;
-            text-align: center;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         @media (max-width: 768px) {
-            .nav-tabs {
-                flex-wrap: wrap;
+            .container {
+                padding: 16px;
             }
             
-            .grid {
+            .subject-grid {
                 grid-template-columns: 1fr;
             }
             
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
+            .timetable {
+                grid-template-columns: 50px repeat(7, 1fr);
+                font-size: 11px;
+            }
+            
+            .pdf-viewer {
+                height: 400px;
             }
         }
 
-        .print-only {
-            display: none;
+        .ripple {
+            position: relative;
+            overflow: hidden;
+            transform: translate3d(0, 0, 0);
         }
 
-        @media print {
-            .no-print {
-                display: none;
-            }
-            
-            .print-only {
-                display: block;
-            }
-            
-            body {
-                background-color: white;
-                color: black;
-            }
-            
-            .card {
-                box-shadow: none;
-                border: 1px solid #ddd;
-            }
+        .ripple:after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+
+        .ripple:active:after {
+            transform: scale(0, 0);
+            opacity: .2;
+            transition: 0s;
         }
     </style>
 </head>
 <body>
-    <header class="no-print">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">Carnet de l'élève</div>
-                <div class="user-info">
-                    <span id="user-greeting">Bonjour</span>
-                    <button class="theme-toggle" id="theme-toggle">🌙</button>
+    <div class="container">
+        <!-- Page d'accueil -->
+        <div id="home-page" class="page active">
+            <div class="card glass">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+                    <h1>Bonjour, <span id="user-name">Élève</span></h1>
+                    <button class="btn btn-secondary" onclick="showFormules()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 18h2V6H7v12zM11 18h2V6h-2v12zM15 18h2V6h-2v12z"/>
+                        </svg>
+                        FORMULES
+                    </button>
+                </div>
+                <div class="streak">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB74D">
+                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/>
+                    </svg>
+                    <span>Série de révision : <strong id="streak-count">0</strong> jours</span>
+                </div>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Chaque ligne apprise aujourd'hui allume une étoile pour demain.</p>
+            </div>
+
+            <div id="subjects-overview">
+                <!-- Les matières seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Matières -->
+        <div id="subjects-page" class="page">
+            <div class="card glass">
+                <h2>Matières</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Organisez votre savoir, construisez votre avenir.</p>
+                <button class="btn btn-primary" onclick="showAddSubjectModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    Nouvelle matière
+                </button>
+            </div>
+
+            <div id="subjects-list" class="subject-grid">
+                <!-- Les matières seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Formules (Nouvelle) -->
+        <div id="formules-page" class="page">
+            <div class="card glass">
+                <h2>Formules par Matière</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Maîtrisez les concepts fondamentaux de chaque discipline.</p>
+            </div>
+
+            <div id="formules-list" class="subject-grid">
+                <!-- Les formules par matière seront ajoutées ici dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Page Détail Matière/Formules -->
+        <div id="subject-detail-page" class="page">
+            <div class="card glass">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+                    <h2 id="subject-detail-title">Matière</h2>
+                    <button class="btn btn-secondary" onclick="goBack()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                        </svg>
+                        Retour
+                    </button>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" data-tab="photo">PHOTO</div>
+                    <div class="tab" data-tab="video">VIDEO</div>
+                    <div class="tab" data-tab="note">NOTE</div>
+                    <div class="tab" data-tab="document">DOCUMENT</div>
+                </div>
+
+                <div id="categories-section">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 16px;">
+                        <h4>Catégories</h4>
+                        <button class="btn btn-primary" onclick="showAddCategoryModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                            Catégorie
+                        </button>
+                    </div>
+                    <div id="categories-list">
+                        <!-- Catégories dynamiques -->
+                    </div>
+                </div>
+
+                <div id="content-area">
+                    <!-- Contenu dynamique par onglet et catégorie -->
                 </div>
             </div>
         </div>
-    </header>
 
-    <nav class="no-print">
-        <div class="container">
-            <ul class="nav-tabs">
-                <li><a href="#" class="nav-link active" data-section="dashboard">Tableau de bord</a></li>
-                <li><a href="#" class="nav-link" data-section="subjects">Matières</a></li>
-                <li><a href="#" class="nav-link" data-section="assignments">Devoirs</a></li>
-                <li><a href="#" class="nav-link" data-section="grades">Notes</a></li>
-                <li><a href="#" class="nav-link" data-section="bulletin">Bulletin</a></li>
-                <li><a href="#" class="nav-link" data-section="trash">Corbeille</a></li>
-                <li><a href="#" class="nav-link" data-section="settings">Paramètres</a></li>
-            </ul>
+        <!-- Page Emploi du temps -->
+        <div id="timetable-page" class="page">
+            <div class="card glass">
+                <h2>Emploi du temps</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Organisez votre temps, maximisez votre potentiel.</p>
+                
+                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                    <button class="btn btn-primary" id="school-context-btn" onclick="switchTimetableContext('school')">
+                        À l'école/Université
+                    </button>
+                    <button class="btn btn-secondary" id="home-context-btn" onclick="switchTimetableContext('home')">
+                        À la maison
+                    </button>
+                </div>
+
+                <button class="btn btn-primary" onclick="showAddTimeslotModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    Nouveau créneau
+                </button>
+            </div>
+
+            <div id="timetable-container" class="card glass">
+                <!-- Emploi du temps dynamique -->
+            </div>
         </div>
-    </nav>
 
-    <main>
-        <div class="container">
-            <!-- Section Tableau de bord -->
-            <section id="dashboard" class="section active">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title" id="dashboard-title">Tableau de bord</h2>
-                    </div>
-                    <div id="dashboard-content">
-                        <!-- Contenu dynamique -->
-                    </div>
-                </div>
-            </section>
+        <!-- Page Bibliothèque -->
+        <div id="library-page" class="page">
+            <div class="card glass">
+                <h2>Bibliothèque</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Votre savoir en un seul endroit.</p>
+                
+                <input type="file" id="pdf-upload" accept=".pdf" style="display: none;" onchange="handlePdfUpload(this.files[0])">
+                <button class="btn btn-primary" onclick="document.getElementById('pdf-upload').click()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    Importer PDF
+                </button>
+            </div>
 
-            <!-- Section Matières -->
-            <section id="subjects" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Matières</h2>
-                        <button class="btn" id="add-subject-btn">Ajouter une matière</button>
-                    </div>
-                    <div id="subjects-list">
-                        <!-- Liste des matières -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section Devoirs -->
-            <section id="assignments" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Devoirs</h2>
-                        <button class="btn" id="add-assignment-btn">Ajouter un devoir</button>
-                    </div>
-                    <div id="assignments-list">
-                        <!-- Liste des devoirs -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section Notes -->
-            <section id="grades" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Notes</h2>
-                        <button class="btn" id="add-grade-btn">Ajouter une note</button>
-                    </div>
-                    <div id="grades-list">
-                        <!-- Liste des notes -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section Bulletin -->
-            <section id="bulletin" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Bulletin</h2>
-                        <button class="btn" id="print-bulletin-btn">Imprimer</button>
-                    </div>
-                    <div id="bulletin-content">
-                        <!-- Contenu du bulletin -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section Corbeille -->
-            <section id="trash" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Corbeille</h2>
-                    </div>
-                    <div id="trash-content">
-                        <!-- Contenu de la corbeille -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section Paramètres -->
-            <section id="settings" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Paramètres</h2>
-                    </div>
-                    <div id="settings-content">
-                        <!-- Contenu des paramètres -->
-                    </div>
-                </div>
-            </section>
+            <div id="library-list" class="subject-grid">
+                <!-- Liste des PDFs dynamique -->
+            </div>
         </div>
-    </main>
+
+        <!-- Page Paramètres -->
+        <div id="settings-page" class="page">
+            <div class="card glass">
+                <h2>Paramètres</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Personnalisez votre expérience d'apprentissage.</p>
+
+                <div class="form-group">
+                    <label class="form-label">Mode sombre</label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
+                        <span>Activer/désactiver</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Rétention corbeille (jours)</label>
+                    <input type="number" id="trash-retention" class="form-input" value="30" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Export/Import</label>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="exportData()">Exporter données</button>
+                        <input type="file" id="import-file" accept=".json,.carnet" style="display: none;" onchange="importData(this.files[0])">
+                        <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Importer données</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mode Développeur</label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="dev-mode-toggle" onchange="toggleDevMode()">
+                        <span>Activer/désactiver</span>
+                    </label>
+                </div>
+
+                <button class="btn btn-danger" onclick="showResetModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                    Réinitialiser l'application
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation inférieure -->
+    <div class="nav-bottom">
+        <div class="nav-item active" data-page="home-page">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span>Accueil</span>
+        </div>
+        <div class="nav-item" data-page="subjects-page">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+            </svg>
+            <span>Matières</span>
+        </div>
+        <div class="nav-item" data-page="timetable-page">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+            </svg>
+            <span>Emploi du temps</span>
+        </div>
+        <div class="nav-item" data-page="library-page">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+            </svg>
+            <span>Bibliothèque</span>
+        </div>
+        <div class="nav-item" data-page="settings-page">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+            <span>Paramètres</span>
+        </div>
+    </div>
 
     <!-- Modals -->
-    <div id="onboarding-modal" class="modal">
+    <div id="onboarding-modal" class="modal active">
         <div class="modal-content">
-            <div class="onboarding">
-                <h1>Bienvenue dans votre Carnet de l'élève</h1>
-                <p>Organisez vos matières, devoirs et notes en un seul endroit</p>
-                <p class="quote">"Chaque ligne apprise aujourd'hui allume une étoile pour demain."</p>
-                
-                <form id="onboarding-form">
-                    <div class="form-group">
-                        <label for="user-name">Votre nom</label>
-                        <input type="text" id="user-name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="user-role">Je suis</label>
-                        <select id="user-role" required>
-                            <option value="">Sélectionnez</option>
-                            <option value="Écolier">Écolier</option>
-                            <option value="Étudiant">Étudiant</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="user-class">Classe / Niveau</label>
-                        <input type="text" id="user-class" required>
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Commencer</button>
-                    </div>
-                </form>
+            <h2 style="margin-bottom: 20px; text-align: center;">Bienvenue dans votre Carnet</h2>
+            <p style="margin-bottom: 30px; text-align: center; opacity: 0.8;">Commencez par personnaliser votre profil</p>
+            
+            <div class="form-group">
+                <label class="form-label">Votre nom</label>
+                <input type="text" id="user-name-input" class="form-input" placeholder="Votre nom">
             </div>
+            
+            <div class="form-group">
+                <label class="form-label">Je suis</label>
+                <select id="user-status" class="form-input">
+                    <option value="school">Écolier</option>
+                    <option value="student">Étudiant</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Classe/Niveau</label>
+                <input type="text" id="user-class" class="form-input" placeholder="Ex: Terminale S, Licence 2...">
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="completeOnboarding()">
+                Commencer l'aventure
+            </button>
         </div>
     </div>
 
-    <div id="subject-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="subject-modal-title">Ajouter une matière</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="subject-form">
-                <input type="hidden" id="subject-id">
-                <div class="form-group">
-                    <label for="subject-name">Nom de la matière</label>
-                    <input type="text" id="subject-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="subject-coefficient">Coefficient</label>
-                    <input type="number" id="subject-coefficient" min="1" value="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="subject-color">Couleur</label>
-                    <input type="color" id="subject-color" value="#4a6fa5">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="assignment-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="assignment-modal-title">Ajouter un devoir</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="assignment-form">
-                <input type="hidden" id="assignment-id">
-                <div class="form-group">
-                    <label for="assignment-subject">Matière</label>
-                    <select id="assignment-subject" required>
-                        <option value="">Sélectionnez une matière</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="assignment-title">Titre</label>
-                    <input type="text" id="assignment-title" required>
-                </div>
-                <div class="form-group">
-                    <label for="assignment-type">Type</label>
-                    <select id="assignment-type" required>
-                        <option value="Devoir">Devoir</option>
-                        <option value="Composition">Composition</option>
-                        <option value="Examen">Examen</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="assignment-coefficient">Coefficient</label>
-                    <input type="number" id="assignment-coefficient" min="1" value="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="assignment-due-date">Date d'échéance</label>
-                    <input type="date" id="assignment-due-date">
-                </div>
-                <div class="form-group">
-                    <label for="assignment-description">Description</label>
-                    <textarea id="assignment-description" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="assignment-attachments">Pièces jointes</label>
-                    <input type="file" id="assignment-attachments" multiple>
-                    <div id="assignment-attachments-preview"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="grade-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="grade-modal-title">Ajouter une note</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="grade-form">
-                <input type="hidden" id="grade-id">
-                <div class="form-group">
-                    <label for="grade-assignment">Devoir</label>
-                    <select id="grade-assignment" required>
-                        <option value="">Sélectionnez un devoir</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="grade-score">Note</label>
-                    <input type="number" id="grade-score" min="0" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="grade-max-score">Note maximale</label>
-                    <input type="number" id="grade-max-score" min="1" value="20" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="confirm-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="confirm-modal-title">Confirmation</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div id="confirm-modal-content">
-                <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" id="confirm-cancel">Annuler</button>
-                <button type="button" class="btn btn-danger" id="confirm-ok">Confirmer</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="delete-confirm-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Suppression définitive</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div id="delete-confirm-content">
-                <p>Cette action est irréversible. Tapez <strong>SUPPRIMER</strong> pour confirmer.</p>
-                <div class="form-group">
-                    <input type="text" id="delete-confirm-input" placeholder="SUPPRIMER">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" id="delete-confirm-cancel">Annuler</button>
-                <button type="button" class="btn btn-danger" id="delete-confirm-ok" disabled>Supprimer définitivement</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="export-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Exporter les données</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="export-form">
-                <div class="form-group">
-                    <label for="export-password">Mot de passe (optionnel)</label>
-                    <input type="password" id="export-password" placeholder="Laissez vide pour exporter en clair">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Exporter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="import-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Importer des données</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="import-form">
-                <div class="form-group">
-                    <label for="import-file">Fichier à importer</label>
-                    <input type="file" id="import-file" required>
-                </div>
-                <div class="form-group">
-                    <label for="import-password">Mot de passe (si le fichier est chiffré)</label>
-                    <input type="password" id="import-password">
-                </div>
-                <div class="form-group">
-                    <label for="import-mode">Mode d'importation</label>
-                    <select id="import-mode">
-                        <option value="merge">Fusionner avec les données existantes</option>
-                        <option value="overwrite">Remplacer toutes les données</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Importer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <footer class="no-print">
-        <div class="container">
-            <p>Carnet de l'élève - Organisez votre réussite scolaire</p>
-        </div>
-    </footer>
+    <!-- Autres modals seront ajoutés dynamiquement -->
 
     <script>
-        // Structure de base de l'application
-        (function() {
-            'use strict';
-            
-            // Configuration
-            const CONFIG = {
-                trashRetentionDays: 30,
-                pbkdf2Iterations: 100000, // Peut être réduit à 1000 pour les tests
-                defaultMaxScore: 20
-            };
-            
-            // État de l'application
-            let appState = {
-                profile: null,
-                subjects: [],
-                assignments: [],
-                grades: [],
-                attachments: [],
-                trash: [],
-                currentSection: 'dashboard',
-                pendingAction: null
-            };
-            
-            // Références aux éléments DOM
-            const DOM = {
-                sections: document.querySelectorAll('.section'),
-                navLinks: document.querySelectorAll('.nav-link'),
-                modals: document.querySelectorAll('.modal'),
-                themeToggle: document.getElementById('theme-toggle'),
-                userGreeting: document.getElementById('user-greeting'),
-                dashboardContent: document.getElementById('dashboard-content'),
-                subjectsList: document.getElementById('subjects-list'),
-                assignmentsList: document.getElementById('assignments-list'),
-                gradesList: document.getElementById('grades-list'),
-                bulletinContent: document.getElementById('bulletin-content'),
-                trashContent: document.getElementById('trash-content'),
-                settingsContent: document.getElementById('settings-content')
-            };
-            
-            // Initialisation de la base de données
-            let db;
-            const DB_NAME = 'StudentNotebook';
-            const DB_VERSION = 1;
-            
-            // Stores IndexedDB
-            const DB_STORES = {
-                PROFILE: 'profile',
-                SUBJECTS: 'subjects',
-                ASSIGNMENTS: 'assignments',
-                GRADES: 'grades',
-                ATTACHMENTS: 'attachments',
-                BACKUPS: 'backups',
-                TRASH: 'trash',
-                LOGS: 'logs'
-            };
-            
-            // Initialisation de l'application
-            async function init() {
-                await initDB();
-                await loadAppData();
-                initEventListeners();
-                checkOnboarding();
-                updateUI();
+        // =============================================================================
+        // README INTERNE - Structure et Documentation
+        // =============================================================================
+        /*
+        CARNET DE L'ÉLÈVE/ÉTUDIANT - Application Web Complète
+        
+        STRUCTURE DES STORES INDEXEDDB:
+        - profile: { id: 1, name, status, class, streak, settings }
+        - subjects: { id, name, color, coefficient, createdAt }
+        - categories: { id, subjectId, name, type (photo/video/note/document), order }
+        - items: { id, categoryId, type, title, content, fileBlob, order, createdAt }
+        - grades: { id, subjectId, title, grade, coefficient, date, category }
+        - timetable: { id, context (school/home), day, startTime, endTime, subjectId, room, notes, reminder }
+        - library: { id, title, fileName, fileBlob, lastPage, totalPages, createdAt }
+        - backups: { id, timestamp, data, hash, encrypted }
+        - trash: { id, originalStore, originalData, deletedAt }
+        - logs: { id, action, timestamp, details }
+        
+        ALGORITHMES DE CALCUL DES MOYENNES:
+        - Moyenne matière: Σ(grade * coefficient) / Σ(coefficient)
+        - Moyenne générale: Σ(moyenne_matière * coefficient_matière) / Σ(coefficient_matière)
+        - Arrondi à 2 décimales, drop lowest n optionnel
+        - Conversion automatique sur 20
+        
+        FLOW DE SUPPRESSION / CORBEILLE:
+        1. Première confirmation modale "Êtes-vous sûr ?"
+        2. Deuxième confirmation avec saisie "SUPPRIMER" ou nom
+        3. Soft delete: déplacement vers trash avec deletedAt
+        4. Retention: 30 jours par défaut (configurable)
+        5. Restauration possible depuis corbeille
+        
+        BACKUPS & LASTPAGE:
+        - Export: JSON chiffré (AES-GCM) ou non avec mot de passe optionnel
+        - Import: Support .carnet (chiffré) et JSON, merge/overwrite
+        - LastPage PDF: Stockée dans IndexedDB + localStorage + backups
+        - Réinitialisation: Préserve lastPage via backup si disponible
+        - Si données navigateur supprimées manuellement: restauration impossible
+        
+        TRASH RETENTION DAYS:
+        - Modifiable dans Settings -> trash-retention input
+        - Valeur par défaut: 30 jours
+        
+        PBKDF2 ITERATIONS:
+        - Valeur production: 100000
+        - Pour debug: réduire à 1000 dans encryptJSON/decryptJSON
+        */
+
+        // =============================================================================
+        // VARIABLES GLOBALES ET INITIALISATION
+        // =============================================================================
+        let db = null;
+        let currentSubjectId = null;
+        let currentTab = 'photo';
+        let currentContext = 'school';
+
+        // Initialisation au chargement
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initDB();
+            await checkOnboarding();
+            setupNavigation();
+            loadAllData();
+        });
+
+        // =============================================================================
+        // BASE DE DONNÉES INDEXEDDB
+        // =============================================================================
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('StudentNotebook', 1);
                 
-                // Tenter de persister le stockage
-                if (navigator.storage && navigator.storage.persist) {
-                    navigator.storage.persist().then(granted => {
-                        if (granted) {
-                            console.log("Stockage persistant activé");
-                        }
-                    });
-                }
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
                 
-                // Exécuter les tests en mode développement
-                if (localStorage.getItem('devMode') === 'true') {
-                    selfTest();
-                }
-            }
-            
-            // Initialisation de la base de données
-            function initDB() {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
                     
-                    request.onerror = () => reject(request.error);
-                    request.onsuccess = () => {
-                        db = request.result;
-                        resolve(db);
-                    };
+                    // Stores principaux
+                    if (!db.objectStoreNames.contains('profile')) {
+                        db.createObjectStore('profile', { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains('subjects')) {
+                        db.createObjectStore('subjects', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('categories')) {
+                        db.createObjectStore('categories', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('items')) {
+                        db.createObjectStore('items', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('grades')) {
+                        db.createObjectStore('grades', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('timetable')) {
+                        db.createObjectStore('timetable', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('library')) {
+                        db.createObjectStore('library', { keyPath: 'id', autoIncrement: true });
+                    }
                     
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        
-                        // Créer les stores s'ils n'existent pas
-                        if (!db.objectStoreNames.contains(DB_STORES.PROFILE)) {
-                            const profileStore = db.createObjectStore(DB_STORES.PROFILE, { keyPath: 'id', autoIncrement: true });
-                            profileStore.createIndex('createdAt', 'createdAt', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains(DB_STORES.SUBJECTS)) {
-                            const subjectsStore = db.createObjectStore(DB_STORES.SUBJECTS, { keyPath: 'id', autoIncrement: true });
-                            subjectsStore.createIndex('createdAt', 'createdAt', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains(DB_STORES.ASSIGNMENTS)) {
-                            const assignmentsStore = db.createObjectStore(DB_STORES.ASSIGNMENTS, { keyPath: 'id', autoIncrement: true });
-                            assignmentsStore.createIndex('subjectId', 'subjectId', { unique: false });
-                            assignmentsStore.createIndex('dueDate', 'dueDate', { unique: false });
-                            assignmentsStore.createIndex('createdAt', 'createdAt', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains(DB_STORES.GRADES)) {
-                            const gradesStore = db.createObjectStore(DB_STORES.GRADES, { keyPath: 'id', autoIncrement: true });
-                            gradesStore.createIndex('assignmentId', 'assignmentId', { unique: false });
-                            gradesStore.createIndex('createdAt', 'createdAt', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains(DB_STORES.ATTACHMENTS)) {
-                            const attachmentsStore = db.createObjectStore(DB_STORES.ATTACHMENTS, { keyPath: 'id', autoIncrement: true });
-                            attachmentsStore.createIndex('createdAt', 'createdAt', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains(DB_STORES.BACKUPS)) {
-                            const backupsStore = db.createObjectStore(DB_STORES.BACKUPS, { keyPath: 'id', autoIncrement: true });
-                            backupsStore.createIndex('createdAt', 'createdAt', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains(DB_STORES.TRASH)) {
-                            const trashStore = db.createObjectStore(DB_STORES.TRASH, { keyPath: 'id', autoIncrement: true });
-                            trashStore.createIndex('deletedAt', 'deletedAt', { unique: false });
-                            trashStore.createIndex('type', 'type', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains(DB_STORES.LOGS)) {
-                            const logsStore = db.createObjectStore(DB_STORES.LOGS, { keyPath: 'id', autoIncrement: true });
-                            logsStore.createIndex('createdAt', 'createdAt', { unique: false });
-                            logsStore.createIndex('action', 'action', { unique: false });
-                        }
-                    };
-                });
-            }
-            
-            // Charger les données de l'application
-            async function loadAppData() {
-                appState.profile = await getFromStore(DB_STORES.PROFILE, 'all');
-                appState.subjects = await getFromStore(DB_STORES.SUBJECTS, 'all');
-                appState.assignments = await getFromStore(DB_STORES.ASSIGNMENTS, 'all');
-                appState.grades = await getFromStore(DB_STORES.GRADES, 'all');
-                appState.attachments = await getFromStore(DB_STORES.ATTACHMENTS, 'all');
-                appState.trash = await getFromStore(DB_STORES.TRASH, 'all');
+                    // Stores système
+                    if (!db.objectStoreNames.contains('backups')) {
+                        db.createObjectStore('backups', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('trash')) {
+                        db.createObjectStore('trash', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('logs')) {
+                        db.createObjectStore('logs', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+            });
+        }
+
+        // =============================================================================
+        // FONCTIONS UTILITAIRES POUR INDEXEDDB
+        // =============================================================================
+        function dbAction(storeName, action, data = null) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
                 
-                // Charger les données de démonstration si la base est vide
-                if (appState.subjects.length === 0 && appState.assignments.length === 0) {
-                    await loadDemoData();
-                }
-            }
-            
-            // Charger les données de démonstration
-            async function loadDemoData() {
-                const demoSubjects = [
-                    { name: 'Mathématiques', coefficient: 3, color: '#4a6fa5' },
-                    { name: 'Français', coefficient: 3, color: '#6b8cbc' }
-                ];
-                
-                const demoAssignments = [
-                    { subjectId: 1, title: 'Devoir maison n°1', type: 'Devoir', coefficient: 1, dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] },
-                    { subjectId: 1, title: 'Contrôle sur les fonctions', type: 'Composition', coefficient: 2, dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] },
-                    { subjectId: 2, title: 'Commentaire de texte', type: 'Devoir', coefficient: 1, dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }
-                ];
-                
-                const demoGrades = [
-                    { assignmentId: 1, score: 15, maxScore: 20 },
-                    { assignmentId: 1, score: 17, maxScore: 20 },
-                    { assignmentId: 3, score: 12, maxScore: 20 }
-                ];
-                
-                for (const subject of demoSubjects) {
-                    await addToStore(DB_STORES.SUBJECTS, { ...subject, createdAt: new Date() });
+                let request;
+                switch (action) {
+                    case 'add':
+                        request = store.add(data);
+                        break;
+                    case 'put':
+                        request = store.put(data);
+                        break;
+                    case 'get':
+                        request = store.get(data);
+                        break;
+                    case 'getAll':
+                        request = store.getAll();
+                        break;
+                    case 'delete':
+                        request = store.delete(data);
+                        break;
                 }
                 
-                for (const assignment of demoAssignments) {
-                    await addToStore(DB_STORES.ASSIGNMENTS, { ...assignment, createdAt: new Date() });
-                }
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // =============================================================================
+        // GESTION DE L'ONBOARDING
+        // =============================================================================
+        async function checkOnboarding() {
+            const profile = await dbAction('profile', 'get', 1);
+            if (!profile) {
+                showModal('onboarding-modal');
+            } else {
+                document.getElementById('user-name').textContent = profile.name;
+                document.getElementById('streak-count').textContent = profile.streak || 0;
                 
-                for (const grade of demoGrades) {
-                    await addToStore(DB_STORES.GRADES, { ...grade, createdAt: new Date() });
-                }
-                
-                // Recharger les données
-                await loadAppData();
-            }
-            
-            // Initialiser les écouteurs d'événements
-            function initEventListeners() {
-                // Navigation
-                DOM.navLinks.forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const section = e.target.getAttribute('data-section');
-                        switchSection(section);
-                    });
-                });
-                
-                // Thème sombre/clair
-                DOM.themeToggle.addEventListener('click', toggleTheme);
-                
-                // Fermeture des modales
-                document.querySelectorAll('.close-modal').forEach(btn => {
-                    btn.addEventListener('click', closeAllModals);
-                });
-                
-                // Boutons d'ajout
-                document.getElementById('add-subject-btn').addEventListener('click', () => openModal('subject-modal'));
-                document.getElementById('add-assignment-btn').addEventListener('click', () => openModal('assignment-modal'));
-                document.getElementById('add-grade-btn').addEventListener('click', () => openModal('grade-modal'));
-                document.getElementById('print-bulletin-btn').addEventListener('click', printBulletin);
-                
-                // Formulaires
-                document.getElementById('onboarding-form').addEventListener('submit', handleOnboarding);
-                document.getElementById('subject-form').addEventListener('submit', handleSubjectForm);
-                document.getElementById('assignment-form').addEventListener('submit', handleAssignmentForm);
-                document.getElementById('grade-form').addEventListener('submit', handleGradeForm);
-                document.getElementById('export-form').addEventListener('submit', handleExport);
-                document.getElementById('import-form').addEventListener('submit', handleImport);
-                
-                // Confirmation de suppression
-                document.getElementById('confirm-ok').addEventListener('click', executePendingAction);
-                document.getElementById('confirm-cancel').addEventListener('click', cancelPendingAction);
-                
-                // Confirmation de suppression définitive
-                document.getElementById('delete-confirm-input').addEventListener('input', toggleDeleteConfirm);
-                document.getElementById('delete-confirm-ok').addEventListener('click', executeFinalDelete);
-                document.getElementById('delete-confirm-cancel').addEventListener('click', closeAllModals);
-                
-                // Gestion des fichiers
-                document.getElementById('assignment-attachments').addEventListener('change', handleFilePreview);
-            }
-            
-            // Vérifier si l'onboarding est nécessaire
-            function checkOnboarding() {
-                if (!appState.profile || appState.profile.length === 0) {
-                    openModal('onboarding-modal');
+                // Appliquer les paramètres
+                if (profile.settings?.darkMode) {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('dark-mode-toggle').checked = true;
                 }
             }
+        }
+
+        async function completeOnboarding() {
+            const name = document.getElementById('user-name-input').value;
+            const status = document.getElementById('user-status').value;
+            const userClass = document.getElementById('user-class').value;
             
-            // Mettre à jour l'interface utilisateur
-            function updateUI() {
-                updateGreeting();
-                updateDashboard();
-                updateSubjectsList();
-                updateAssignmentsList();
-                updateGradesList();
-                updateBulletin();
-                updateTrash();
-                updateSettings();
+            if (!name.trim()) {
+                alert('Veuillez entrer votre nom');
+                return;
             }
             
-            // Mettre à jour le message de bienvenue
-            function updateGreeting() {
-                if (appState.profile && appState.profile.length > 0) {
-                    const profile = appState.profile[0];
-                    DOM.userGreeting.textContent = `Bonjour, ${profile.name}`;
+            const profile = {
+                id: 1,
+                name: name.trim(),
+                status: status,
+                class: userClass.trim(),
+                streak: 0,
+                settings: {
+                    darkMode: false,
+                    trashRetentionDays: 30
+                },
+                createdAt: new Date()
+            };
+            
+            await dbAction('profile', 'put', profile);
+            document.getElementById('user-name').textContent = profile.name;
+            hideModal('onboarding-modal');
+            loadAllData();
+        }
+
+        // =============================================================================
+        // NAVIGATION ET UI
+        // =============================================================================
+        function setupNavigation() {
+            // Navigation principale
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Mettre à jour l'état actif
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
                     
-                    // Mettre à jour le titre du tableau de bord
-                    document.getElementById('dashboard-title').textContent = `Tableau de bord - ${profile.name}`;
+                    // Afficher la page correspondante
+                    const pageId = this.getAttribute('data-page');
+                    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                });
+            });
+
+            // Gestion des onglets dans le détail matière
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('tab')) {
+                    const tabs = e.target.parentElement.querySelectorAll('.tab');
+                    tabs.forEach(tab => tab.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    currentTab = e.target.getAttribute('data-tab');
+                    loadSubjectDetailContent();
                 }
-            }
+            });
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
             
-            // Mettre à jour le tableau de bord
-            function updateDashboard() {
-                if (!appState.profile || appState.profile.length === 0) return;
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            document.querySelector(`.nav-item[data-page="${pageId}"]`).classList.add('active');
+        }
+
+        function goBack() {
+            showPage('subjects-page');
+        }
+
+        function showFormules() {
+            loadFormulesPage();
+            showPage('formules-page');
+        }
+
+        // =============================================================================
+        // GESTION DES MATIÈRES
+        // =============================================================================
+        async function loadAllData() {
+            await loadHomePage();
+            await loadSubjectsPage();
+            await loadTimetablePage();
+            await loadLibraryPage();
+        }
+
+        async function loadHomePage() {
+            const subjects = await dbAction('subjects', 'getAll');
+            const grades = await dbAction('grades', 'getAll');
+            
+            const container = document.getElementById('subjects-overview');
+            container.innerHTML = '';
+            
+            subjects.forEach(subject => {
+                const subjectGrades = grades.filter(g => g.subjectId === subject.id);
+                const average = calculateSubjectAverage(subjectGrades);
                 
-                const profile = appState.profile[0];
-                const overallAverage = calculateOverallAverage();
-                const nextAssignment = getNextAssignment();
-                const countdown = nextAssignment ? getCountdown(nextAssignment.dueDate) : null;
-                const badges = getBadges();
-                
-                let content = `
-                    <div class="stats">
-                        <div class="stat-card">
-                            <div class="stat-value">${appState.subjects.length}</div>
-                            <div class="stat-label">Matières</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${appState.assignments.length}</div>
-                            <div class="stat-label">Devoirs</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${appState.grades.length}</div>
-                            <div class="stat-label">Notes</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${overallAverage !== null ? overallAverage.toFixed(2) : '--'}</div>
-                            <div class="stat-label">Moyenne générale</div>
-                        </div>
+                const card = document.createElement('div');
+                card.className = 'card subject-card glass';
+                card.innerHTML = `
+                    <div class="subject-color" style="background: ${subject.color || '#6C63FF'}"></div>
+                    <h3>${subject.name}</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                        <span style="font-size: 24px; font-weight: bold;">${average}</span>
+                        <canvas class="sparkline" width="100" height="40"></canvas>
                     </div>
+                    <p style="margin-top: 8px; opacity: 0.7; font-size: 14px;">Coefficient: ${subject.coefficient || 1}</p>
                 `;
                 
-                if (badges.length > 0) {
-                    content += `<div class="badges">`;
-                    badges.forEach(badge => {
-                        content += `<span class="badge">${badge}</span>`;
-                    });
-                    content += `</div>`;
-                }
+                card.addEventListener('click', () => openSubjectDetail(subject.id));
+                container.appendChild(card);
                 
-                if (nextAssignment && countdown) {
-                    content += `
-                        <div class="countdown">
-                            Prochain devoir: ${nextAssignment.title} (${formatDate(nextAssignment.dueDate)})<br>
-                            ${countdown}
-                        </div>
-                    `;
-                }
-                
-                // Afficher une citation inspirante
-                const quotes = [
-                    "Chaque ligne apprise aujourd'hui allume une étoile pour demain.",
-                    "La persévérance transforme l'effort en excellence.",
-                    "Tes efforts d'aujourd'hui sont les succès de demain.",
-                    "Chaque note compte, chaque effort construit ton avenir."
-                ];
-                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-                
-                content += `<p class="quote">${randomQuote}</p>`;
-                
-                // Afficher les matières avec leurs moyennes
-                content += `<h3>Moyennes par matière</h3>`;
-                content += `<div class="grid">`;
-                
-                appState.subjects.forEach(subject => {
-                    const average = calculateSubjectAverage(subject.id);
-                    const assignmentsCount = appState.assignments.filter(a => a.subjectId === subject.id).length;
-                    const gradesCount = appState.grades.filter(g => {
-                        const assignment = appState.assignments.find(a => a.id === g.assignmentId);
-                        return assignment && assignment.subjectId === subject.id;
-                    }).length;
-                    
-                    content += `
-                        <div class="subject-card" style="background-color: ${subject.color}20; border-left: 4px solid ${subject.color}">
-                            <div class="subject-name">${subject.name}</div>
-                            <div class="subject-coeff">Coefficient: ${subject.coefficient}</div>
-                            <div class="subject-average">${average !== null ? average.toFixed(2) : '--'}/20</div>
-                            <div class="subject-details">${assignmentsCount} devoir(s), ${gradesCount} note(s)</div>
-                        </div>
-                    `;
-                });
-                
-                content += `</div>`;
-                
-                DOM.dashboardContent.innerHTML = content;
-            }
+                // Dessiner le sparkline
+                setTimeout(() => drawSparkline(card.querySelector('.sparkline'), subjectGrades), 100);
+            });
+        }
+
+        async function loadSubjectsPage() {
+            const subjects = await dbAction('subjects', 'getAll');
+            const container = document.getElementById('subjects-list');
+            container.innerHTML = '';
             
-            // Mettre à jour la liste des matières
-            function updateSubjectsList() {
-                let content = '';
-                
-                if (appState.subjects.length === 0) {
-                    content = '<p>Aucune matière enregistrée. Ajoutez votre première matière !</p>';
-                } else {
-                    appState.subjects.forEach(subject => {
-                        const average = calculateSubjectAverage(subject.id);
-                        const assignments = appState.assignments.filter(a => a.subjectId === subject.id);
-                        
-                        content += `
-                            <div class="card" style="border-left: 4px solid ${subject.color}">
-                                <div class="card-header">
-                                    <h3 class="card-title">${subject.name}</h3>
-                                    <div>
-                                        <button class="btn btn-small edit-subject" data-id="${subject.id}">Modifier</button>
-                                        <button class="btn btn-small btn-delete delete-subject" data-id="${subject.id}">Supprimer</button>
-                                    </div>
-                                </div>
-                                <p>Coefficient: ${subject.coefficient}</p>
-                                <p>Moyenne: ${average !== null ? average.toFixed(2) + '/20' : 'Aucune note'}</p>
-                                <p>Devoirs: ${assignments.length}</p>
-                            </div>
-                        `;
-                    });
-                }
-                
-                DOM.subjectsList.innerHTML = content;
-                
-                // Ajouter les écouteurs d'événements pour les boutons
-                document.querySelectorAll('.edit-subject').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(e.target.getAttribute('data-id'));
-                        editSubject(id);
-                    });
-                });
-                
-                document.querySelectorAll('.delete-subject').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(e.target.getAttribute('data-id'));
-                        confirmDelete('subject', id);
-                    });
-                });
-            }
-            
-            // Mettre à jour la liste des devoirs
-            function updateAssignmentsList() {
-                let content = '';
-                
-                if (appState.assignments.length === 0) {
-                    content = '<p>Aucun devoir enregistré. Ajoutez votre premier devoir !</p>';
-                } else {
-                    // Trier les devoirs par date d'échéance
-                    const sortedAssignments = [...appState.assignments].sort((a, b) => {
-                        if (!a.dueDate) return 1;
-                        if (!b.dueDate) return -1;
-                        return new Date(a.dueDate) - new Date(b.dueDate);
-                    });
-                    
-                    sortedAssignments.forEach(assignment => {
-                        const subject = appState.subjects.find(s => s.id === assignment.subjectId);
-                        const grades = appState.grades.filter(g => g.assignmentId === assignment.id);
-                        const average = grades.length > 0 ? 
-                            grades.reduce((sum, grade) => sum + (grade.score / grade.maxScore * 20), 0) / grades.length : null;
-                        
-                        content += `
-                            <div class="assignment-item">
-                                <div class="assignment-info">
-                                    <div class="assignment-title">${assignment.title}</div>
-                                    <div class="assignment-details">
-                                        ${subject ? subject.name : 'Matière inconnue'} • 
-                                        ${assignment.type} • 
-                                        Coefficient: ${assignment.coefficient}
-                                        ${assignment.dueDate ? ` • Échéance: ${formatDate(assignment.dueDate)}` : ''}
-                                        ${average !== null ? ` • Moyenne: ${average.toFixed(2)}/20` : ''}
-                                    </div>
-                                    ${assignment.description ? `<p>${assignment.description}</p>` : ''}
-                                </div>
-                                <div>
-                                    <button class="btn btn-small edit-assignment" data-id="${assignment.id}">Modifier</button>
-                                    <button class="btn btn-small btn-delete delete-assignment" data-id="${assignment.id}">Supprimer</button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                
-                DOM.assignmentsList.innerHTML = content;
-                
-                // Ajouter les écouteurs d'événements pour les boutons
-                document.querySelectorAll('.edit-assignment').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(e.target.getAttribute('data-id'));
-                        editAssignment(id);
-                    });
-                });
-                
-                document.querySelectorAll('.delete-assignment').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(e.target.getAttribute('data-id'));
-                        confirmDelete('assignment', id);
-                    });
-                });
-            }
-            
-            // Mettre à jour la liste des notes
-            function updateGradesList() {
-                let content = '';
-                
-                if (appState.grades.length === 0) {
-                    content = '<p>Aucune note enregistrée. Ajoutez votre première note !</p>';
-                } else {
-                    // Trier les notes par date de création (plus récentes en premier)
-                    const sortedGrades = [...appState.grades].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    
-                    sortedGrades.forEach(grade => {
-                        const assignment = appState.assignments.find(a => a.id === grade.assignmentId);
-                        const subject = assignment ? appState.subjects.find(s => s.id === assignment.subjectId) : null;
-                        const percentage = (grade.score / grade.maxScore * 100).toFixed(1);
-                        
-                        content += `
-                            <div class="grade-item">
-                                <div class="grade-info">
-                                    <div class="grade-assignment">${assignment ? assignment.title : 'Devoir inconnu'}</div>
-                                    <div class="grade-details">
-                                        ${subject ? subject.name : 'Matière inconnue'} • 
-                                        Note: ${grade.score}/${grade.maxScore} (${percentage}%)
-                                    </div>
-                                </div>
-                                <div class="grade-score">${(grade.score / grade.maxScore * 20).toFixed(2)}/20</div>
-                                <div>
-                                    <button class="btn btn-small edit-grade" data-id="${grade.id}">Modifier</button>
-                                    <button class="btn btn-small btn-delete delete-grade" data-id="${grade.id}">Supprimer</button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                
-                DOM.gradesList.innerHTML = content;
-                
-                // Ajouter les écouteurs d'événements pour les boutons
-                document.querySelectorAll('.edit-grade').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(e.target.getAttribute('data-id'));
-                        editGrade(id);
-                    });
-                });
-                
-                document.querySelectorAll('.delete-grade').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(e.target.getAttribute('data-id'));
-                        confirmDelete('grade', id);
-                    });
-                });
-            }
-            
-            // Mettre à jour le bulletin
-            function updateBulletin() {
-                let content = '';
-                const overallAverage = calculateOverallAverage();
-                
-                if (appState.subjects.length === 0) {
-                    content = '<p>Aucune matière enregistrée. Le bulletin ne peut pas être généré.</p>';
-                } else {
-                    content += `
-                        <div class="print-only">
-                            <h1>Bulletin Scolaire</h1>
-                            ${appState.profile && appState.profile.length > 0 ? `
-                                <p><strong>Élève:</strong> ${appState.profile[0].name}</p>
-                                <p><strong>Classe:</strong> ${appState.profile[0].class}</p>
-                                <p><strong>Période:</strong> ${new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
-                            ` : ''}
-                            <hr>
-                        </div>
-                    `;
-                    
-                    content += `<table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">`;
-                    content += `
-                        <thead>
-                            <tr>
-                                <th style="text-align: left; padding: 0.5rem; border-bottom: 2px solid #ddd;">Matière</th>
-                                <th style="text-align: center; padding: 0.5rem; border-bottom: 2px solid #ddd;">Coefficient</th>
-                                <th style="text-align: center; padding: 0.5rem; border-bottom: 2px solid #ddd;">Moyenne</th>
-                                <th style="text-align: center; padding: 0.5rem; border-bottom: 2px solid #ddd;">Appréciation</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                    `;
-                    
-                    appState.subjects.forEach(subject => {
-                        const average = calculateSubjectAverage(subject.id);
-                        const appreciation = getAppreciation(average);
-                        
-                        content += `
-                            <tr>
-                                <td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">${subject.name}</td>
-                                <td style="text-align: center; padding: 0.5rem; border-bottom: 1px solid #ddd;">${subject.coefficient}</td>
-                                <td style="text-align: center; padding: 0.5rem; border-bottom: 1px solid #ddd;">${average !== null ? average.toFixed(2) : '--'}</td>
-                                <td style="text-align: center; padding: 0.5rem; border-bottom: 1px solid #ddd;">${appreciation}</td>
-                            </tr>
-                        `;
-                    });
-                    
-                    content += `
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td style="padding: 0.5rem; border-top: 2px solid #ddd;" colspan="2"><strong>Moyenne générale</strong></td>
-                                <td style="text-align: center; padding: 0.5rem; border-top: 2px solid #ddd;"><strong>${overallAverage !== null ? overallAverage.toFixed(2) : '--'}</strong></td>
-                                <td style="text-align: center; padding: 0.5rem; border-top: 2px solid #ddd;"><strong>${getAppreciation(overallAverage)}</strong></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    `;
-                    
-                    // Ajouter le hash du bulletin comme preuve
-                    if (overallAverage !== null) {
-                        const bulletinData = {
-                            profile: appState.profile[0],
-                            subjects: appState.subjects.map(s => ({
-                                name: s.name,
-                                coefficient: s.coefficient,
-                                average: calculateSubjectAverage(s.id)
-                            })),
-                            overallAverage: overallAverage,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        generateSHA256(JSON.stringify(bulletinData)).then(hash => {
-                            content += `
-                                <div class="print-only">
-                                    <p style="font-size: 0.8rem; color: #666; margin-top: 2rem;">
-                                        Hash de vérification: ${hash}
-                                    </p>
-                                </div>
-                            `;
-                            DOM.bulletinContent.innerHTML = content;
-                        });
-                    } else {
-                        DOM.bulletinContent.innerHTML = content;
-                    }
-                }
-            }
-            
-            // Mettre à jour la corbeille
-            function updateTrash() {
-                let content = '';
-                
-                // Filtrer les éléments expirés
-                const now = new Date();
-                const validTrash = appState.trash.filter(item => {
-                    const deletedAt = new Date(item.deletedAt);
-                    const retentionDate = new Date(deletedAt.getTime() + CONFIG.trashRetentionDays * 24 * 60 * 60 * 1000);
-                    return now < retentionDate;
-                });
-                
-                if (validTrash.length === 0) {
-                    content = '<p>La corbeille est vide.</p>';
-                } else {
-                    content += `<p>Éléments dans la corbeille (conservés ${CONFIG.trashRetentionDays} jours):</p>`;
-                    
-                    validTrash.forEach(item => {
-                        const deletedDate = new Date(item.deletedAt);
-                        const retentionDate = new Date(deletedDate.getTime() + CONFIG.trashRetentionDays * 24 * 60 * 60 * 1000);
-                        const daysLeft = Math.ceil((retentionDate - now) / (24 * 60 * 60 * 1000));
-                        
-                        content += `
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">${item.type}: ${getItemDisplayName(item)}</h3>
-                                    <div>
-                                        <button class="btn btn-small restore-item" data-id="${item.id}">Restaurer</button>
-                                        <button class="btn btn-small btn-delete delete-permanently" data-id="${item.id}">Supprimer définitivement</button>
-                                    </div>
-                                </div>
-                                <p>Supprimé le: ${formatDate(item.deletedAt)}</p>
-                                <p>Jours restants: ${daysLeft}</p>
-                            </div>
-                        `;
-                    });
-                }
-                
-                DOM.trashContent.innerHTML = content;
-                
-                // Ajouter les écouteurs d'événements pour les boutons
-                document.querySelectorAll('.restore-item').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(e.target.getAttribute('data-id'));
-                        restoreFromTrash(id);
-                    });
-                });
-                
-                document.querySelectorAll('.delete-permanently').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(e.target.getAttribute('data-id'));
-                        confirmFinalDelete(id);
-                    });
-                });
-            }
-            
-            // Mettre à jour les paramètres
-            function updateSettings() {
-                const isDevMode = localStorage.getItem('devMode') === 'true';
-                
-                let content = `
-                    <h3>Exportation et importation</h3>
-                    <p>Sauvegardez vos données ou importez des données précédemment exportées.</p>
-                    <div style="margin: 1rem 0;">
-                        <button class="btn" id="export-btn">Exporter les données</button>
-                        <button class="btn" id="import-btn">Importer des données</button>
+            subjects.forEach(subject => {
+                const card = document.createElement('div');
+                card.className = 'card subject-card glass ripple';
+                card.innerHTML = `
+                    <div class="subject-color" style="background: ${subject.color || '#6C63FF'}"></div>
+                    <h3>${subject.name}</h3>
+                    <p style="margin: 12px 0; opacity: 0.7;">${subject.description || 'Aucune description'}</p>
+                    <div style="display: flex; gap: 8px; margin-top: 16px;">
+                        <button class="btn btn-primary" onclick="openSubjectDetail(${subject.id})">Ouvrir</button>
+                        <button class="btn btn-danger" onclick="deleteSubject(${subject.id})">Supprimer</button>
                     </div>
-                    
-                    <h3>Mode développeur</h3>
-                    <p>Activez le mode développeur pour exécuter des tests automatisés.</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showAddSubjectModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Nouvelle matière</h3>
                     <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="dev-mode-toggle" ${isDevMode ? 'checked' : ''}>
-                            Activer le mode développeur
-                        </label>
+                        <label class="form-label">Nom de la matière</label>
+                        <input type="text" id="subject-name" class="form-input" placeholder="Mathématiques, Physique...">
                     </div>
-                    
-                    <h3>À propos</h3>
-                    <p>Carnet de l'élève - Version 1.0</p>
-                    <p>Application développée pour organiser votre réussite scolaire.</p>
+                    <div class="form-group">
+                        <label class="form-label">Couleur</label>
+                        <input type="color" id="subject-color" class="form-input" value="#6C63FF">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Coefficient</label>
+                        <input type="number" id="subject-coefficient" class="form-input" value="1" min="1" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="subject-description" class="form-input" placeholder="Description de la matière..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="addSubject()">Créer</button>
+                        <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        async function addSubject() {
+            const name = document.getElementById('subject-name').value;
+            const color = document.getElementById('subject-color').value;
+            const coefficient = parseFloat(document.getElementById('subject-coefficient').value);
+            const description = document.getElementById('subject-description').value;
+            
+            if (!name.trim()) {
+                alert('Veuillez entrer un nom pour la matière');
+                return;
+            }
+            
+            const subject = {
+                name: name.trim(),
+                color: color,
+                coefficient: coefficient,
+                description: description.trim(),
+                createdAt: new Date()
+            };
+            
+            await dbAction('subjects', 'add', subject);
+            hideModal(document.querySelector('.modal.active'));
+            loadAllData();
+        }
+
+        // =============================================================================
+        // PAGE FORMULES
+        // =============================================================================
+        async function loadFormulesPage() {
+            const subjects = await dbAction('subjects', 'getAll');
+            const container = document.getElementById('formules-list');
+            container.innerHTML = '';
+            
+            subjects.forEach(subject => {
+                const card = document.createElement('div');
+                card.className = 'card subject-card glass ripple';
+                card.innerHTML = `
+                    <div class="subject-color" style="background: ${subject.color || '#6C63FF'}"></div>
+                    <h3>${subject.name}</h3>
+                    <p style="margin: 12px 0; opacity: 0.7;">Formules et concepts clés</p>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="openFormulesDetail(${subject.id})">
+                        Voir les formules
+                    </button>
                 `;
-                
-                DOM.settingsContent.innerHTML = content;
-                
-                // Ajouter les écouteurs d'événements
-                document.getElementById('export-btn').addEventListener('click', () => openModal('export-modal'));
-                document.getElementById('import-btn').addEventListener('click', () => openModal('import-modal'));
-                document.getElementById('dev-mode-toggle').addEventListener('change', (e) => {
-                    localStorage.setItem('devMode', e.target.checked);
-                    if (e.target.checked) {
-                        selfTest();
-                    }
-                });
-            }
+                container.appendChild(card);
+            });
+        }
+
+        function openFormulesDetail(subjectId) {
+            currentSubjectId = subjectId;
+            document.getElementById('subject-detail-title').textContent = 'Formules - ' + getSubjectName(subjectId);
+            showPage('subject-detail-page');
+            loadSubjectDetailContent();
+        }
+
+        // =============================================================================
+        // DÉTAIL MATIÈRE/FORMULES
+        // =============================================================================
+        async function openSubjectDetail(subjectId) {
+            currentSubjectId = subjectId;
+            document.getElementById('subject-detail-title').textContent = getSubjectName(subjectId);
+            showPage('subject-detail-page');
+            loadSubjectDetailContent();
+        }
+
+        async function loadSubjectDetailContent() {
+            await loadCategories();
+            await loadCategoryContent();
+        }
+
+        async function loadCategories() {
+            const categories = await dbAction('categories', 'getAll');
+            const subjectCategories = categories.filter(c => c.subjectId === currentSubjectId && c.type === currentTab);
             
-            // Changer de section
-            function switchSection(sectionName) {
-                // Mettre à jour la navigation
-                DOM.navLinks.forEach(link => {
-                    if (link.getAttribute('data-section') === sectionName) {
-                        link.classList.add('active');
-                    } else {
-                        link.classList.remove('active');
-                    }
-                });
-                
-                // Afficher la section active
-                DOM.sections.forEach(section => {
-                    if (section.id === sectionName) {
-                        section.classList.add('active');
-                    } else {
-                        section.classList.remove('active');
-                    }
-                });
-                
-                appState.currentSection = sectionName;
-            }
+            const container = document.getElementById('categories-list');
+            container.innerHTML = '';
             
-            // Basculer le thème sombre/clair
-            function toggleTheme() {
-                const currentTheme = document.body.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                document.body.setAttribute('data-theme', newTheme);
-                DOM.themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-                
-                localStorage.setItem('theme', newTheme);
-            }
-            
-            // Ouvrir une modale
-            function openModal(modalId) {
-                closeAllModals();
-                document.getElementById(modalId).classList.add('active');
-                
-                // Initialiser les sélecteurs si nécessaire
-                if (modalId === 'assignment-modal') {
-                    initSubjectSelector('assignment-subject');
-                } else if (modalId === 'grade-modal') {
-                    initAssignmentSelector('grade-assignment');
-                }
-            }
-            
-            // Fermer toutes les modales
-            function closeAllModals() {
-                DOM.modals.forEach(modal => modal.classList.remove('active'));
-                appState.pendingAction = null;
-            }
-            
-            // Gérer l'onboarding
-            function handleOnboarding(e) {
-                e.preventDefault();
-                
-                const name = document.getElementById('user-name').value;
-                const role = document.getElementById('user-role').value;
-                const userClass = document.getElementById('user-class').value;
-                
-                const profile = {
-                    name,
-                    role,
-                    class: userClass,
-                    createdAt: new Date()
-                };
-                
-                addToStore(DB_STORES.PROFILE, profile).then(() => {
-                    appState.profile = [profile];
-                    closeAllModals();
-                    updateUI();
-                });
-            }
-            
-            // Gérer le formulaire de matière
-            function handleSubjectForm(e) {
-                e.preventDefault();
-                
-                const id = document.getElementById('subject-id').value;
-                const name = document.getElementById('subject-name').value;
-                const coefficient = parseInt(document.getElementById('subject-coefficient').value);
-                const color = document.getElementById('subject-color').value;
-                
-                const subject = {
-                    name,
-                    coefficient,
-                    color,
-                    createdAt: new Date()
-                };
-                
-                if (id) {
-                    // Modification
-                    subject.id = parseInt(id);
-                    updateInStore(DB_STORES.SUBJECTS, subject).then(() => {
-                        loadAppData().then(updateUI);
-                        closeAllModals();
-                    });
-                } else {
-                    // Nouvelle matière
-                    addToStore(DB_STORES.SUBJECTS, subject).then(() => {
-                        loadAppData().then(updateUI);
-                        closeAllModals();
-                    });
-                }
-            }
-            
-            // Gérer le formulaire de devoir
-            function handleAssignmentForm(e) {
-                e.preventDefault();
-                
-                const id = document.getElementById('assignment-id').value;
-                const subjectId = parseInt(document.getElementById('assignment-subject').value);
-                const title = document.getElementById('assignment-title').value;
-                const type = document.getElementById('assignment-type').value;
-                const coefficient = parseInt(document.getElementById('assignment-coefficient').value);
-                const dueDate = document.getElementById('assignment-due-date').value;
-                const description = document.getElementById('assignment-description').value;
-                
-                const assignment = {
-                    subjectId,
-                    title,
-                    type,
-                    coefficient,
-                    dueDate: dueDate || null,
-                    description,
-                    attachments: [],
-                    createdAt: new Date()
-                };
-                
-                // Gérer les pièces jointes
-                const fileInput = document.getElementById('assignment-attachments');
-                if (fileInput.files.length > 0) {
-                    // Dans une implémentation complète, nous stockerions les fichiers dans IndexedDB
-                    // Pour cette démo, nous allons simplement enregistrer les noms
-                    assignment.attachments = Array.from(fileInput.files).map(file => file.name);
-                }
-                
-                if (id) {
-                    // Modification
-                    assignment.id = parseInt(id);
-                    updateInStore(DB_STORES.ASSIGNMENTS, assignment).then(() => {
-                        loadAppData().then(updateUI);
-                        closeAllModals();
-                    });
-                } else {
-                    // Nouveau devoir
-                    addToStore(DB_STORES.ASSIGNMENTS, assignment).then(() => {
-                        loadAppData().then(updateUI);
-                        closeAllModals();
-                    });
-                }
-            }
-            
-            // Gérer le formulaire de note
-            function handleGradeForm(e) {
-                e.preventDefault();
-                
-                const id = document.getElementById('grade-id').value;
-                const assignmentId = parseInt(document.getElementById('grade-assignment').value);
-                const score = parseFloat(document.getElementById('grade-score').value);
-                const maxScore = parseFloat(document.getElementById('grade-max-score').value);
-                
-                const grade = {
-                    assignmentId,
-                    score,
-                    maxScore,
-                    createdAt: new Date()
-                };
-                
-                if (id) {
-                    // Modification
-                    grade.id = parseInt(id);
-                    updateInStore(DB_STORES.GRADES, grade).then(() => {
-                        loadAppData().then(updateUI);
-                        closeAllModals();
-                    });
-                } else {
-                    // Nouvelle note
-                    addToStore(DB_STORES.GRADES, grade).then(() => {
-                        loadAppData().then(updateUI);
-                        closeAllModals();
-                    });
-                }
-            }
-            
-            // Modifier une matière
-            function editSubject(id) {
-                const subject = appState.subjects.find(s => s.id === id);
-                if (!subject) return;
-                
-                document.getElementById('subject-id').value = subject.id;
-                document.getElementById('subject-name').value = subject.name;
-                document.getElementById('subject-coefficient').value = subject.coefficient;
-                document.getElementById('subject-color').value = subject.color;
-                document.getElementById('subject-modal-title').textContent = 'Modifier la matière';
-                
-                openModal('subject-modal');
-            }
-            
-            // Modifier un devoir
-            function editAssignment(id) {
-                const assignment = appState.assignments.find(a => a.id === id);
-                if (!assignment) return;
-                
-                document.getElementById('assignment-id').value = assignment.id;
-                document.getElementById('assignment-title').value = assignment.title;
-                document.getElementById('assignment-type').value = assignment.type;
-                document.getElementById('assignment-coefficient').value = assignment.coefficient;
-                document.getElementById('assignment-due-date').value = assignment.dueDate || '';
-                document.getElementById('assignment-description').value = assignment.description || '';
-                document.getElementById('assignment-modal-title').textContent = 'Modifier le devoir';
-                
-                // Initialiser le sélecteur de matière
-                initSubjectSelector('assignment-subject', assignment.subjectId);
-                
-                openModal('assignment-modal');
-            }
-            
-            // Modifier une note
-            function editGrade(id) {
-                const grade = appState.grades.find(g => g.id === id);
-                if (!grade) return;
-                
-                document.getElementById('grade-id').value = grade.id;
-                document.getElementById('grade-score').value = grade.score;
-                document.getElementById('grade-max-score').value = grade.maxScore;
-                document.getElementById('grade-modal-title').textContent = 'Modifier la note';
-                
-                // Initialiser le sélecteur de devoir
-                initAssignmentSelector('grade-assignment', grade.assignmentId);
-                
-                openModal('grade-modal');
-            }
-            
-            // Initialiser le sélecteur de matière
-            function initSubjectSelector(selectId, selectedId = null) {
-                const select = document.getElementById(selectId);
-                select.innerHTML = '<option value="">Sélectionnez une matière</option>';
-                
-                appState.subjects.forEach(subject => {
-                    const option = document.createElement('option');
-                    option.value = subject.id;
-                    option.textContent = subject.name;
-                    option.selected = subject.id === selectedId;
-                    select.appendChild(option);
-                });
-            }
-            
-            // Initialiser le sélecteur de devoir
-            function initAssignmentSelector(selectId, selectedId = null) {
-                const select = document.getElementById(selectId);
-                select.innerHTML = '<option value="">Sélectionnez un devoir</option>';
-                
-                appState.assignments.forEach(assignment => {
-                    const subject = appState.subjects.find(s => s.id === assignment.subjectId);
-                    const option = document.createElement('option');
-                    option.value = assignment.id;
-                    option.textContent = `${assignment.title} (${subject ? subject.name : 'Matière inconnue'})`;
-                    option.selected = assignment.id === selectedId;
-                    select.appendChild(option);
-                });
-            }
-            
-            // Confirmer la suppression
-            function confirmDelete(type, id) {
-                let itemName = '';
-                
-                switch (type) {
-                    case 'subject':
-                        const subject = appState.subjects.find(s => s.id === id);
-                        itemName = subject ? subject.name : 'Matière inconnue';
-                        break;
-                    case 'assignment':
-                        const assignment = appState.assignments.find(a => a.id === id);
-                        itemName = assignment ? assignment.title : 'Devoir inconnu';
-                        break;
-                    case 'grade':
-                        const grade = appState.grades.find(g => g.id === id);
-                        const gradeAssignment = grade ? appState.assignments.find(a => a.id === grade.assignmentId) : null;
-                        itemName = gradeAssignment ? `Note pour ${gradeAssignment.title}` : 'Note inconnue';
-                        break;
-                }
-                
-                document.getElementById('confirm-modal-title').textContent = `Supprimer ${type}`;
-                document.getElementById('confirm-modal-content').innerHTML = `
-                    <p>Êtes-vous sûr de vouloir supprimer "${itemName}" ?</p>
-                    <p>L'élément sera déplacé dans la corbeille et conservé ${CONFIG.trashRetentionDays} jours.</p>
+            subjectCategories.forEach(category => {
+                const badge = document.createElement('span');
+                badge.className = 'category-badge';
+                badge.innerHTML = `
+                    ${category.name}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" onclick="deleteCategory(${category.id})" style="cursor: pointer;">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
                 `;
-                
-                appState.pendingAction = { type, id, itemName };
-                openModal('confirm-modal');
+                container.appendChild(badge);
+            });
+        }
+
+        function showAddCategoryModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Nouvelle catégorie</h3>
+                    <div class="form-group">
+                        <label class="form-label">Nom de la catégorie</label>
+                        <input type="text" id="category-name" class="form-input" placeholder="Fiches, Exercices, Cours...">
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="addCategory()">Créer</button>
+                        <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        async function addCategory() {
+            const name = document.getElementById('category-name').value;
+            
+            if (!name.trim()) {
+                alert('Veuillez entrer un nom pour la catégorie');
+                return;
             }
             
-            // Exécuter l'action en attente
-            function executePendingAction() {
-                if (!appState.pendingAction) return;
+            const category = {
+                subjectId: currentSubjectId,
+                name: name.trim(),
+                type: currentTab,
+                order: 0,
+                createdAt: new Date()
+            };
+            
+            await dbAction('categories', 'add', category);
+            hideModal(document.querySelector('.modal.active'));
+            loadCategories();
+        }
+
+        async function loadCategoryContent() {
+            const container = document.getElementById('content-area');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                    <p>Ajoutez du contenu à vos catégories pour ${currentTab}</p>
+                    <button class="btn btn-primary" onclick="showAddContentModal()" style="margin-top: 16px;">
+                        Ajouter du contenu
+                    </button>
+                </div>
+            `;
+        }
+
+        // =============================================================================
+        // EMPLOI DU TEMPS
+        // =============================================================================
+        async function loadTimetablePage() {
+            const timetable = await dbAction('timetable', 'getAll');
+            const contextTimetable = timetable.filter(t => t.context === currentContext);
+            
+            const container = document.getElementById('timetable-container');
+            container.innerHTML = `
+                <div class="timetable">
+                    <div class="timetable-header"></div>
+                    <div class="timetable-header">Lun</div>
+                    <div class="timetable-header">Mar</div>
+                    <div class="timetable-header">Mer</div>
+                    <div class="timetable-header">Jeu</div>
+                    <div class="timetable-header">Ven</div>
+                    <div class="timetable-header">Sam</div>
+                    <div class="timetable-header">Dim</div>
+                    
+                    ${generateTimeSlots(contextTimetable)}
+                </div>
+            `;
+        }
+
+        function generateTimeSlots(timetable) {
+            let html = '';
+            const timeSlots = ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00', '12:00-13:00', 
+                              '13:00-14:00', '14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'];
+            
+            timeSlots.forEach(timeSlot => {
+                html += `<div class="timetable-header">${timeSlot}</div>`;
                 
-                const { type, id, itemName } = appState.pendingAction;
-                
-                // Déplacer l'élément dans la corbeille
-                let itemData = null;
-                
-                switch (type) {
-                    case 'subject':
-                        itemData = appState.subjects.find(s => s.id === id);
-                        break;
-                    case 'assignment':
-                        itemData = appState.assignments.find(a => a.id === id);
-                        break;
-                    case 'grade':
-                        itemData = appState.grades.find(g => g.id === id);
-                        break;
+                for (let day = 1; day <= 7; day++) {
+                    const slots = timetable.filter(t => t.day === day && t.startTime === timeSlot.split('-')[0]);
+                    html += `<div class="timetable-cell">`;
+                    slots.forEach(slot => {
+                        html += `<div class="time-slot">${getSubjectName(slot.subjectId)}</div>`;
+                    });
+                    html += `</div>`;
                 }
-                
-                if (itemData) {
-                    const trashItem = {
-                        type,
-                        data: itemData,
-                        deletedAt: new Date()
-                    };
-                    
-                    addToStore(DB_STORES.TRASH, trashItem).then(() => {
-                        // Supprimer l'élément original
-                        deleteFromStore(type === 'subject' ? DB_STORES.SUBJECTS : 
-                                      type === 'assignment' ? DB_STORES.ASSIGNMENTS : 
-                                      DB_STORES.GRADES, id).then(() => {
-                            loadAppData().then(updateUI);
-                            closeAllModals();
-                        });
-                    });
-                }
+            });
+            
+            return html;
+        }
+
+        function switchTimetableContext(context) {
+            currentContext = context;
+            document.getElementById('school-context-btn').classList.toggle('btn-primary', context === 'school');
+            document.getElementById('school-context-btn').classList.toggle('btn-secondary', context !== 'school');
+            document.getElementById('home-context-btn').classList.toggle('btn-primary', context === 'home');
+            document.getElementById('home-context-btn').classList.toggle('btn-secondary', context !== 'home');
+            loadTimetablePage();
+        }
+
+        // =============================================================================
+        // BIBLIOTHÈQUE PDF
+        // =============================================================================
+        async function loadLibraryPage() {
+            const library = await dbAction('library', 'getAll');
+            const container = document.getElementById('library-list');
+            container.innerHTML = '';
+            
+            library.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card glass';
+                card.innerHTML = `
+                    <h3>${item.title}</h3>
+                    <p style="margin: 12px 0; opacity: 0.7;">Dernière page: ${item.lastPage || 1}</p>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary" onclick="openPdf(${item.id})">Lire</button>
+                        <button class="btn btn-danger" onclick="deletePdf(${item.id})">Supprimer</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function handlePdfUpload(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert('Veuillez sélectionner un fichier PDF valide');
+                return;
             }
             
-            // Annuler l'action en attente
-            function cancelPendingAction() {
-                appState.pendingAction = null;
-                closeAllModals();
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = {
+                title: file.name.replace('.pdf', ''),
+                fileName: file.name,
+                fileBlob: arrayBuffer,
+                lastPage: 1,
+                totalPages: 0,
+                createdAt: new Date()
+            };
+            
+            await dbAction('library', 'add', pdf);
+            loadLibraryPage();
+        }
+
+        // =============================================================================
+        // CALCULS ET STATISTIQUES
+        // =============================================================================
+        function calculateSubjectAverage(grades) {
+            if (!grades.length) return '--';
+            
+            const total = grades.reduce((sum, grade) => sum + (grade.grade * grade.coefficient), 0);
+            const totalCoefficient = grades.reduce((sum, grade) => sum + grade.coefficient, 0);
+            
+            return (total / totalCoefficient).toFixed(2);
+        }
+
+        function drawSparkline(canvas, grades) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            if (!grades.length) {
+                ctx.fillStyle = '#ccc';
+                ctx.fillRect(0, height/2, width, 1);
+                return;
             }
             
-            // Confirmer la suppression définitive
-            function confirmFinalDelete(id) {
-                appState.pendingAction = { type: 'permanent', id };
-                openModal('delete-confirm-modal');
-            }
+            const gradesValues = grades.map(g => g.grade).slice(-10); // Dernières 10 notes
+            const maxGrade = Math.max(...gradesValues);
+            const minGrade = Math.min(...gradesValues);
+            const range = maxGrade - minGrade || 1;
             
-            // Activer/désactiver le bouton de confirmation de suppression
-            function toggleDeleteConfirm() {
-                const input = document.getElementById('delete-confirm-input');
-                const button = document.getElementById('delete-confirm-ok');
-                button.disabled = input.value !== 'SUPPRIMER';
-            }
+            ctx.clearRect(0, 0, width, height);
+            ctx.beginPath();
             
-            // Exécuter la suppression définitive
-            function executeFinalDelete() {
-                if (!appState.pendingAction || appState.pendingAction.type !== 'permanent') return;
+            gradesValues.forEach((grade, index) => {
+                const x = (index / (gradesValues.length - 1)) * width;
+                const y = height - ((grade - minGrade) / range) * height;
                 
-                const { id } = appState.pendingAction;
-                
-                deleteFromStore(DB_STORES.TRASH, id).then(() => {
-                    loadAppData().then(updateUI);
-                    closeAllModals();
-                });
-            }
-            
-            // Restaurer depuis la corbeille
-            function restoreFromTrash(id) {
-                const trashItem = appState.trash.find(item => item.id === id);
-                if (!trashItem) return;
-                
-                // Restaurer l'élément dans son store d'origine
-                const store = trashItem.type === 'subject' ? DB_STORES.SUBJECTS :
-                             trashItem.type === 'assignment' ? DB_STORES.ASSIGNMENTS :
-                             DB_STORES.GRADES;
-                
-                addToStore(store, trashItem.data).then(() => {
-                    // Supprimer de la corbeille
-                    deleteFromStore(DB_STORES.TRASH, id).then(() => {
-                        loadAppData().then(updateUI);
-                    });
-                });
-            }
-            
-            // Aperçu des fichiers
-            function handleFilePreview() {
-                const fileInput = document.getElementById('assignment-attachments');
-                const previewContainer = document.getElementById('assignment-attachments-preview');
-                previewContainer.innerHTML = '';
-                
-                Array.from(fileInput.files).forEach(file => {
-                    const preview = document.createElement('div');
-                    preview.className = 'file-preview';
-                    
-                    if (file.type.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = URL.createObjectURL(file);
-                        preview.appendChild(img);
-                    } else if (file.type === 'application/pdf') {
-                        preview.innerHTML = '<div class="file-icon">📄</div>';
-                    } else if (file.type.startsWith('video/')) {
-                        preview.innerHTML = '<div class="file-icon">🎬</div>';
-                    } else {
-                        preview.innerHTML = '<div class="file-icon">📎</div>';
-                    }
-                    
-                    const fileName = document.createElement('div');
-                    fileName.textContent = file.name;
-                    fileName.style.fontSize = '0.8rem';
-                    preview.appendChild(fileName);
-                    
-                    previewContainer.appendChild(preview);
-                });
-            }
-            
-            // Gérer l'exportation
-            function handleExport(e) {
-                e.preventDefault();
-                
-                const password = document.getElementById('export-password').value;
-                const data = {
-                    profile: appState.profile,
-                    subjects: appState.subjects,
-                    assignments: appState.assignments,
-                    grades: appState.grades,
-                    attachments: appState.attachments,
-                    exportDate: new Date().toISOString()
-                };
-                
-                if (password) {
-                    // Chiffrer les données
-                    encryptJSON(password, data).then(encrypted => {
-                        const blob = new Blob([JSON.stringify(encrypted)], { type: 'application/json' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `carnet-eleve-${new Date().toISOString().split('T')[0]}.carnet`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-                        
-                        // Sauvegarder dans les backups
-                        addToStore(DB_STORES.BACKUPS, {
-                            data: encrypted,
-                            hash: '', // Serait calculé avec SHA-256
-                            createdAt: new Date()
-                        });
-                    });
+                if (index === 0) {
+                    ctx.moveTo(x, y);
                 } else {
-                    // Exporter en clair
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `carnet-eleve-${new Date().toISOString().split('T')[0]}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
+                    ctx.lineTo(x, y);
                 }
-                
-                closeAllModals();
-            }
+            });
             
-            // Gérer l'importation
-            function handleImport(e) {
-                e.preventDefault();
-                
-                const fileInput = document.getElementById('import-file');
-                const password = document.getElementById('import-password').value;
-                const mode = document.getElementById('import-mode').value;
-                
-                if (fileInput.files.length === 0) return;
-                
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = async (e) => {
-                    try {
-                        let data;
-                        const content = e.target.result;
-                        
-                        if (password) {
-                            // Déchiffrer les données
-                            const encrypted = JSON.parse(content);
-                            data = await decryptJSON(password, encrypted);
-                        } else {
-                            // Données en clair
-                            data = JSON.parse(content);
-                        }
-                        
-                        // Valider les données
-                        if (!data.profile || !data.subjects || !data.assignments || !data.grades) {
-                            throw new Error('Format de fichier invalide');
-                        }
-                        
-                        if (mode === 'overwrite') {
-                            // Supprimer toutes les données existantes
-                            await clearStore(DB_STORES.PROFILE);
-                            await clearStore(DB_STORES.SUBJECTS);
-                            await clearStore(DB_STORES.ASSIGNMENTS);
-                            await clearStore(DB_STORES.GRADES);
-                            await clearStore(DB_STORES.ATTACHMENTS);
-                        }
-                        
-                        // Importer les données
-                        for (const item of data.profile) {
-                            await addToStore(DB_STORES.PROFILE, { ...item, id: undefined });
-                        }
-                        
-                        for (const item of data.subjects) {
-                            await addToStore(DB_STORES.SUBJECTS, { ...item, id: undefined });
-                        }
-                        
-                        for (const item of data.assignments) {
-                            await addToStore(DB_STORES.ASSIGNMENTS, { ...item, id: undefined });
-                        }
-                        
-                        for (const item of data.grades) {
-                            await addToStore(DB_STORES.GRADES, { ...item, id: undefined });
-                        }
-                        
-                        if (data.attachments) {
-                            for (const item of data.attachments) {
-                                await addToStore(DB_STORES.ATTACHMENTS, { ...item, id: undefined });
-                            }
-                        }
-                        
-                        // Recharger les données et mettre à jour l'UI
-                        await loadAppData();
-                        updateUI();
-                        closeAllModals();
-                        
-                        alert('Importation réussie !');
-                    } catch (error) {
-                        console.error('Erreur lors de l\'importation:', error);
-                        alert('Erreur lors de l\'importation: ' + error.message);
-                    }
-                };
-                
-                reader.readAsText(file);
-            }
-            
-            // Imprimer le bulletin
-            function printBulletin() {
-                window.print();
-            }
-            
-            // Calculer la moyenne d'une matière
-            function calculateSubjectAverage(subjectId) {
-                const subjectAssignments = appState.assignments.filter(a => a.subjectId === subjectId);
-                if (subjectAssignments.length === 0) return null;
-                
-                let totalWeightedScore = 0;
-                let totalWeight = 0;
-                
-                subjectAssignments.forEach(assignment => {
-                    const assignmentGrades = appState.grades.filter(g => g.assignmentId === assignment.id);
-                    if (assignmentGrades.length > 0) {
-                        const assignmentAverage = assignmentGrades.reduce((sum, grade) => sum + (grade.score / grade.maxScore * 20), 0) / assignmentGrades.length;
-                        totalWeightedScore += assignmentAverage * assignment.coefficient;
-                        totalWeight += assignment.coefficient;
-                    }
-                });
-                
-                return totalWeight > 0 ? totalWeightedScore / totalWeight : null;
-            }
-            
-            // Calculer la moyenne générale
-            function calculateOverallAverage() {
-                let totalWeightedAverage = 0;
-                let totalWeight = 0;
-                
-                appState.subjects.forEach(subject => {
-                    const subjectAverage = calculateSubjectAverage(subject.id);
-                    if (subjectAverage !== null) {
-                        totalWeightedAverage += subjectAverage * subject.coefficient;
-                        totalWeight += subject.coefficient;
-                    }
-                });
-                
-                return totalWeight > 0 ? totalWeightedAverage / totalWeight : null;
-            }
-            
-            // Obtenir le prochain devoir
-            function getNextAssignment() {
-                const now = new Date();
-                const futureAssignments = appState.assignments
-                    .filter(a => a.dueDate && new Date(a.dueDate) > now)
-                    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-                
-                return futureAssignments.length > 0 ? futureAssignments[0] : null;
-            }
-            
-            // Obtenir le compte à rebours
-            function getCountdown(dueDate) {
-                const now = new Date();
-                const due = new Date(dueDate);
-                const diffTime = due - now;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays < 0) return 'Échéance dépassée';
-                if (diffDays === 0) return 'Aujourd\'hui';
-                if (diffDays === 1) return 'Demain';
-                return `Dans ${diffDays} jour(s)`;
-            }
-            
-            // Obtenir les badges
-            function getBadges() {
-                const badges = [];
-                
-                if (appState.grades.length >= 10) {
-                    badges.push('📚 Collectionneur de notes');
-                }
-                
-                if (appState.subjects.length >= 5) {
-                    badges.push('🎓 Polyvalent');
-                }
-                
-                const overallAverage = calculateOverallAverage();
-                if (overallAverage !== null && overallAverage >= 16) {
-                    badges.push('⭐ Excellent');
-                } else if (overallAverage !== null && overallAverage >= 14) {
-                    badges.push('👍 Très bien');
-                }
-                
-                return badges;
-            }
-            
-            // Obtenir l'appréciation
-            function getAppreciation(average) {
-                if (average === null) return '--';
-                if (average >= 16) return 'Excellent';
-                if (average >= 14) return 'Très bien';
-                if (average >= 12) return 'Bien';
-                if (average >= 10) return 'Assez bien';
-                return 'Insuffisant';
-            }
-            
-            // Formater une date
-            function formatDate(dateString) {
-                if (!dateString) return '';
-                const date = new Date(dateString);
-                return date.toLocaleDateString('fr-FR');
-            }
-            
-            // Obtenir le nom d'affichage d'un élément de la corbeille
-            function getItemDisplayName(trashItem) {
-                switch (trashItem.type) {
-                    case 'subject':
-                        return trashItem.data.name;
-                    case 'assignment':
-                        return trashItem.data.title;
-                    case 'grade':
-                        const assignment = appState.assignments.find(a => a.id === trashItem.data.assignmentId);
-                        return assignment ? `Note pour ${assignment.title}` : 'Note inconnue';
-                    default:
-                        return 'Élément inconnu';
+            ctx.strokeStyle = '#6C63FF';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // =============================================================================
+        // FONCTIONS UTILITAIRES
+        // =============================================================================
+        function getSubjectName(subjectId) {
+            // Implémentation simplifiée - en réalité il faudrait récupérer depuis la DB
+            return `Matière ${subjectId}`;
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function hideModal(modalElement) {
+            if (typeof modalElement === 'string') {
+                document.getElementById(modalElement).classList.remove('active');
+            } else {
+                modalElement.classList.remove('active');
+                if (modalElement.parentElement) {
+                    modalElement.parentElement.removeChild(modalElement);
                 }
             }
-            
-            // Chiffrer un objet JSON
-            async function encryptJSON(password, obj) {
-                const encoder = new TextEncoder();
-                const data = encoder.encode(JSON.stringify(obj));
-                
-                // Générer une clé à partir du mot de passe
-                const keyMaterial = await crypto.subtle.importKey(
-                    'raw',
-                    encoder.encode(password),
-                    'PBKDF2',
-                    false,
-                    ['deriveKey']
-                );
-                
-                const salt = crypto.getRandomValues(new Uint8Array(16));
-                const key = await crypto.subtle.deriveKey(
-                    {
-                        name: 'PBKDF2',
-                        salt: salt,
-                        iterations: CONFIG.pbkdf2Iterations,
-                        hash: 'SHA-256'
-                    },
-                    keyMaterial,
-                    { name: 'AES-GCM', length: 256 },
-                    false,
-                    ['encrypt']
-                );
-                
-                const iv = crypto.getRandomValues(new Uint8Array(12));
-                const encrypted = await crypto.subtle.encrypt(
-                    {
-                        name: 'AES-GCM',
-                        iv: iv
-                    },
-                    key,
-                    data
-                );
-                
-                // Combiner salt, iv et données chiffrées
-                const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
-                result.set(salt, 0);
-                result.set(iv, salt.length);
-                result.set(new Uint8Array(encrypted), salt.length + iv.length);
-                
-                return {
-                    ciphertext: btoa(String.fromCharCode(...result)),
-                    algorithm: 'PBKDF2->AES-GCM'
-                };
-            }
-            
-            // Déchiffrer un payload
-            async function decryptJSON(password, payload) {
-                try {
-                    const ciphertext = Uint8Array.from(atob(payload.ciphertext), c => c.charCodeAt(0));
-                    
-                    const salt = ciphertext.slice(0, 16);
-                    const iv = ciphertext.slice(16, 28);
-                    const encrypted = ciphertext.slice(28);
-                    
-                    const encoder = new TextEncoder();
-                    const keyMaterial = await crypto.subtle.importKey(
-                        'raw',
-                        encoder.encode(password),
-                        'PBKDF2',
-                        false,
-                        ['deriveKey']
-                    );
-                    
-                    const key = await crypto.subtle.deriveKey(
-                        {
-                            name: 'PBKDF2',
-                            salt: salt,
-                            iterations: CONFIG.pbkdf2Iterations,
-                            hash: 'SHA-256'
-                        },
-                        keyMaterial,
-                        { name: 'AES-GCM', length: 256 },
-                        false,
-                        ['decrypt']
-                    );
-                    
-                    const decrypted = await crypto.subtle.decrypt(
-                        {
-                            name: 'AES-GCM',
-                            iv: iv
-                        },
-                        key,
-                        encrypted
-                    );
-                    
-                    const decoder = new TextDecoder();
-                    return JSON.parse(decoder.decode(decrypted));
-                } catch (error) {
-                    throw new Error('Échec du déchiffrement - mot de passe incorrect ou données corrompues');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            // Sauvegarder le préférence
+        }
+
+        // =============================================================================
+        // FONCTIONS STUB POUR LES FONCTIONNALITÉS MANQUANTES
+        // =============================================================================
+        function deleteSubject(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette matière ?')) {
+                const confirmation = prompt('Tapez "SUPPRIMER" pour confirmer:');
+                if (confirmation === 'SUPPRIMER') {
+                    // Implémenter la suppression
+                    console.log('Suppression matière:', id);
                 }
             }
-            
-            // Générer un hash SHA-256
-            async function generateSHA256(data) {
-                const encoder = new TextEncoder();
-                const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function deleteCategory(id) {
+            if (confirm('Supprimer cette catégorie ?')) {
+                console.log('Suppression catégorie:', id);
             }
-            
-            // Tests automatisés
-            function selfTest() {
-                console.log('=== Tests automatisés Carnet de l\'élève ===');
-                
-                // Test de calcul de moyenne
-                const testGrades = [
-                    { score: 15, maxScore: 20 },
-                    { score: 18, maxScore: 20 }
-                ];
-                
-                const testAverage = testGrades.reduce((sum, grade) => sum + (grade.score / grade.maxScore * 20), 0) / testGrades.length;
-                console.log(`Test de moyenne: ${testAverage.toFixed(2)}/20 (attendu: 16.50/20)`);
-                
-                // Test d'export/import
-                const testData = { test: 'données de test' };
-                const testPassword = 'motdepassetest';
-                
-                encryptJSON(testPassword, testData)
-                    .then(encrypted => {
-                        return decryptJSON(testPassword, encrypted);
-                    })
-                    .then(decrypted => {
-                        const success = JSON.stringify(decrypted) === JSON.stringify(testData);
-                        console.log(`Test chiffrement/déchiffrement: ${success ? 'SUCCÈS' : 'ÉCHEC'}`);
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors du test de chiffrement:', error);
-                    });
-                
-                console.log('=== Fin des tests ===');
+        }
+
+        function showAddContentModal() {
+            alert('Fonctionnalité à implémenter: Ajout de contenu');
+        }
+
+        function showAddTimeslotModal() {
+            alert('Fonctionnalité à implémenter: Ajout de créneau');
+        }
+
+        function openPdf(id) {
+            alert(`Ouvrir PDF ${id} - Fonctionnalité à implémenter`);
+        }
+
+        function deletePdf(id) {
+            if (confirm('Supprimer ce PDF ?')) {
+                console.log('Suppression PDF:', id);
             }
-            
-            // Fonctions utilitaires pour IndexedDB
-            function getFromStore(storeName, key) {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readonly');
-                    const objectStore = transaction.objectStore(storeName);
-                    let request;
-                    
-                    if (key === 'all') {
-                        request = objectStore.getAll();
-                    } else {
-                        request = objectStore.get(key);
-                    }
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
+        }
+
+        function exportData() {
+            alert('Fonctionnalité export à implémenter');
+        }
+
+        function importData(file) {
+            alert('Fonctionnalité import à implémenter');
+        }
+
+        function toggleDevMode() {
+            alert('Mode développeur activé/désactivé');
+        }
+
+        function showResetModal() {
+            if (confirm('Réinitialiser toutes les données ? Cette action est irréversible.')) {
+                const confirmation = prompt('Tapez "RÉINITIALISER" pour confirmer:');
+                if (confirmation === 'RÉINITIALISER') {
+                    alert('Réinitialisation - Fonctionnalité à implémenter');
+                }
             }
+        }
+
+        // =============================================================================
+        // SELF-TEST POUR LE MODE DÉVELOPPEUR
+        // =============================================================================
+        function selfTest() {
+            console.log('=== SELF-TEST MODE DÉVELOPPEUR ===');
             
-            function addToStore(storeName, data) {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const objectStore = transaction.objectStore(storeName);
-                    const request = objectStore.add(data);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
+            // Test de moyenne
+            const testGrades = [
+                { grade: 15, coefficient: 1 },
+                { grade: 18, coefficient: 2 },
+                { grade: 12, coefficient: 1 }
+            ];
+            console.log('Test moyenne:', calculateSubjectAverage(testGrades));
             
-            function updateInStore(storeName, data) {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const objectStore = transaction.objectStore(storeName);
-                    const request = objectStore.put(data);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-            
-            function deleteFromStore(storeName, key) {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const objectStore = transaction.objectStore(storeName);
-                    const request = objectStore.delete(key);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-            
-            function clearStore(storeName) {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const objectStore = transaction.objectStore(storeName);
-                    const request = objectStore.clear();
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-            
-            // Initialiser le thème au chargement
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.body.setAttribute('data-theme', savedTheme);
-            DOM.themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-            
-            // Démarrer l'application
-            init();
-        })();
+            // Test autres fonctionnalités...
+            console.log('=== SELF-TEST COMPLÉTÉ ===');
+        }
     </script>
 </body>
 </html>
