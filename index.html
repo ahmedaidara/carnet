@@ -3,272 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carnet de l'élève</title>
+    <title>EduManager - Gestion Scolaire</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Variables CSS */
         :root {
-            --primary: #6c63ff;
-            --secondary: #4fc3f7;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --danger: #f44336;
-            --dark: #121212;
-            --light: #f8f9fa;
-            --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff7e5f;
+            --light-color: #f5f7fa;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --text-color: #333;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
 
-        [data-theme="dark"] {
-            --bg: #0a0a0a;
-            --surface: #1a1a1a;
-            --text: #ffffff;
-            --text-secondary: #b0b0b0;
-        }
-
-        [data-theme="light"] {
-            --bg: #f0f2f5;
-            --surface: #ffffff;
-            --text: #121212;
-            --text-secondary: #666666;
-        }
-
+        /* Reset et styles de base */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding-bottom: 80px;
-            transition: var(--transition);
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .glass {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .page {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Navigation */
-        .nav-bottom {
+        /* Styles pour la navigation */
+        .nav-container {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--surface);
-            border-top: 1px solid var(--glass-border);
+            background-color: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
-            z-index: 1000;
+            padding: 10px 0;
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            padding: 8px 12px;
-            border-radius: 12px;
-            cursor: pointer;
+            text-decoration: none;
+            color: var(--dark-color);
+            font-size: 0.8rem;
+            padding: 5px;
             transition: var(--transition);
-            opacity: 0.6;
         }
 
         .nav-item.active {
-            opacity: 1;
-            background: var(--glass);
+            color: var(--primary-color);
         }
 
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
         }
 
-        .nav-label {
-            font-size: 12px;
-            font-weight: 500;
+        /* Styles pour les pages */
+        .page {
+            display: none;
+            padding: 20px;
+            padding-bottom: 80px;
+            min-height: 100vh;
         }
 
-        /* Header */
+        .page.active {
+            display: block;
+        }
+
+        /* Styles pour l'en-tête */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .greeting {
-            font-size: 24px;
-            font-weight: 300;
-            margin-bottom: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
+        .search-bar {
+            flex-grow: 1;
+            max-width: 200px;
+            margin-left: 15px;
         }
 
-        /* Cards */
-        .subject-card {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+        .search-bar input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Styles pour les cartes */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow);
+            padding: 15px;
+            margin-bottom: 15px;
             transition: var(--transition);
-            cursor: pointer;
         }
 
-        .subject-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .subject-header {
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
-        .subject-name {
-            font-size: 18px;
+        .card-title {
+            font-size: 1.1rem;
             font-weight: 600;
         }
 
-        .subject-average {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .sparkline {
-            height: 40px;
-            background: var(--bg);
-            border-radius: 8px;
-            margin-top: 8px;
-        }
-
-        /* Buttons */
+        /* Styles pour les boutons */
         .btn {
-            padding: 12px 24px;
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
+            border-radius: var(--border-radius);
             cursor: pointer;
+            font-size: 0.9rem;
             transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--glass);
-            color: var(--text);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-            opacity: 0.7;
+            text-align: center;
         }
 
         .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
         }
 
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            overflow-x: auto;
+        .btn-danger {
+            background-color: var(--danger-color);
         }
 
-        .tab {
-            padding: 12px 20px;
-            background: var(--glass);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-            opacity: 0.6;
+        .btn-success {
+            background-color: var(--success-color);
         }
 
-        .tab.active {
-            opacity: 1;
-            background: var(--primary);
-            color: white;
+        .btn-warning {
+            background-color: var(--warning-color);
         }
 
-        /* Forms */
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        /* Styles pour les formulaires */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 15px;
         }
 
-        .form-label {
+        .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            margin-bottom: 5px;
+            font-weight: 500;
         }
 
-        .form-input {
+        .form-control {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            background: var(--surface);
-            color: var(--text);
-            font-size: 14px;
-            transition: var(--transition);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
         }
 
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
-        }
-
-        /* Modal */
+        /* Styles pour les modals */
         .modal {
             display: none;
             position: fixed;
@@ -276,7 +199,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -287,1114 +210,1889 @@
         }
 
         .modal-content {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 400px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
             width: 90%;
+            max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
         }
 
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
         .modal-title {
-            font-size: 20px;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 16px;
         }
 
-        .modal-actions {
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+
+        .modal-footer {
             display: flex;
-            gap: 12px;
             justify-content: flex-end;
-            margin-top: 24px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
-        /* Onboarding */
-        .onboarding {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg);
-            z-index: 3000;
+        /* Styles pour les listes */
+        .list {
+            list-style: none;
+        }
+
+        .list-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
         }
 
-        .onboarding-content {
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
+        .list-item:last-child {
+            border-bottom: none;
         }
 
-        .onboarding-title {
-            font-size: 28px;
-            font-weight: 300;
-            margin-bottom: 16px;
+        .list-item:hover {
+            background-color: #f9f9f9;
         }
 
-        .onboarding-subtitle {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
+        /* Styles pour les onglets */
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
         }
 
-        /* Timetable */
-        .timetable {
-            display: grid;
-            grid-template-columns: 60px repeat(7, 1fr);
-            gap: 1px;
-            background: var(--glass-border);
-            border-radius: 12px;
-            overflow: hidden;
+        .tab {
+            padding: 10px 15px;
+            white-space: nowrap;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
         }
 
-        .timetable-header {
-            background: var(--surface);
-            padding: 12px;
-            text-align: center;
+        .tab.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
             font-weight: 600;
         }
 
-        .timetable-cell {
-            background: var(--surface);
-            padding: 8px;
-            min-height: 60px;
-            font-size: 12px;
+        .tab-content {
+            display: none;
         }
 
-        .time-slot {
-            background: var(--primary);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin-bottom: 4px;
-            font-size: 11px;
+        .tab-content.active {
+            display: block;
         }
 
-        /* PDF Reader */
-        .pdf-reader {
+        /* Styles pour le compte à rebours */
+        .countdown {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .countdown-item {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .countdown-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .countdown-label {
+            font-size: 0.8rem;
+            color: var(--dark-color);
+        }
+
+        /* Styles pour les graphiques */
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+        }
+
+        /* Styles pour la corbeille */
+        .trash-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .trash-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Styles pour l'emploi du temps */
+        .schedule {
             width: 100%;
-            height: 600px;
-            background: var(--surface);
-            border-radius: 12px;
-            overflow: hidden;
+            border-collapse: collapse;
+            margin: 15px 0;
         }
 
-        .pdf-controls {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
-            background: var(--glass);
-            border-bottom: 1px solid var(--glass-border);
+        .schedule th, .schedule td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
         }
 
-        .page-indicator {
+        .schedule th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+
+        /* Styles pour le bulletin de notes */
+        .grade-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .grade-table th, .grade-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .grade-table th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+
+        .grade-table input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        /* Styles pour les fichiers */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .file-item {
+            text-align: center;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            background-color: #f9f9f9;
+            transition: var(--transition);
+        }
+
+        .file-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .file-name {
+            font-size: 0.8rem;
+            word-break: break-word;
+        }
+
+        /* Styles pour les alertes personnalisées */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            z-index: 3000;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+
+        .custom-alert.active {
+            display: block;
+        }
+
+        .alert-buttons {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 16px;
+        @media (min-width: 768px) {
+            .nav-container {
+                position: static;
+                flex-direction: column;
+                width: 80px;
+                height: 100vh;
+                justify-content: flex-start;
+                padding-top: 20px;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             }
-            
-            .greeting {
-                font-size: 20px;
+
+            .page {
+                margin-left: 80px;
+                padding-bottom: 20px;
             }
-            
-            .timetable {
-                grid-template-columns: 50px repeat(7, 1fr);
-                font-size: 11px;
+
+            .nav-item {
+                margin-bottom: 20px;
+                font-size: 0.7rem;
             }
-            
-            .timetable-cell {
-                padding: 4px;
-                min-height: 50px;
+
+            .nav-item i {
+                font-size: 1.5rem;
             }
-        }
-
-        /* Animations */
-        .ripple {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .ripple::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
-        }
-
-        .ripple:active::after {
-            width: 300px;
-            height: 300px;
-        }
-
-        /* Badges */
-        .badge {
-            background: var(--primary);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--glass-border);
-            border-top: 2px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <!-- 
-        README INTERNE - Carnet de l'élève/étudiant
-        
-        STRUCTURE INDEXEDDB:
-        - profile: { id: 1, name, status, class, theme, settings }
-        - subjects: { id, name, color, coefficient, createdAt }
-        - assignments: { id, subjectId, title, grade, coefficient, date, category }
-        - attachments: { id, subjectId, type, category, file, fileName, fileType, createdAt }
-        - timetable: { id, context, day, startTime, endTime, subjectId, room, notes, reminder }
-        - library: { id, title, fileName, fileType, file, lastPage, createdAt }
-        - backups: { id, data, hash, createdAt, encrypted }
-        - trash: { id, originalData, type, deletedAt }
-        - logs: { id, action, timestamp, details }
-        
-        ALGORITHMES MOYENNES:
-        - Moyenne matière: somme(notes * coefficients) / somme(coefficients)
-        - Moyenne générale: somme(moyenne_matière * coefficient_matière) / somme(coefficients_matières)
-        - Arrondi à 2 décimales
-        - Option "drop lowest n" disponible dans les paramètres
-        
-        FLOW SUPPRESSION:
-        1. Modal confirmation "Êtes-vous sûr ?"
-        2. Modal demande de taper "SUPPRIMER" ou nom élément
-        3. Soft delete: déplacement vers trash avec deletedAt
-        4. Retention: 30 jours par défaut (configurable)
-        5. Restauration possible depuis corbeille
-        
-        BACKUP & LASTPAGE:
-        - LastPage stocké dans library + dupliqué localStorage
-        - Backup inclut lastPage pour restauration
-        - Reset UI préserve backups, restaure lastPage depuis backup
-        - Si données navigateur supprimées manuellement: restauration impossible
-        
-        CONFIGURATION:
-        - trashRetentionDays: modifier dans profile.settings
-        - PBKDF2 iterations: valeur sécurisée par défaut (100000)
-          Pour debug: réduire à 1000 dans encryptJSON/decryptJSON
-    -->
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <a href="#" class="nav-item active" data-page="accueil">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </a>
+        <a href="#" class="nav-item" data-page="matiere">
+            <i class="fas fa-book"></i>
+            <span>Matière</span>
+        </a>
+        <a href="#" class="nav-item" data-page="bibliotheque">
+            <i class="fas fa-book-open"></i>
+            <span>Bibliothèque</span>
+        </a>
+        <a href="#" class="nav-item" data-page="emploi">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Emploi du temps</span>
+        </a>
+        <a href="#" class="nav-item" data-page="parametre">
+            <i class="fas fa-cog"></i>
+            <span>Paramètre</span>
+        </a>
+    </nav>
 
-    <!-- Onboarding -->
-    <div class="onboarding" id="onboarding">
-        <div class="onboarding-content">
-            <h1 class="onboarding-title">Bienvenue sur ton carnet</h1>
-            <p class="onboarding-subtitle">Chaque ligne apprise aujourd'hui allume une étoile pour demain.</p>
-            
-            <div class="form-group">
-                <label class="form-label">Ton nom</label>
-                <input type="text" class="form-input" id="onboarding-name" placeholder="Alexandre">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Je suis</label>
-                <select class="form-input" id="onboarding-status">
-                    <option value="school">Écolier</option>
-                    <option value="student">Étudiant</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Ma classe</label>
-                <input type="text" class="form-input" id="onboarding-class" placeholder="Terminale S">
-            </div>
-            
-            <button class="btn btn-primary" onclick="completeOnboarding()">Commencer l'aventure</button>
-        </div>
-    </div>
-
-    <!-- Main App -->
-    <div class="container" id="app" style="display: none;">
-        <!-- Home Page -->
-        <div class="page active" id="page-home">
-            <div class="header">
-                <div>
-                    <h1 class="greeting" id="greeting">Bonjour,</h1>
-                    <p class="subtitle" id="daily-motivation">Prêt à conquérir de nouveaux savoirs ?</p>
-                </div>
-                <div class="badge" id="streak-badge">🔥 7 jours</div>
-            </div>
-
-            <div class="glass">
-                <h2 style="margin-bottom: 16px;">Tes matières</h2>
-                <div id="subjects-list">
-                    <!-- Subjects will be populated here -->
-                </div>
-                <button class="btn btn-secondary" onclick="showAddSubjectModal()">
-                    <svg class="nav-icon"><use href="#svg-plus"></use></svg>
-                    Ajouter une matière
-                </button>
-            </div>
-
-            <div class="glass">
-                <h2 style="margin-bottom: 16px;">Progression générale</h2>
-                <canvas id="progress-chart" height="120"></canvas>
+    <!-- Pages -->
+    <!-- Page d'accueil -->
+    <section id="accueil" class="page active">
+        <div class="header">
+            <div class="greeting" id="greeting">Bonjour</div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Rechercher...">
             </div>
         </div>
 
-        <!-- Subjects Page -->
-        <div class="page" id="page-subjects">
-            <div class="header">
-                <h1 class="greeting">Tes matières</h1>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-clock"></i> Date et heure
+                </div>
             </div>
+            <div id="datetime"></div>
+        </div>
 
-            <div id="subjects-detailed-list">
-                <!-- Detailed subjects list -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-tasks"></i> Devoir à préparer
+                </div>
+            </div>
+            <div id="homework-countdown"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-calendar-day"></i> Emploi du temps de demain
+                </div>
+                <a href="#" class="btn btn-small" data-page="emploi">Voir plus</a>
+            </div>
+            <div id="tomorrow-schedule"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-chart-line"></i> Évolution
+                </div>
+                <a href="#" class="btn btn-small" id="view-evolution">Voir détails</a>
+            </div>
+            <div class="chart-container" id="evolution-chart"></div>
+        </div>
+    </section>
+
+    <!-- Page Matière -->
+    <section id="matiere" class="page">
+        <div class="header">
+            <div class="card-title">Matières</div>
+            <button class="btn" id="add-subject-btn">Ajouter une matière</button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Liste des matières</div>
+            </div>
+            <ul class="list" id="subjects-list"></ul>
+        </div>
+    </section>
+
+    <!-- Page Bibliothèque -->
+    <section id="bibliotheque" class="page">
+        <div class="header">
+            <div class="card-title">Bibliothèque</div>
+            <button class="btn" id="add-book-btn">Ajouter un livre</button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Livres disponibles</div>
+            </div>
+            <div class="file-grid" id="books-grid"></div>
+        </div>
+    </section>
+
+    <!-- Page Emploi du temps -->
+    <section id="emploi" class="page">
+        <div class="header">
+            <div class="card-title">Emploi du temps</div>
+            <div>
+                <button class="btn" id="add-schedule-btn">Nouvel emploi</button>
+                <button class="btn" id="add-homework-btn">Devoir à venir</button>
+                <button class="btn" id="add-reminder-btn">Rappel</button>
             </div>
         </div>
 
-        <!-- Timetable Page -->
-        <div class="page" id="page-timetable">
-            <div class="header">
-                <h1 class="greeting">Emploi du temps</h1>
-                <div>
-                    <select class="form-input" id="timetable-context" onchange="loadTimetable()">
-                        <option value="school">À l'école</option>
-                        <option value="home">À la maison</option>
-                    </select>
-                </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Mes emplois du temps</div>
             </div>
+            <div id="schedules-container"></div>
+        </div>
+    </section>
 
-            <div class="glass">
-                <div class="timetable" id="timetable-grid">
-                    <!-- Timetable grid will be populated here -->
-                </div>
-            </div>
-
-            <button class="btn btn-primary" onclick="showAddTimeSlotModal()">
-                <svg class="nav-icon"><use href="#svg-plus"></use></svg>
-                Ajouter un créneau
-            </button>
+    <!-- Page Paramètres -->
+    <section id="parametre" class="page">
+        <div class="header">
+            <div class="card-title">Paramètres</div>
         </div>
 
-        <!-- Library Page -->
-        <div class="page" id="page-library">
-            <div class="header">
-                <h1 class="greeting">Bibliothèque</h1>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Compte</div>
             </div>
-
-            <div class="glass">
-                <div id="library-list">
-                    <!-- Library items will be populated here -->
-                </div>
-                
-                <input type="file" id="pdf-upload" accept=".pdf" style="display: none;" onchange="handlePdfUpload(this.files[0])">
-                <button class="btn btn-primary" onclick="document.getElementById('pdf-upload').click()">
-                    <svg class="nav-icon"><use href="#svg-upload"></use></svg>
-                    Importer un PDF
-                </button>
-            </div>
-        </div>
-
-        <!-- Settings Page -->
-        <div class="page" id="page-settings">
-            <div class="header">
-                <h1 class="greeting">Paramètres</h1>
-            </div>
-
-            <div class="glass">
-                <h2 style="margin-bottom: 16px;">Profil</h2>
+            <form id="user-form">
                 <div class="form-group">
-                    <label class="form-label">Nom</label>
-                    <input type="text" class="form-input" id="settings-name">
+                    <label for="user-firstname">Prénom</label>
+                    <input type="text" id="user-firstname" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Statut</label>
-                    <select class="form-input" id="settings-status">
-                        <option value="school">Écolier</option>
-                        <option value="student">Étudiant</option>
+                    <label for="user-lastname">Nom</label>
+                    <input type="text" id="user-lastname" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="user-status">Statut</label>
+                    <select id="user-status" class="form-control">
+                        <option value="eleve">Élève</option>
+                        <option value="etudiant">Étudiant</option>
+                        <option value="professeur">Professeur</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Classe</label>
-                    <input type="text" class="form-input" id="settings-class">
+                    <label for="user-class">Classe</label>
+                    <input type="text" id="user-class" class="form-control">
                 </div>
+                <button type="submit" class="btn">Enregistrer</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Corbeille</div>
             </div>
-
-            <div class="glass">
-                <h2 style="margin-bottom: 16px;">Apparence</h2>
-                <div class="form-group">
-                    <label class="form-label">Thème</label>
-                    <select class="form-input" id="settings-theme" onchange="changeTheme(this.value)">
-                        <option value="light">Clair</option>
-                        <option value="dark">Sombre</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="glass">
-                <h2 style="margin-bottom: 16px;">Sauvegarde</h2>
-                <button class="btn btn-secondary" onclick="exportData()" style="margin-bottom: 12px;">
-                    <svg class="nav-icon"><use href="#svg-export"></use></svg>
-                    Exporter les données
-                </button>
-                <button class="btn btn-secondary" onclick="importData()" style="margin-bottom: 12px;">
-                    <svg class="nav-icon"><use href="#svg-import"></use></svg>
-                    Importer des données
-                </button>
-                <button class="btn btn-danger" onclick="showResetModal()">
-                    <svg class="nav-icon"><use href="#svg-reset"></use></svg>
-                    Réinitialiser l'application
-                </button>
-            </div>
+            <div id="trash-container"></div>
         </div>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <div class="nav-bottom">
-        <div class="nav-item active" onclick="showPage('home')">
-            <svg class="nav-icon"><use href="#svg-home"></use></svg>
-            <span class="nav-label">Accueil</span>
-        </div>
-        <div class="nav-item" onclick="showPage('subjects')">
-            <svg class="nav-icon"><use href="#svg-subjects"></use></svg>
-            <span class="nav-label">Matières</span>
-        </div>
-        <div class="nav-item" onclick="showPage('timetable')">
-            <svg class="nav-icon"><use href="#svg-timetable"></use></svg>
-            <span class="nav-label">Emploi du temps</span>
-        </div>
-        <div class="nav-item" onclick="showPage('library')">
-            <svg class="nav-icon"><use href="#svg-library"></use></svg>
-            <span class="nav-label">Bibliothèque</span>
-        </div>
-        <div class="nav-item" onclick="showPage('settings')">
-            <svg class="nav-icon"><use href="#svg-settings"></use></svg>
-            <span class="nav-label">Paramètres</span>
-        </div>
-    </div>
-
-    <!-- SVG Icons (Inline) -->
-    <svg style="display: none;">
-        <symbol id="svg-home" viewBox="0 0 24 24">
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-        </symbol>
-        <symbol id="svg-subjects" viewBox="0 0 24 24">
-            <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
-        </symbol>
-        <symbol id="svg-timetable" viewBox="0 0 24 24">
-            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-        </symbol>
-        <symbol id="svg-library" viewBox="0 0 24 24">
-            <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/>
-        </symbol>
-        <symbol id="svg-settings" viewBox="0 0 24 24">
-            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-        </symbol>
-        <symbol id="svg-plus" viewBox="0 0 24 24">
-            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-        </symbol>
-        <symbol id="svg-upload" viewBox="0 0 24 24">
-            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-        </symbol>
-        <symbol id="svg-export" viewBox="0 0 24 24">
-            <path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/>
-        </symbol>
-        <symbol id="svg-import" viewBox="0 0 24 24">
-            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-        </symbol>
-        <symbol id="svg-reset" viewBox="0 0 24 24">
-            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-        </symbol>
-    </svg>
+    </section>
 
     <!-- Modals -->
-    <div class="modal" id="modal-add-subject">
+    <!-- Modal Ajouter une matière -->
+    <div class="modal" id="add-subject-modal">
         <div class="modal-content">
-            <h2 class="modal-title">Nouvelle matière</h2>
-            <div class="form-group">
-                <label class="form-label">Nom de la matière</label>
-                <input type="text" class="form-input" id="subject-name" placeholder="Mathématiques">
+            <div class="modal-header">
+                <div class="modal-title">Ajouter une matière</div>
+                <button class="close-modal">&times;</button>
             </div>
-            <div class="form-group">
-                <label class="form-label">Couleur</label>
-                <input type="color" class="form-input" id="subject-color" value="#6c63ff">
+            <form id="add-subject-form">
+                <div class="form-group">
+                    <label for="subject-name">Nom de la matière</label>
+                    <input type="text" id="subject-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject-coefficient">Coefficient</label>
+                    <input type="number" id="subject-coefficient" class="form-control" min="1" value="1">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Détails d'une matière -->
+    <div class="modal" id="subject-details-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="subject-details-title">Détails de la matière</div>
+                <button class="close-modal">&times;</button>
             </div>
-            <div class="form-group">
-                <label class="form-label">Coefficient</label>
-                <input type="number" class="form-input" id="subject-coefficient" value="1" min="1" max="10">
+            <div class="tabs">
+                <div class="tab active" data-tab="documents">Documents</div>
+                <div class="tab" data-tab="photos">Photos</div>
+                <div class="tab" data-tab="videos">Vidéos</div>
+                <div class="tab" data-tab="notes">Notes</div>
             </div>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="hideModal('modal-add-subject')">Annuler</button>
-                <button class="btn btn-primary" onclick="addSubject()">Ajouter</button>
+
+            <div class="tab-content active" id="documents-tab">
+                <button class="btn" id="add-document-btn">Ajouter un document</button>
+                <div class="file-grid" id="documents-grid"></div>
+            </div>
+
+            <div class="tab-content" id="photos-tab">
+                <button class="btn" id="add-photo-btn">Ajouter une photo</button>
+                <div class="file-grid" id="photos-grid"></div>
+            </div>
+
+            <div class="tab-content" id="videos-tab">
+                <button class="btn" id="add-video-btn">Ajouter une vidéo</button>
+                <div class="file-grid" id="videos-grid"></div>
+            </div>
+
+            <div class="tab-content" id="notes-tab">
+                <button class="btn" id="add-note-btn">Ajouter une note</button>
+                <div class="file-grid" id="notes-grid"></div>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="modal-confirm-delete">
+    <!-- Modal Ajouter un fichier -->
+    <div class="modal" id="add-file-modal">
         <div class="modal-content">
-            <h2 class="modal-title">Confirmer la suppression</h2>
-            <p>Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.</p>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="hideModal('modal-confirm-delete')">Annuler</button>
-                <button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+            <div class="modal-header">
+                <div class="modal-title" id="add-file-title">Ajouter un fichier</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="add-file-form">
+                <div class="form-group">
+                    <label for="file-title">Titre</label>
+                    <input type="text" id="file-title" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="file-content">Contenu</label>
+                    <textarea id="file-content" class="form-control" rows="5"></textarea>
+                </div>
+                <div class="form-group" id="file-upload-container">
+                    <label for="file-upload">Fichier</label>
+                    <input type="file" id="file-upload" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Bulletin de notes -->
+    <div class="modal" id="grades-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Bulletin de notes</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="header">
+                <div id="student-name">Nom Prénom</div>
+                <div id="student-class">Classe</div>
+            </div>
+            <table class="grade-table" id="grades-table">
+                <thead>
+                    <tr>
+                        <th>Matière</th>
+                        <th>Coefficient</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody id="grades-body"></tbody>
+                <tfoot>
+                    <tr>
+                        <td>Total</td>
+                        <td id="total-coeff">0</td>
+                        <td id="total-points">0</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Moyenne</td>
+                        <td id="average-grade">0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="form-group">
+                <label for="grade-report-name">Nom du bulletin</label>
+                <input type="text" id="grade-report-name" class="form-control" placeholder="Ex: Bulletin du 1er semestre">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="calculate-grades-btn">Calculer la moyenne</button>
+                <button class="btn btn-success" id="save-grades-btn">Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="modal-type-confirm">
-        <div class="modal-content">
-            <h2 class="modal-title">Confirmation finale</h2>
-            <p>Tapez <strong id="confirm-text">SUPPRIMER</strong> pour confirmer :</p>
-            <input type="text" class="form-input" id="confirm-input" placeholder="">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="hideModal('modal-type-confirm')">Annuler</button>
-                <button class="btn btn-danger" onclick="finalConfirmDelete()" id="final-confirm-btn" disabled>Confirmer</button>
-            </div>
+    <!-- Alertes personnalisées -->
+    <div class="custom-alert" id="delete-confirm-alert">
+        <div class="alert-title">Confirmer la suppression</div>
+        <div class="alert-message">Êtes-vous sûr de vouloir supprimer cet élément ?</div>
+        <div class="alert-buttons">
+            <button class="btn btn-danger" id="confirm-delete">Supprimer</button>
+            <button class="btn" id="cancel-delete">Annuler</button>
         </div>
     </div>
 
     <script>
-        // Database and State Management
-        let db = null;
-        let currentUser = null;
-        let deleteCallback = null;
-        let deleteData = null;
+        // Données de l'application
+        let appData = {
+            user: {
+                firstname: "",
+                lastname: "",
+                status: "eleve",
+                class: ""
+            },
+            subjects: [],
+            books: [],
+            schedules: [],
+            homework: [],
+            reminders: [],
+            gradeReports: [],
+            trash: []
+        };
 
-        // Initialize the application
-        async function initApp() {
-            await initDB();
-            await loadUserProfile();
+        // Éléments DOM
+        const pages = document.querySelectorAll('.page');
+        const navItems = document.querySelectorAll('.nav-item');
+        const modals = document.querySelectorAll('.modal');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            initNavigation();
+            initModals();
+            initTabs();
+            updateGreeting();
+            updateDateTime();
+            displaySubjects();
+            displayBooks();
+            displaySchedules();
+            displayTrash();
+            setInterval(updateDateTime, 1000);
+            setInterval(updateHomeworkCountdown, 1000);
+        });
+
+        // Navigation entre les pages
+        function initNavigation() {
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    
+                    // Mettre à jour la navigation active
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Afficher la page correspondante
+                    pages.forEach(page => page.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                });
+            });
+        }
+
+        // Gestion des modals
+        function initModals() {
+            // Ouvrir les modals
+            document.getElementById('add-subject-btn').addEventListener('click', () => {
+                openModal('add-subject-modal');
+            });
+
+            document.getElementById('add-book-btn').addEventListener('click', () => {
+                openModal('add-book-modal');
+            });
+
+            document.getElementById('add-schedule-btn').addEventListener('click', () => {
+                openModal('add-schedule-modal');
+            });
+
+            document.getElementById('add-homework-btn').addEventListener('click', () => {
+                openModal('add-homework-modal');
+            });
+
+            document.getElementById('add-reminder-btn').addEventListener('click', () => {
+                openModal('add-reminder-modal');
+            });
+
+            document.getElementById('view-evolution').addEventListener('click', () => {
+                openModal('evolution-modal');
+            });
+
+            // Fermer les modals
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', closeAllModals);
+            });
+
+            // Fermer en cliquant en dehors
+            modals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeAllModals();
+                    }
+                });
+            });
+
+            // Formulaires
+            document.getElementById('user-form').addEventListener('submit', saveUserSettings);
+            document.getElementById('add-subject-form').addEventListener('submit', addSubject);
+        }
+
+        // Onglets
+        function initTabs() {
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Mettre à jour les onglets actifs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Afficher le contenu correspondant
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+        }
+
+        // Fonctions utilitaires
+        function openModal(modalId) {
+            closeAllModals();
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeAllModals() {
+            modals.forEach(modal => modal.classList.remove('active'));
+        }
+
+        function updateGreeting() {
+            const greetings = [
+                "Bonjour", "Bonsoir", "Salut", "Hello", "Hey", "Comment ça va?",
+                "Bienvenue", "Salutations", "Yo", "Hi", "Howdy", "Coucou"
+            ];
+            const now = new Date();
+            const hour = now.getHours();
             
-            if (!currentUser) {
-                document.getElementById('onboarding').style.display = 'flex';
+            let greeting;
+            if (hour < 12) {
+                greeting = greetings[0]; // Bonjour
+            } else if (hour < 18) {
+                greeting = greetings[1]; // Bonsoir
             } else {
-                document.getElementById('app').style.display = 'block';
-                updateUI();
-            }
-        }
-
-        // IndexedDB initialization
-        async function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('StudentNotebook', 1);
-                
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => {
-                    db = request.result;
-                    resolve(db);
-                };
-                
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    
-                    // Create object stores
-                    const stores = [
-                        'profile', 'subjects', 'assignments', 'attachments',
-                        'timetable', 'library', 'backups', 'trash', 'logs'
-                    ];
-                    
-                    stores.forEach(store => {
-                        if (!db.objectStoreNames.contains(store)) {
-                            db.createObjectStore(store, { keyPath: 'id', autoIncrement: true });
-                        }
-                    });
-                };
-            });
-        }
-
-        // Generic DB operations
-        function dbAction(storeName, action, data = null) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                
-                let request;
-                switch (action) {
-                    case 'add':
-                        request = store.add(data);
-                        break;
-                    case 'put':
-                        request = store.put(data);
-                        break;
-                    case 'get':
-                        request = store.get(data);
-                        break;
-                    case 'getAll':
-                        request = store.getAll();
-                        break;
-                    case 'delete':
-                        request = store.delete(data);
-                        break;
-                }
-                
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        // User Profile Management
-        async function loadUserProfile() {
-            const profile = await dbAction('profile', 'get', 1);
-            if (profile) {
-                currentUser = profile;
-                document.body.setAttribute('data-theme', profile.theme || 'light');
-            }
-        }
-
-        async function saveUserProfile(profile) {
-            profile.id = 1;
-            await dbAction('profile', 'put', profile);
-            currentUser = profile;
-            updateUI();
-        }
-
-        // Onboarding
-        function completeOnboarding() {
-            const name = document.getElementById('onboarding-name').value;
-            const status = document.getElementById('onboarding-status').value;
-            const userClass = document.getElementById('onboarding-class').value;
-            
-            if (!name) {
-                alert('Veuillez entrer votre nom');
-                return;
+                greeting = greetings[2]; // Salut
             }
             
-            const profile = {
-                name,
-                status,
-                class: userClass,
-                theme: 'light',
-                settings: {
-                    trashRetentionDays: 30,
-                    dropLowestN: 0,
-                    enableNotifications: true
-                }
+            // Changer aléatoirement parfois
+            if (Math.random() > 0.7) {
+                greeting = greetings[Math.floor(Math.random() * greetings.length)];
+            }
+            
+            const userName = appData.user.firstname || '';
+            document.getElementById('greeting').textContent = userName ? `${greeting}, ${userName}` : greeting;
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             };
-            
-            saveUserProfile(profile);
-            document.getElementById('onboarding').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
+            document.getElementById('datetime').textContent = now.toLocaleDateString('fr-FR', options);
         }
 
-        // UI Navigation
-        function showPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById(`page-${page}`).classList.add('active');
-            document.querySelector(`.nav-item:nth-child(${getNavIndex(page)})`).classList.add('active');
-            
-            updatePageContent(page);
-        }
-
-        function getNavIndex(page) {
-            const pages = ['home', 'subjects', 'timetable', 'library', 'settings'];
-            return pages.indexOf(page) + 1;
-        }
-
-        function updateUI() {
-            if (!currentUser) return;
-            
-            document.getElementById('greeting').textContent = `Bonjour, ${currentUser.name}`;
-            document.getElementById('settings-name').value = currentUser.name;
-            document.getElementById('settings-status').value = currentUser.status;
-            document.getElementById('settings-class').value = currentUser.class;
-            document.getElementById('settings-theme').value = currentUser.theme;
-            
-            updatePageContent('home');
-        }
-
-        async function updatePageContent(page) {
-            switch (page) {
-                case 'home':
-                    await updateHomePage();
-                    break;
-                case 'subjects':
-                    await updateSubjectsPage();
-                    break;
-                case 'timetable':
-                    await updateTimetablePage();
-                    break;
-                case 'library':
-                    await updateLibraryPage();
-                    break;
+        function updateHomeworkCountdown() {
+            // Simuler un compte à rebours pour le prochain devoir
+            const homeworkElement = document.getElementById('homework-countdown');
+            if (appData.homework.length > 0) {
+                const nextHomework = appData.homework[0];
+                const examDate = new Date(nextHomework.date);
+                const now = new Date();
+                const diff = examDate - now;
+                
+                if (diff > 0) {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    homeworkElement.innerHTML = `
+                        <div class="countdown">
+                            <div class="countdown-item">
+                                <div class="countdown-value">${days}</div>
+                                <div class="countdown-label">Jours</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value">${hours}</div>
+                                <div class="countdown-label">Heures</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value">${minutes}</div>
+                                <div class="countdown-label">Minutes</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value">${seconds}</div>
+                                <div class="countdown-label">Secondes</div>
+                            </div>
+                        </div>
+                        <div><strong>${nextHomework.name}</strong></div>
+                    `;
+                } else {
+                    homeworkElement.innerHTML = `<div>Pas de devoir à venir</div>`;
+                }
+            } else {
+                homeworkElement.innerHTML = `<div>Pas de devoir à venir</div>`;
             }
         }
 
-        // Home Page
-        async function updateHomePage() {
-            const subjects = await dbAction('subjects', 'getAll');
-            const assignments = await dbAction('assignments', 'getAll');
-            
+        // Gestion des matières
+        function displaySubjects() {
             const subjectsList = document.getElementById('subjects-list');
             subjectsList.innerHTML = '';
             
-            subjects.forEach(subject => {
-                const subjectAssignments = assignments.filter(a => a.subjectId === subject.id);
-                const average = calculateSubjectAverage(subjectAssignments);
-                
-                const card = document.createElement('div');
-                card.className = 'subject-card';
-                card.onclick = () => showSubjectDetail(subject.id);
-                
-                card.innerHTML = `
-                    <div class="subject-header">
-                        <div class="subject-name">${subject.name}</div>
-                        <div class="subject-average">${average.toFixed(2)}</div>
+            appData.subjects.forEach((subject, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-item';
+                listItem.innerHTML = `
+                    <div>
+                        <div><strong>${subject.name}</strong></div>
+                        <div>Coefficient: ${subject.coefficient}</div>
                     </div>
-                    <div class="sparkline">
-                        <canvas width="200" height="40" data-subject-id="${subject.id}"></canvas>
+                    <div>
+                        <button class="btn btn-small" onclick="viewSubjectDetails(${index})">Voir</button>
+                        <button class="btn btn-small btn-warning" onclick="editSubject(${index})">Modifier</button>
+                        <button class="btn btn-small btn-danger" onclick="confirmDelete('subject', ${index})">Supprimer</button>
                     </div>
                 `;
-                
-                subjectsList.appendChild(card);
+                subjectsList.appendChild(listItem);
+            });
+        }
+
+        function addSubject(e) {
+            e.preventDefault();
+            const name = document.getElementById('subject-name').value;
+            const coefficient = parseInt(document.getElementById('subject-coefficient').value) || 1;
+            
+            appData.subjects.push({
+                name,
+                coefficient,
+                documents: [],
+                photos: [],
+                videos: [],
+                notes: []
             });
             
-            // Render sparklines
-            setTimeout(() => {
-                subjects.forEach(subject => {
-                    renderSparkline(subject.id);
-                });
-            }, 100);
+            saveData();
+            displaySubjects();
+            closeAllModals();
+            document.getElementById('add-subject-form').reset();
         }
 
-        // Subject Management
-        function showAddSubjectModal() {
-            document.getElementById('modal-add-subject').classList.add('active');
-        }
-
-        function hideModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        async function addSubject() {
-            const name = document.getElementById('subject-name').value;
-            const color = document.getElementById('subject-color').value;
-            const coefficient = parseInt(document.getElementById('subject-coefficient').value);
+        function viewSubjectDetails(index) {
+            const subject = appData.subjects[index];
+            document.getElementById('subject-details-title').textContent = subject.name;
             
-            if (!name) {
-                alert('Veuillez entrer un nom pour la matière');
+            // Afficher les documents, photos, etc.
+            displaySubjectFiles('documents', subject.documents);
+            displaySubjectFiles('photos', subject.photos);
+            displaySubjectFiles('videos', subject.videos);
+            displaySubjectFiles('notes', subject.notes);
+            
+            // Configurer les boutons d'ajout
+            document.getElementById('add-document-btn').onclick = () => openAddFileModal('document', index);
+            document.getElementById('add-photo-btn').onclick = () => openAddFileModal('photo', index);
+            document.getElementById('add-video-btn').onclick = () => openAddFileModal('video', index);
+            document.getElementById('add-note-btn').onclick = () => openAddFileModal('note', index);
+            
+            openModal('subject-details-modal');
+        }
+
+        function displaySubjectFiles(type, files) {
+            const grid = document.getElementById(`${type}-grid`);
+            grid.innerHTML = '';
+            
+            files.forEach((file, fileIndex) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-icon">
+                        <i class="fas fa-${getFileIcon(type)}"></i>
+                    </div>
+                    <div class="file-name">${file.title || 'Sans titre'}</div>
+                    <div>
+                        <button class="btn btn-small" onclick="viewFile('${type}', ${fileIndex})">Voir</button>
+                        <button class="btn btn-small btn-danger" onclick="confirmDelete('${type}', ${fileIndex})">Supprimer</button>
+                    </div>
+                `;
+                grid.appendChild(fileItem);
+            });
+        }
+
+        function getFileIcon(type) {
+            switch(type) {
+                case 'documents': return 'file-alt';
+                case 'photos': return 'image';
+                case 'videos': return 'video';
+                case 'notes': return 'sticky-note';
+                default: return 'file';
+            }
+        }
+
+        function openAddFileModal(type, subjectIndex) {
+            document.getElementById('add-file-title').textContent = `Ajouter un ${type}`;
+            
+            // Afficher ou masquer le champ de téléchargement selon le type
+            const uploadContainer = document.getElementById('file-upload-container');
+            if (type === 'photo' || type === 'video' || type === 'document') {
+                uploadContainer.style.display = 'block';
+            } else {
+                uploadContainer.style.display = 'none';
+            }
+            
+            // Configurer le formulaire
+            document.getElementById('add-file-form').onsubmit = function(e) {
+                e.preventDefault();
+                addFileToSubject(type, subjectIndex);
+            };
+            
+            openModal('add-file-modal');
+        }
+
+        function addFileToSubject(type, subjectIndex) {
+            const title = document.getElementById('file-title').value;
+            const content = document.getElementById('file-content').value;
+            
+            const fileData = {
+                title,
+                content,
+                date: new Date().toISOString()
+            };
+            
+            // Ajouter le fichier à la matière
+            appData.subjects[subjectIndex][type + 's'].push(fileData);
+            
+            saveData();
+            viewSubjectDetails(subjectIndex); // Recharger les détails
+            closeAllModals();
+            document.getElementById('add-file-form').reset();
+        }
+
+        // Gestion des livres
+        function displayBooks() {
+            const booksGrid = document.getElementById('books-grid');
+            booksGrid.innerHTML = '';
+            
+            appData.books.forEach((book, index) => {
+                const bookItem = document.createElement('div');
+                bookItem.className = 'file-item';
+                bookItem.innerHTML = `
+                    <div class="file-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="file-name">${book.title}</div>
+                    <div>
+                        <button class="btn btn-small" onclick="viewBook(${index})">Voir</button>
+                        <button class="btn btn-small btn-warning" onclick="editBook(${index})">Modifier</button>
+                        <button class="btn btn-small btn-danger" onclick="confirmDelete('book', ${index})">Supprimer</button>
+                    </div>
+                `;
+                booksGrid.appendChild(bookItem);
+            });
+        }
+
+        // Gestion des emplois du temps
+        function displaySchedules() {
+            const container = document.getElementById('schedules-container');
+            container.innerHTML = '';
+            
+            appData.schedules.forEach((schedule, index) => {
+                const scheduleCard = document.createElement('div');
+                scheduleCard.className = 'card';
+                scheduleCard.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">${schedule.name}</div>
+                        <div>
+                            <button class="btn btn-small" onclick="viewSchedule(${index})">Voir</button>
+                            <button class="btn btn-small btn-warning" onclick="editSchedule(${index})">Modifier</button>
+                            <button class="btn btn-small btn-danger" onclick="confirmDelete('schedule', ${index})">Supprimer</button>
+                        </div>
+                    </div>
+                    <div>${schedule.description || ''}</div>
+                `;
+                container.appendChild(scheduleCard);
+            });
+        }
+
+        // Gestion de la corbeille
+        function displayTrash() {
+            const container = document.getElementById('trash-container');
+            container.innerHTML = '';
+            
+            if (appData.trash.length === 0) {
+                container.innerHTML = '<div class="trash-item">Corbeille vide</div>';
                 return;
             }
             
-            const subject = {
-                name,
-                color,
-                coefficient,
-                createdAt: new Date().toISOString()
-            };
-            
-            await dbAction('subjects', 'add', subject);
-            hideModal('modal-add-subject');
-            updateHomePage();
-            
-            // Reset form
-            document.getElementById('subject-name').value = '';
-            document.getElementById('subject-color').value = '#6c63ff';
-            document.getElementById('subject-coefficient').value = '1';
-        }
-
-        // Calculations
-        function calculateSubjectAverage(assignments) {
-            if (assignments.length === 0) return 0;
-            
-            const totalWeighted = assignments.reduce((sum, assignment) => {
-                return sum + (assignment.grade * assignment.coefficient);
-            }, 0);
-            
-            const totalCoefficients = assignments.reduce((sum, assignment) => {
-                return sum + assignment.coefficient;
-            }, 0);
-            
-            return totalWeighted / totalCoefficients;
-        }
-
-        // Sparkline rendering
-        function renderSparkline(subjectId) {
-            const canvas = document.querySelector(`canvas[data-subject-id="${subjectId}"]`);
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-            
-            // Generate sample data (in real app, this would come from assignments)
-            const data = Array.from({length: 8}, () => Math.random() * 10 + 10);
-            
-            ctx.clearRect(0, 0, width, height);
-            
-            // Draw background
-            ctx.fillStyle = 'rgba(108, 99, 255, 0.1)';
-            ctx.beginPath();
-            
-            const xStep = width / (data.length - 1);
-            ctx.moveTo(0, height - (data[0] / 20) * height);
-            
-            data.forEach((value, index) => {
-                const x = index * xStep;
-                const y = height - (value / 20) * height;
-                ctx.lineTo(x, y);
+            appData.trash.forEach((item, index) => {
+                const trashItem = document.createElement('div');
+                trashItem.className = 'trash-item';
+                trashItem.innerHTML = `
+                    <div>
+                        <div><strong>${item.name || item.title || 'Élément sans nom'}</strong></div>
+                        <div>Type: ${item.type}</div>
+                        <div>Date de suppression: ${new Date(item.deletedAt).toLocaleDateString('fr-FR')}</div>
+                    </div>
+                    <div class="trash-actions">
+                        <button class="btn btn-small btn-success" onclick="restoreFromTrash(${index})">Restaurer</button>
+                        <button class="btn btn-small btn-danger" onclick="permanentlyDelete(${index})">Supprimer</button>
+                    </div>
+                `;
+                container.appendChild(trashItem);
             });
             
-            ctx.lineTo(width, height);
-            ctx.lineTo(0, height);
-            ctx.closePath();
-            ctx.fill();
-            
-            // Draw line
-            ctx.strokeStyle = '#6c63ff';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            
-            data.forEach((value, index) => {
-                const x = index * xStep;
-                const y = height - (value / 20) * height;
-                
-                if (index === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            });
-            
-            ctx.stroke();
+            // Ajouter le bouton pour vider toute la corbeille
+            const emptyTrashBtn = document.createElement('button');
+            emptyTrashBtn.className = 'btn btn-danger';
+            emptyTrashBtn.textContent = 'Vider la corbeille';
+            emptyTrashBtn.onclick = emptyTrash;
+            container.appendChild(emptyTrashBtn);
         }
 
-        // Settings
-        function changeTheme(theme) {
-            document.body.setAttribute('data-theme', theme);
-            if (currentUser) {
-                currentUser.theme = theme;
-                saveUserProfile(currentUser);
-            }
-        }
-
-        // Export/Import
-        async function exportData() {
-            const password = prompt('Mot de passe (facultatif) :');
-            const data = await getAllData();
+        // Fonctions de confirmation de suppression
+        function confirmDelete(type, index) {
+            const alert = document.getElementById('delete-confirm-alert');
+            alert.classList.add('active');
             
-            let exportData;
-            if (password) {
-                exportData = await encryptJSON(password, data);
-            } else {
-                exportData = JSON.stringify(data, null, 2);
-            }
-            
-            const blob = new Blob([exportData], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `carnet-backup-${new Date().toISOString().split('T')[0]}.${password ? 'carnet' : 'json'}`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        async function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json,.carnet';
-            
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                const text = await file.text();
-                
-                let data;
-                try {
-                    // Try to parse as JSON first
-                    data = JSON.parse(text);
-                } catch {
-                    // If it fails, try to decrypt
-                    const password = prompt('Ce fichier est chiffré. Entrez le mot de passe :');
-                    if (!password) return;
-                    
-                    try {
-                        data = await decryptJSON(password, text);
-                    } catch (error) {
-                        alert('Mot de passe incorrect ou fichier corrompu');
-                        return;
-                    }
-                }
-                
-                // Validate data structure
-                if (!isValidBackup(data)) {
-                    alert('Format de fichier invalide');
-                    return;
-                }
-                
-                const confirmMerge = confirm('Voulez-vous fusionner avec les données existantes ? (Annuler pour écraser)');
-                await restoreData(data, confirmMerge);
-                alert('Données importées avec succès !');
-                location.reload();
+            document.getElementById('confirm-delete').onclick = function() {
+                moveToTrash(type, index);
+                alert.classList.remove('active');
             };
             
-            input.click();
+            document.getElementById('cancel-delete').onclick = function() {
+                alert.classList.remove('active');
+            };
         }
 
-        // Encryption utilities
-        async function encryptJSON(password, obj) {
-            const text = JSON.stringify(obj);
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text);
+        function moveToTrash(type, index) {
+            let item;
             
-            // Generate salt and IV
-            const salt = crypto.getRandomValues(new Uint8Array(16));
-            const iv = crypto.getRandomValues(new Uint8Array(12));
+            switch(type) {
+                case 'subject':
+                    item = appData.subjects[index];
+                    item.type = 'subject';
+                    appData.subjects.splice(index, 1);
+                    break;
+                case 'book':
+                    item = appData.books[index];
+                    item.type = 'book';
+                    appData.books.splice(index, 1);
+                    break;
+                case 'schedule':
+                    item = appData.schedules[index];
+                    item.type = 'schedule';
+                    appData.schedules.splice(index, 1);
+                    break;
+                // Ajouter d'autres types au besoin
+            }
             
-            // Derive key
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw',
-                encoder.encode(password),
-                'PBKDF2',
-                false,
-                ['deriveKey']
-            );
-            
-            const key = await crypto.subtle.deriveKey(
-                {
-                    name: 'PBKDF2',
-                    salt: salt,
-                    iterations: 100000,
-                    hash: 'SHA-256'
-                },
-                keyMaterial,
-                { name: 'AES-GCM', length: 256 },
-                false,
-                ['encrypt']
-            );
-            
-            // Encrypt
-            const encrypted = await crypto.subtle.encrypt(
-                {
-                    name: 'AES-GCM',
-                    iv: iv
-                },
-                key,
-                data
-            );
-            
-            // Combine salt + iv + encrypted data
-            const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
-            result.set(salt);
-            result.set(iv, salt.length);
-            result.set(new Uint8Array(encrypted), salt.length + iv.length);
-            
-            return btoa(String.fromCharCode(...result));
-        }
-
-        async function decryptJSON(password, payload) {
-            try {
-                const data = Uint8Array.from(atob(payload), c => c.charCodeAt(0));
+            if (item) {
+                item.deletedAt = new Date().toISOString();
+                appData.trash.push(item);
+                saveData();
                 
-                // Extract salt, iv, and encrypted data
-                const salt = data.slice(0, 16);
-                const iv = data.slice(16, 28);
-                const encrypted = data.slice(28);
-                
-                // Derive key
-                const encoder = new TextEncoder();
-                const keyMaterial = await crypto.subtle.importKey(
-                    'raw',
-                    encoder.encode(password),
-                    'PBKDF2',
-                    false,
-                    ['deriveKey']
-                );
-                
-                const key = await crypto.subtle.deriveKey(
-                    {
-                        name: 'PBKDF2',
-                        salt: salt,
-                        iterations: 100000,
-                        hash: 'SHA-256'
-                    },
-                    keyMaterial,
-                    { name: 'AES-GCM', length: 256 },
-                    false,
-                    ['decrypt']
-                );
-                
-                // Decrypt
-                const decrypted = await crypto.subtle.decrypt(
-                    {
-                        name: 'AES-GCM',
-                        iv: iv
-                    },
-                    key,
-                    encrypted
-                );
-                
-                const text = new TextDecoder().decode(decrypted);
-                return JSON.parse(text);
-            } catch (error) {
-                throw new Error('Decryption failed');
+                // Mettre à jour l'affichage
+                displaySubjects();
+                displayBooks();
+                displaySchedules();
+                displayTrash();
             }
         }
 
-        // Data management
-        async function getAllData() {
-            const stores = ['profile', 'subjects', 'assignments', 'attachments', 'timetable', 'library'];
-            const data = {};
+        function restoreFromTrash(index) {
+            const item = appData.trash[index];
             
-            for (const store of stores) {
-                data[store] = await dbAction(store, 'getAll');
+            switch(item.type) {
+                case 'subject':
+                    appData.subjects.push(item);
+                    break;
+                case 'book':
+                    appData.books.push(item);
+                    break;
+                case 'schedule':
+                    appData.schedules.push(item);
+                    break;
             }
             
-            return data;
+            appData.trash.splice(index, 1);
+            saveData();
+            displayTrash();
+            displaySubjects();
+            displayBooks();
+            displaySchedules();
         }
 
-        function isValidBackup(data) {
-            const requiredStores = ['profile', 'subjects', 'assignments', 'library'];
-            return requiredStores.every(store => Array.isArray(data[store]));
+        function permanentlyDelete(index) {
+            appData.trash.splice(index, 1);
+            saveData();
+            displayTrash();
         }
 
-        async function restoreData(data, merge = false) {
-            const stores = Object.keys(data);
+        function emptyTrash() {
+            appData.trash = [];
+            saveData();
+            displayTrash();
+        }
+
+        // Gestion des paramètres utilisateur
+        function saveUserSettings(e) {
+            e.preventDefault();
+            appData.user.firstname = document.getElementById('user-firstname').value;
+            appData.user.lastname = document.getElementById('user-lastname').value;
+            appData.user.status = document.getElementById('user-status').value;
+            appData.user.class = document.getElementById('user-class').value;
             
-            for (const store of stores) {
-                if (!merge) {
-                    // Clear existing data
-                    const allItems = await dbAction(store, 'getAll');
-                    for (const item of allItems) {
-                        await dbAction(store, 'delete', item.id);
-                    }
+            saveData();
+            updateGreeting();
+            alert('Paramètres enregistrés avec succès!');
+        }
+
+        // Persistance des données
+        function saveData() {
+            localStorage.setItem('eduManagerData', JSON.stringify(appData));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('eduManagerData');
+            if (savedData) {
+                appData = JSON.parse(savedData);
+                
+                // Remplir le formulaire utilisateur
+                document.getElementById('user-firstname').value = appData.user.firstname || '';
+                document.getElementById('user-lastname').value = appData.user.lastname || '';
+                document.getElementById('user-status').value = appData.user.status || 'eleve';
+                document.getElementById('user-class').value = appData.user.class || '';
+            }
+            
+            // Données par défaut si vide
+            if (appData.subjects.length === 0) {
+                appData.subjects = [
+                    { name: "Mathématiques", coefficient: 3, documents: [], photos: [], videos: [], notes: [] },
+                    { name: "Français", coefficient: 2, documents: [], photos: [], videos: [], notes: [] },
+                    { name: "Histoire-Géographie", coefficient: 2, documents: [], photos: [], videos: [], notes: [] }
+                ];
+            }
+            
+            if (appData.books.length === 0) {
+                appData.books = [
+                    { title: "Manuel de Mathématiques" },
+                    { title: "Anthologie de la Littérature Française" },
+                    { title: "Atlas Historique" }
+                ];
+            }
+            
+            if (appData.schedules.length === 0) {
+                appData.schedules = [
+                    { name: "Emploi du temps scolaire", description: "Emploi du temps de la semaine" },
+                    { name: "Emploi du temps à la maison", description: "Planning de révision" }
+                ];
+            }
+            
+            if (appData.homework.length === 0) {
+                const nextWeek = new Date();
+                nextWeek.setDate(nextWeek.getDate() + 7);
+                appData.homework = [
+                    { name: "Examen de Mathématiques", date: nextWeek.toISOString() }
+                ];
+            }
+            
+            saveData();
+        }
+
+        // Fonctions à implémenter (placeholders)
+      // Fonction pour visualiser un fichier
+function viewFile(type, index) {
+    const currentSubjectIndex = getCurrentSubjectIndex();
+    if (currentSubjectIndex === -1) return;
+    
+    const subject = appData.subjects[currentSubjectIndex];
+    const file = subject[type + 's'][index];
+    
+    // Créer un modal pour afficher le fichier
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 90%; max-height: 90%;">
+            <div class="modal-header">
+                <div class="modal-title">${file.title || 'Fichier sans titre'}</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+                ${getFileContentPreview(file, type)}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger close-modal">Fermer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Gérer la fermeture
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function getFileContentPreview(file, type) {
+    switch(type) {
+        case 'documents':
+            return `<div style="white-space: pre-wrap;">${file.content || 'Aucun contenu'}</div>`;
+        case 'photos':
+            if (file.fileUrl) {
+                return `<img src="${file.fileUrl}" style="max-width: 100%; height: auto;" alt="${file.title}">`;
+            }
+            return `<p>Aucune image disponible</p>`;
+        case 'videos':
+            if (file.fileUrl) {
+                return `<video controls style="max-width: 100%;"><source src="${file.fileUrl}"></video>`;
+            }
+            return `<p>Aucune vidéo disponible</p>`;
+        case 'notes':
+            return `<div style="white-space: pre-wrap;">${file.content || 'Aucune note'}</div>`;
+        default:
+            return `<p>Type de fichier non supporté</p>`;
+    }
+}
+
+// Fonction pour modifier une matière
+function editSubject(index) {
+    const subject = appData.subjects[index];
+    
+    // Créer le formulaire de modification
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Modifier la matière</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="edit-subject-form">
+                <div class="form-group">
+                    <label for="edit-subject-name">Nom de la matière</label>
+                    <input type="text" id="edit-subject-name" class="form-control" value="${subject.name}" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-subject-coefficient">Coefficient</label>
+                    <input type="number" id="edit-subject-coefficient" class="form-control" min="1" value="${subject.coefficient}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Gérer la soumission du formulaire
+    modal.querySelector('#edit-subject-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('edit-subject-name').value;
+        const coefficient = parseInt(document.getElementById('edit-subject-coefficient').value) || 1;
+        
+        // Mettre à jour la matière
+        appData.subjects[index].name = name;
+        appData.subjects[index].coefficient = coefficient;
+        
+        saveData();
+        displaySubjects();
+        modal.remove();
+    });
+    
+    // Gérer la fermeture
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+// Fonction pour visualiser un livre
+function viewBook(index) {
+    const book = appData.books[index];
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 90%; max-height: 90%;">
+            <div class="modal-header">
+                <div class="modal-title">${book.title}</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div style="padding: 20px; text-align: center;">
+                ${book.fileUrl ? 
+                    `<iframe src="${book.fileUrl}" style="width: 100%; height: 70vh; border: none;"></iframe>` :
+                    `<p>Aucun fichier disponible pour ce livre</p>`
                 }
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger close-modal">Fermer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+// Fonction pour modifier un livre
+function editBook(index) {
+    const book = appData.books[index];
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Modifier le livre</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="edit-book-form">
+                <div class="form-group">
+                    <label for="edit-book-title">Titre du livre</label>
+                    <input type="text" id="edit-book-title" class="form-control" value="${book.title}" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-book-file">Fichier PDF/Image</label>
+                    <input type="file" id="edit-book-file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                    ${book.fileUrl ? `<p class="file-info">Fichier actuel: ${book.fileUrl}</p>` : ''}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('#edit-book-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const title = document.getElementById('edit-book-title').value;
+        const fileInput = document.getElementById('edit-book-file');
+        
+        // Mettre à jour le livre
+        appData.books[index].title = title;
+        
+        // Gérer le fichier uploadé
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileUrl = URL.createObjectURL(file);
+            appData.books[index].fileUrl = fileUrl;
+        }
+        
+        saveData();
+        displayBooks();
+        modal.remove();
+    });
+    
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+// Fonction pour visualiser un emploi du temps
+function viewSchedule(index) {
+    const schedule = appData.schedules[index];
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 95%;">
+            <div class="modal-header">
+                <div class="modal-title">${schedule.name}</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div style="padding: 20px;">
+                ${schedule.description ? `<p>${schedule.description}</p>` : ''}
+                <div class="schedule-view">
+                    ${renderScheduleTable(schedule)}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger close-modal">Fermer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function renderScheduleTable(schedule) {
+    if (!schedule.data || schedule.data.length === 0) {
+        return '<p>Aucun cours programmé</p>';
+    }
+    
+    let html = `
+        <table class="schedule" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Heure</th>
+                    <th>Lundi</th>
+                    <th>Mardi</th>
+                    <th>Mercredi</th>
+                    <th>Jeudi</th>
+                    <th>Vendredi</th>
+                    <th>Samedi</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    // Heures typiques pour un emploi du temps scolaire
+    const timeSlots = [
+        '8h-9h', '9h-10h', '10h-11h', '11h-12h',
+        '12h-13h', '13h-14h', '14h-15h', '15h-16h', '16h-17h'
+    ];
+    
+    timeSlots.forEach(time => {
+        html += `<tr><td>${time}</td>`;
+        for (let i = 0; i < 6; i++) {
+            const course = schedule.data.find(c => c.time === time && c.day === i);
+            html += `<td style="background-color: ${course ? course.color : 'transparent'}; padding: 8px;">${course ? course.subject : ''}</td>`;
+        }
+        html += '</tr>';
+    });
+    
+    html += '</tbody></table>';
+    return html;
+}
+
+// Fonction pour modifier un emploi du temps
+function editSchedule(index) {
+    const schedule = appData.schedules[index];
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 95%;">
+            <div class="modal-header">
+                <div class="modal-title">Modifier l'emploi du temps</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="edit-schedule-form">
+                <div class="form-group">
+                    <label for="edit-schedule-name">Nom</label>
+                    <input type="text" id="edit-schedule-name" class="form-control" value="${schedule.name}" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-schedule-description">Description</label>
+                    <textarea id="edit-schedule-description" class="form-control">${schedule.description || ''}</textarea>
+                </div>
                 
-                // Add new data
-                for (const item of data[store]) {
-                    await dbAction(store, 'add', item);
-                }
+                <div class="form-group">
+                    <label>Ajouter un cours</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;">
+                        <select id="new-course-day" class="form-control">
+                            <option value="0">Lundi</option>
+                            <option value="1">Mardi</option>
+                            <option value="2">Mercredi</option>
+                            <option value="3">Jeudi</option>
+                            <option value="4">Vendredi</option>
+                            <option value="5">Samedi</option>
+                        </select>
+                        <select id="new-course-time" class="form-control">
+                            <option value="8h-9h">8h-9h</option>
+                            <option value="9h-10h">9h-10h</option>
+                            <option value="10h-11h">10h-11h</option>
+                            <option value="11h-12h">11h-12h</option>
+                            <option value="12h-13h">12h-13h</option>
+                            <option value="13h-14h">13h-14h</option>
+                            <option value="14h-15h">14h-15h</option>
+                            <option value="15h-16h">15h-16h</option>
+                            <option value="16h-17h">16h-17h</option>
+                        </select>
+                        <input type="text" id="new-course-subject" class="form-control" placeholder="Matière">
+                        <input type="color" id="new-course-color" class="form-control" value="#4a6fa5">
+                        <button type="button" class="btn btn-small" id="add-course-btn">+</button>
+                    </div>
+                </div>
+                
+                <div id="courses-list">
+                    ${renderCoursesList(schedule)}
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Initialiser les données si elles n'existent pas
+    if (!schedule.data) {
+        schedule.data = [];
+    }
+    
+    // Ajouter un cours
+    modal.querySelector('#add-course-btn').addEventListener('click', function() {
+        const day = parseInt(modal.querySelector('#new-course-day').value);
+        const time = modal.querySelector('#new-course-time').value;
+        const subject = modal.querySelector('#new-course-subject').value;
+        const color = modal.querySelector('#new-course-color').value;
+        
+        if (subject.trim()) {
+            schedule.data.push({ day, time, subject, color });
+            modal.querySelector('#courses-list').innerHTML = renderCoursesList(schedule);
+            
+            // Réinitialiser les champs
+            modal.querySelector('#new-course-subject').value = '';
+        }
+    });
+    
+    // Gérer la soumission du formulaire
+    modal.querySelector('#edit-schedule-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('edit-schedule-name').value;
+        const description = document.getElementById('edit-schedule-description').value;
+        
+        // Mettre à jour l'emploi du temps
+        appData.schedules[index].name = name;
+        appData.schedules[index].description = description;
+        
+        saveData();
+        displaySchedules();
+        modal.remove();
+    });
+    
+    // Gérer la fermeture
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function renderCoursesList(schedule) {
+    if (!schedule.data || schedule.data.length === 0) {
+        return '<p>Aucun cours ajouté</p>';
+    }
+    
+    let html = '<h4>Cours programmés</h4><ul class="list">';
+    
+    schedule.data.forEach((course, courseIndex) => {
+        const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+        html += `
+            <li class="list-item">
+                <div>
+                    <span style="display: inline-block; width: 20px; height: 20px; background-color: ${course.color}; margin-right: 10px;"></span>
+                    ${days[course.day]} - ${course.time} - ${course.subject}
+                </div>
+                <button type="button" class="btn btn-small btn-danger" onclick="removeCourse(${courseIndex})">Supprimer</button>
+            </li>
+        `;
+    });
+    
+    html += '</ul>';
+    return html;
+}
+
+function removeCourse(courseIndex) {
+    const currentScheduleIndex = getCurrentScheduleIndex();
+    if (currentScheduleIndex === -1) return;
+    
+    appData.schedules[currentScheduleIndex].data.splice(courseIndex, 1);
+    
+    // Mettre à jour l'affichage
+    const modal = document.querySelector('.modal.active');
+    if (modal) {
+        modal.querySelector('#courses-list').innerHTML = renderCoursesList(appData.schedules[currentScheduleIndex]);
+    }
+}
+
+// Fonctions utilitaires
+function getCurrentSubjectIndex() {
+    const modalTitle = document.getElementById('subject-details-title');
+    if (!modalTitle) return -1;
+    
+    const subjectName = modalTitle.textContent.replace('Détails de la matière', '').trim();
+    return appData.subjects.findIndex(subject => subject.name === subjectName);
+}
+
+function getCurrentScheduleIndex() {
+    const modalTitle = document.querySelector('.modal.active .modal-title');
+    if (!modalTitle) return -1;
+    
+    const scheduleName = modalTitle.textContent.replace('Modifier l\'emploi du temps', '').trim();
+    return appData.schedules.findIndex(schedule => schedule.name === scheduleName);
+}
+      
+      // Fonction pour visualiser un fichier - VERSION CORRIGÉE
+function viewFile(type, fileIndex) {
+    // Récupérer l'index de la matière actuelle
+    const subjectIndex = getCurrentSubjectIndex();
+    if (subjectIndex === -1) return;
+    
+    const subject = appData.subjects[subjectIndex];
+    const file = subject[type + 's'][fileIndex];
+    
+    if (!file) return;
+    
+    // Créer un modal pour afficher le fichier
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 95%; max-height: 95%;">
+            <div class="modal-header">
+                <div class="modal-title">${file.title || 'Fichier sans titre'}</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div style="padding: 20px; max-height: 70vh; overflow-y: auto; text-align: center;">
+                ${getFileContentPreview(file, type)}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger close-modal">Fermer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Gérer la fermeture
+    const closeModal = () => modal.remove();
+    modal.querySelector('.close-modal').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => e.target === modal && closeModal());
+}
+
+// Fonction améliorée pour l'aperçu des fichiers
+function getFileContentPreview(file, type) {
+    switch(type) {
+        case 'documents':
+            return `
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: left;">
+                    <h4>${file.title || 'Document sans titre'}</h4>
+                    <div style="white-space: pre-wrap; margin-top: 15px;">${file.content || 'Aucun contenu'}</div>
+                    ${file.date ? `<p style="color: #666; margin-top: 15px; font-size: 0.9em;">Créé le: ${new Date(file.date).toLocaleDateString('fr-FR')}</p>` : ''}
+                </div>
+            `;
+        case 'photos':
+            if (file.fileUrl) {
+                return `<img src="${file.fileUrl}" style="max-width: 100%; max-height: 60vh; border-radius: 8px;" alt="${file.title}">`;
+            } else if (file.content) {
+                // Si c'est une URL base64 ou un chemin
+                return `<img src="${file.content}" style="max-width: 100%; max-height: 60vh; border-radius: 8px;" alt="${file.title}">`;
             }
-        }
-
-        // Modal functions for delete confirmation flow
-        function showDeleteConfirmation(callback, data, confirmText = 'SUPPRIMER') {
-            deleteCallback = callback;
-            deleteData = data;
-            document.getElementById('confirm-text').textContent = confirmText;
-            document.getElementById('confirm-input').value = '';
-            document.getElementById('final-confirm-btn').disabled = true;
-            
-            hideModal('modal-confirm-delete');
-            document.getElementById('modal-type-confirm').classList.add('active');
-        }
-
-        function confirmDelete() {
-            // First confirmation
-            hideModal('modal-confirm-delete');
-            // Second confirmation handled in showDeleteConfirmation
-        }
-
-        function finalConfirmDelete() {
-            if (deleteCallback) {
-                deleteCallback(deleteData);
+            return `<div style="padding: 40px; color: #666;">
+                <i class="fas fa-image" style="font-size: 3em; margin-bottom: 15px;"></i>
+                <p>Aucune image disponible</p>
+            </div>`;
+        case 'videos':
+            if (file.fileUrl) {
+                return `<video controls style="max-width: 100%; max-height: 60vh; border-radius: 8px;">
+                    <source src="${file.fileUrl}">
+                    Votre navigateur ne supporte pas la lecture vidéo.
+                </video>`;
+            } else if (file.content && file.content.startsWith('http')) {
+                return `<video controls style="max-width: 100%; max-height: 60vh; border-radius: 8px;">
+                    <source src="${file.content}">
+                    Votre navigateur ne supporte pas la lecture vidéo.
+                </video>`;
             }
-            hideModal('modal-type-confirm');
+            return `<div style="padding: 40px; color: #666;">
+                <i class="fas fa-video" style="font-size: 3em; margin-bottom: 15px;"></i>
+                <p>Aucune vidéo disponible</p>
+            </div>`;
+        case 'notes':
+            return `
+                <div style="background: #fff9e6; padding: 20px; border-radius: 8px; border-left: 4px solid #ffd700; text-align: left;">
+                    <h4>${file.title || 'Note sans titre'}</h4>
+                    <div style="white-space: pre-wrap; margin-top: 15px;">${file.content || 'Aucune note'}</div>
+                    ${file.date ? `<p style="color: #666; margin-top: 15px; font-size: 0.9em;">Créé le: ${new Date(file.date).toLocaleDateString('fr-FR')}</p>` : ''}
+                </div>
+            `;
+        default:
+            return `<p>Type de fichier non supporté</p>`;
+    }
+}
+
+// Fonction pour ajouter un fichier à une matière - VERSION CORRIGÉE
+function addFileToSubject(type, subjectIndex) {
+    const title = document.getElementById('file-title').value || `Sans titre - ${new Date().toLocaleString()}`;
+    const content = document.getElementById('file-content').value;
+    const fileInput = document.getElementById('file-upload');
+    
+    const fileData = {
+        title,
+        content,
+        date: new Date().toISOString()
+    };
+    
+    // Gérer l'upload de fichier pour les photos, vidéos et documents
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const fileUrl = URL.createObjectURL(file);
+        fileData.fileUrl = fileUrl;
+        fileData.fileName = file.name;
+        fileData.fileType = file.type;
+    }
+    
+    // Ajouter le fichier à la matière
+    appData.subjects[subjectIndex][type + 's'].push(fileData);
+    
+    saveData();
+    
+    // Recharger l'affichage des fichiers du type actuel
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab) {
+        const tabType = activeTab.getAttribute('data-tab');
+        displaySubjectFiles(tabType, appData.subjects[subjectIndex][tabType]);
+    }
+    
+    closeAllModals();
+    document.getElementById('add-file-form').reset();
+}
+
+// Fonction pour afficher les fichiers d'une matière - VERSION CORRIGÉE
+function displaySubjectFiles(type, files) {
+    const grid = document.getElementById(`${type}-grid`);
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    if (files.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <i class="fas fa-${getFileIcon(type)}" style="font-size: 3em; margin-bottom: 15px;"></i>
+                <p>Aucun ${getFileTypeLabel(type)}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    files.forEach((file, fileIndex) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+            <div class="file-icon" onclick="viewFile('${type}', ${fileIndex})" style="cursor: pointer;">
+                <i class="fas fa-${getFileIcon(type)}"></i>
+            </div>
+            <div class="file-name" style="cursor: pointer;" onclick="viewFile('${type}', ${fileIndex})">
+                ${file.title || 'Sans titre'}
+            </div>
+            <div style="font-size: 0.7em; color: #666; margin: 5px 0;">
+                ${new Date(file.date).toLocaleDateString('fr-FR')}
+            </div>
+            <div>
+                <button class="btn btn-small" onclick="viewFile('${type}', ${fileIndex})">Voir</button>
+                <button class="btn btn-small btn-danger" onclick="confirmDeleteFile('${type}', ${fileIndex})">Supprimer</button>
+            </div>
+        `;
+        grid.appendChild(fileItem);
+    });
+}
+
+// Fonction utilitaire pour obtenir le libellé du type de fichier
+function getFileTypeLabel(type) {
+    const labels = {
+        'documents': 'document',
+        'photos': 'photo', 
+        'videos': 'vidéo',
+        'notes': 'note'
+    };
+    return labels[type] || 'fichier';
+}
+
+// Fonction de confirmation de suppression pour les fichiers
+function confirmDeleteFile(type, fileIndex) {
+    const alert = document.getElementById('delete-confirm-alert');
+    const alertMessage = alert.querySelector('.alert-message');
+    alertMessage.textContent = 'Êtes-vous sûr de vouloir supprimer ce fichier ?';
+    
+    alert.classList.add('active');
+    
+    document.getElementById('confirm-delete').onclick = function() {
+        deleteFile(type, fileIndex);
+        alert.classList.remove('active');
+    };
+    
+    document.getElementById('cancel-delete').onclick = function() {
+        alert.classList.remove('active');
+    };
+}
+
+// Fonction pour supprimer un fichier
+function deleteFile(type, fileIndex) {
+    const subjectIndex = getCurrentSubjectIndex();
+    if (subjectIndex === -1) return;
+    
+    const file = appData.subjects[subjectIndex][type + 's'][fileIndex];
+    
+    // Déplacer vers la corbeille
+    file.type = type.slice(0, -1); // Enlever le 's' final (documents -> document)
+    file.deletedAt = new Date().toISOString();
+    appData.trash.push(file);
+    
+    // Supprimer de la matière
+    appData.subjects[subjectIndex][type + 's'].splice(fileIndex, 1);
+    
+    saveData();
+    
+    // Recharger l'affichage
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab) {
+        const tabType = activeTab.getAttribute('data-tab');
+        displaySubjectFiles(tabType, appData.subjects[subjectIndex][tabType]);
+    }
+    
+    // Mettre à jour la corbeille
+    displayTrash();
+}
+
+// Fonction utilitaire pour obtenir l'index de la matière actuelle
+function getCurrentSubjectIndex() {
+    const modalTitle = document.getElementById('subject-details-title');
+    if (!modalTitle) return -1;
+    
+    const subjectName = modalTitle.textContent.replace('Détails de la matière', '').trim();
+    return appData.subjects.findIndex(subject => subject.name === subjectName);
+}
+
+// Initialisation améliorée pour les formulaires de fichiers
+function openAddFileModal(type, subjectIndex) {
+    document.getElementById('add-file-title').textContent = `Ajouter un ${getFileTypeLabel(type)}`;
+    
+    // Afficher ou masquer le champ de téléchargement selon le type
+    const uploadContainer = document.getElementById('file-upload-container');
+    const contentLabel = document.getElementById('file-content').previousElementSibling;
+    
+    if (type === 'photo' || type === 'video' || type === 'document') {
+        uploadContainer.style.display = 'block';
+        contentLabel.textContent = 'Description (optionnelle)';
+        
+        // Définir les types de fichiers acceptés
+        const fileInput = document.getElementById('file-upload');
+        if (type === 'photo') {
+            fileInput.accept = 'image/*';
+        } else if (type === 'video') {
+            fileInput.accept = 'video/*';
+        } else {
+            fileInput.accept = '.pdf,.doc,.docx,.txt';
         }
-
-        // Enable final confirm button when text matches
-        document.getElementById('confirm-input').addEventListener('input', function() {
-            const confirmText = document.getElementById('confirm-text').textContent;
-            const finalConfirmBtn = document.getElementById('final-confirm-btn');
-            finalConfirmBtn.disabled = this.value !== confirmText;
-        });
-
-        // Placeholder functions for unimplemented features
-        function showSubjectDetail(subjectId) {
-            alert(`Détails de la matière ${subjectId} - À implémenter`);
-        }
-
-        function updateSubjectsPage() {
-            document.getElementById('subjects-detailed-list').innerHTML = '<p>Liste détaillée des matières - À implémenter</p>';
-        }
-
-        function updateTimetablePage() {
-            document.getElementById('timetable-grid').innerHTML = '<p>Grille emploi du temps - À implémenter</p>';
-        }
-
-        function updateLibraryPage() {
-            document.getElementById('library-list').innerHTML = '<p>Liste des documents - À implémenter</p>';
-        }
-
-        function loadTimetable() {
-            // À implémenter
-        }
-
-        function showAddTimeSlotModal() {
-            alert('Modal ajout créneau - À implémenter');
-        }
-
-        function handlePdfUpload(file) {
-            alert(`Upload PDF ${file.name} - À implémenter`);
-        }
-
-        function showResetModal() {
-            if (confirm('Êtes-vous sûr de vouloir réinitialiser l\'application ? Toutes les données locales seront supprimées.')) {
-                if (confirm('Tapez RÉINITIALISER pour confirmer :') === 'RÉINITIALISER') {
-                    indexedDB.deleteDatabase('StudentNotebook');
-                    localStorage.clear();
-                    alert('Application réinitialisée. La page va se recharger.');
-                    location.reload();
-                }
-            }
-        }
-
-        // Self-test function for development
-        async function selfTest() {
-            console.log('Running self-test...');
-            
-            // Test averages calculation
-            const testAssignments = [
-                { grade: 15, coefficient: 1 },
-                { grade: 18, coefficient: 2 },
-                { grade: 12, coefficient: 1 }
-            ];
-            
-            const average = calculateSubjectAverage(testAssignments);
-            console.assert(average === 16.5, 'Average calculation failed');
-            
-            // Test encryption roundtrip
-            const testData = { message: 'Hello, World!' };
-            const password = 'test123';
-            
-            try {
-                const encrypted = await encryptJSON(password, testData);
-                const decrypted = await decryptJSON(password, encrypted);
-                console.assert(JSON.stringify(testData) === JSON.stringify(decrypted), 'Encryption roundtrip failed');
-            } catch (error) {
-                console.error('Encryption test failed:', error);
-            }
-            
-            console.log('Self-test completed');
-        }
-
-        // Initialize the app when the page loads
-        window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+        uploadContainer.style.display = 'none';
+        contentLabel.textContent = 'Contenu de la note';
+    }
+    
+    // Configurer le formulaire
+    const form = document.getElementById('add-file-form');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        addFileToSubject(type, subjectIndex);
+    };
+    
+    // Réinitialiser le fo rmulaire
+    form.reset();
+    
+    openModal('add-file-modal');
+}
     </script>
 </body>
 </html>
