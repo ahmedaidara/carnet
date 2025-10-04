@@ -6,51 +6,46 @@
     <title>Carnet de l'élève</title>
     <style>
         :root {
-            --primary: #6C63FF;
-            --secondary: #4FC3F7;
-            --accent: #FF6B9D;
-            --success: #4CD97B;
-            --warning: #FFB74D;
-            --danger: #FF5252;
-            --dark: #2D3047;
-            --light: #F9F7FE;
+            --primary: #6c63ff;
+            --secondary: #4fc3f7;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --dark: #121212;
+            --light: #f8f9fa;
             --glass: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
 
-        .dark-mode {
-            --primary: #8B80F8;
-            --secondary: #66D3FA;
-            --accent: #FF8BB5;
-            --success: #6AE395;
-            --warning: #FFC870;
-            --danger: #FF6B6B;
-            --dark: #1A1C2B;
-            --light: #25283D;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --surface: #1a1a1a;
+            --text: #ffffff;
+            --text-secondary: #b0b0b0;
+        }
+
+        [data-theme="light"] {
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+            --text: #121212;
+            --text-secondary: #666666;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, var(--light) 0%, #E8EAF6 100%);
-            color: var(--dark);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             padding-bottom: 80px;
             transition: var(--transition);
-        }
-
-        body.dark-mode {
-            background: linear-gradient(135deg, var(--dark) 0%, #1E1F2E 100%);
-            color: var(--light);
         }
 
         .container {
@@ -63,29 +58,134 @@
             background: var(--glass);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            transition: var(--transition);
+            box-shadow: var(--shadow);
         }
 
-        .card:hover {
-            transform: translateY(-5px);
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Navigation */
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0.6;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            background: var(--glass);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Cards */
+        .subject-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-2px);
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
 
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .subject-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .subject-average {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .sparkline {
+            height: 40px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        /* Buttons */
         .btn {
             padding: 12px 24px;
             border: none;
             border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
@@ -99,14 +199,9 @@
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #5A52E0;
-            transform: translateY(-2px);
-        }
-
         .btn-secondary {
-            background: var(--secondary);
-            color: white;
+            background: var(--glass);
+            color: var(--text);
         }
 
         .btn-danger {
@@ -115,86 +210,12 @@
             opacity: 0.7;
         }
 
-        .btn-danger:hover {
-            opacity: 1;
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .nav-bottom {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--dark);
-            text-decoration: none;
-            font-size: 12px;
-        }
-
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .subject-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .subject-card {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .subject-color {
-            height: 4px;
-            background: var(--primary);
-            margin-bottom: 12px;
-            border-radius: 2px;
-        }
-
-        .sparkline {
-            height: 40px;
-            margin-top: 12px;
-        }
-
+        /* Tabs */
         .tabs {
             display: flex;
             gap: 8px;
@@ -205,30 +226,49 @@
         .tab {
             padding: 12px 20px;
             background: var(--glass);
-            border: 1px solid var(--glass-border);
             border-radius: 12px;
             cursor: pointer;
             transition: var(--transition);
             white-space: nowrap;
+            opacity: 0.6;
         }
 
         .tab.active {
+            opacity: 1;
             background: var(--primary);
             color: white;
         }
 
-        .category-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            font-size: 14px;
-            margin: 4px;
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
         }
 
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -237,7 +277,6 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -248,57 +287,60 @@
         }
 
         .modal-content {
-            background: var(--light);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
         }
 
-        .dark-mode .modal-content {
-            background: var(--dark);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
+        .modal-title {
+            font-size: 20px;
             font-weight: 600;
+            margin-bottom: 16px;
         }
 
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            background: var(--glass);
-            color: var(--dark);
-            transition: var(--transition);
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
         }
 
-        .dark-mode .form-input {
-            color: var(--light);
+        /* Onboarding */
+        .onboarding {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        .onboarding-content {
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
         }
 
-        .file-preview {
-            margin-top: 20px;
-            padding: 20px;
-            background: var(--glass);
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
+        .onboarding-title {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 16px;
         }
 
+        .onboarding-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        /* Timetable */
         .timetable {
             display: grid;
             grid-template-columns: 60px repeat(7, 1fr);
@@ -309,70 +351,60 @@
         }
 
         .timetable-header {
-            background: var(--primary);
-            color: white;
+            background: var(--surface);
             padding: 12px;
             text-align: center;
             font-weight: 600;
         }
 
         .timetable-cell {
-            background: var(--light);
+            background: var(--surface);
             padding: 8px;
             min-height: 60px;
             font-size: 12px;
         }
 
-        .dark-mode .timetable-cell {
-            background: var(--dark);
-        }
-
         .time-slot {
-            background: var(--secondary);
+            background: var(--primary);
             color: white;
-            padding: 6px 8px;
-            border-radius: 8px;
+            padding: 4px 8px;
+            border-radius: 6px;
             margin-bottom: 4px;
             font-size: 11px;
         }
 
-        .pdf-viewer {
+        /* PDF Reader */
+        .pdf-reader {
             width: 100%;
             height: 600px;
-            border: 1px solid var(--glass-border);
+            background: var(--surface);
             border-radius: 12px;
             overflow: hidden;
         }
 
-        .streak {
-            display: inline-flex;
+        .pdf-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--glass);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .page-indicator {
+            display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
-            background: var(--glass);
-            border-radius: 20px;
-            margin-bottom: 20px;
         }
 
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            background: var(--accent);
-            color: white;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
+        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 padding: 16px;
             }
             
-            .subject-grid {
-                grid-template-columns: 1fr;
+            .greeting {
+                font-size: 20px;
             }
             
             .timetable {
@@ -380,431 +412,394 @@
                 font-size: 11px;
             }
             
-            .pdf-viewer {
-                height: 400px;
+            .timetable-cell {
+                padding: 4px;
+                min-height: 50px;
             }
         }
 
+        /* Animations */
         .ripple {
             position: relative;
             overflow: hidden;
-            transform: translate3d(0, 0, 0);
         }
 
-        .ripple:after {
-            content: "";
-            display: block;
+        .ripple::after {
+            content: '';
             position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
-            background-repeat: no-repeat;
-            background-position: 50%;
-            transform: scale(10, 10);
-            opacity: 0;
-            transition: transform .5s, opacity 1s;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
         }
 
-        .ripple:active:after {
-            transform: scale(0, 0);
-            opacity: .2;
-            transition: 0s;
+        .ripple:active::after {
+            width: 300px;
+            height: 300px;
         }
-      
-      @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-      
-      .timetable-cell {
-    min-height: 80px;
-    position: relative;
-    transition: all 0.2s ease;
-}
 
-.timetable-cell:hover {
-    background: rgba(108, 99, 255, 0.05);
-}
+        /* Badges */
+        .badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
 
-.time-slot {
-    padding: 6px 8px;
-    border-radius: 8px;
-    margin-bottom: 4px;
-    font-size: 11px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--glass-border);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-.time-slot:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.timetable-header {
-    background: var(--primary);
-    color: white;
-    padding: 12px 8px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 12px;
-    position: sticky;
-    top: 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .timetable {
-        font-size: 10px;
-    }
-    
-    .timetable-header {
-        padding: 8px 4px;
-        font-size: 10px;
-    }
-    
-    .time-slot {
-        padding: 4px 6px;
-        font-size: 9px;
-    }
-    
-    .timetable-cell {
-        min-height: 60px;
-    }
-}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Page d'accueil -->
-        <div id="home-page" class="page active">
-            <div class="card glass">
-                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
-                    <h1>Bonjour, <span id="user-name">Élève</span></h1>
-                    <button class="btn btn-secondary" onclick="showFormules()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 18h2V6H7v12zM11 18h2V6h-2v12zM15 18h2V6h-2v12z"/>
-                        </svg>
-                        FORMULES
-                    </button>
-                </div>
-                <div class="streak">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB74D">
-                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/>
-                    </svg>
-                    <span>Série de révision : <strong id="streak-count">0</strong> jours</span>
-                </div>
-                <p style="margin-bottom: 20px; opacity: 0.8;">Chaque ligne apprise aujourd'hui allume une étoile pour demain.</p>
-            </div>
+    <!-- 
+        README INTERNE - Carnet de l'élève/étudiant
+        
+        STRUCTURE INDEXEDDB:
+        - profile: { id: 1, name, status, class, theme, settings }
+        - subjects: { id, name, color, coefficient, createdAt }
+        - assignments: { id, subjectId, title, grade, coefficient, date, category }
+        - attachments: { id, subjectId, type, category, file, fileName, fileType, createdAt }
+        - timetable: { id, context, day, startTime, endTime, subjectId, room, notes, reminder }
+        - library: { id, title, fileName, fileType, file, lastPage, createdAt }
+        - backups: { id, data, hash, createdAt, encrypted }
+        - trash: { id, originalData, type, deletedAt }
+        - logs: { id, action, timestamp, details }
+        
+        ALGORITHMES MOYENNES:
+        - Moyenne matière: somme(notes * coefficients) / somme(coefficients)
+        - Moyenne générale: somme(moyenne_matière * coefficient_matière) / somme(coefficients_matières)
+        - Arrondi à 2 décimales
+        - Option "drop lowest n" disponible dans les paramètres
+        
+        FLOW SUPPRESSION:
+        1. Modal confirmation "Êtes-vous sûr ?"
+        2. Modal demande de taper "SUPPRIMER" ou nom élément
+        3. Soft delete: déplacement vers trash avec deletedAt
+        4. Retention: 30 jours par défaut (configurable)
+        5. Restauration possible depuis corbeille
+        
+        BACKUP & LASTPAGE:
+        - LastPage stocké dans library + dupliqué localStorage
+        - Backup inclut lastPage pour restauration
+        - Reset UI préserve backups, restaure lastPage depuis backup
+        - Si données navigateur supprimées manuellement: restauration impossible
+        
+        CONFIGURATION:
+        - trashRetentionDays: modifier dans profile.settings
+        - PBKDF2 iterations: valeur sécurisée par défaut (100000)
+          Pour debug: réduire à 1000 dans encryptJSON/decryptJSON
+    -->
 
-            <div id="subjects-overview">
-                <!-- Les matières seront ajoutées ici dynamiquement -->
-            </div>
-        </div>
-
-        <!-- Page Matières -->
-        <div id="subjects-page" class="page">
-            <div class="card glass">
-                <h2>Matières</h2>
-                <p style="margin-bottom: 20px; opacity: 0.8;">Organisez votre savoir, construisez votre avenir.</p>
-                <button class="btn btn-primary" onclick="showAddSubjectModal()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                    </svg>
-                    Nouvelle matière
-                </button>
-            </div>
-
-            <div id="subjects-list" class="subject-grid">
-                <!-- Les matières seront ajoutées ici dynamiquement -->
-            </div>
-        </div>
-
-        <!-- Page Formules (Nouvelle) -->
-        <div id="formules-page" class="page">
-            <div class="card glass">
-                <h2>Formules par Matière</h2>
-                <p style="margin-bottom: 20px; opacity: 0.8;">Maîtrisez les concepts fondamentaux de chaque discipline.</p>
-            </div>
-
-            <div id="formules-list" class="subject-grid">
-                <!-- Les formules par matière seront ajoutées ici dynamiquement -->
-            </div>
-        </div>
-
-        <!-- Page Détail Matière/Formules -->
-        <div id="subject-detail-page" class="page">
-            <div class="card glass">
-                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
-                    <h2 id="subject-detail-title">Matière</h2>
-                    <button class="btn btn-secondary" onclick="goBack()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-                        </svg>
-                        Retour
-                    </button>
-                </div>
-
-                <div class="tabs">
-                    <div class="tab active" data-tab="photo">PHOTO</div>
-                    <div class="tab" data-tab="video">VIDEO</div>
-                    <div class="tab" data-tab="note">NOTE</div>
-                    <div class="tab" data-tab="document">DOCUMENT</div>
-                </div>
-
-                <div id="categories-section">
-                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 16px;">
-                        <h4>Catégories</h4>
-                        <button class="btn btn-primary" onclick="showAddCategoryModal()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                            </svg>
-                            Catégorie
-                        </button>
-                    </div>
-                    <div id="categories-list">
-                        <!-- Catégories dynamiques -->
-                    </div>
-                </div>
-
-                <div id="content-area">
-                    <!-- Contenu dynamique par onglet et catégorie -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Page Emploi du temps -->
-        <div id="timetable-page" class="page">
-            <div class="card glass">
-                <h2>Emploi du temps</h2>
-                <p style="margin-bottom: 20px; opacity: 0.8;">Organisez votre temps, maximisez votre potentiel.</p>
-                
-                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-                    <button class="btn btn-primary" id="school-context-btn" onclick="switchTimetableContext('school')">
-                        À l'école/Université
-                    </button>
-                    <button class="btn btn-secondary" id="home-context-btn" onclick="switchTimetableContext('home')">
-                        À la maison
-                    </button>
-                </div>
-
-                <button class="btn btn-primary" onclick="showAddTimeslotModal()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                    </svg>
-                    Nouveau créneau
-                </button>
-            </div>
-
-            <div id="timetable-container" class="card glass">
-                <!-- Emploi du temps dynamique -->
-            </div>
-        </div>
-
-        <!-- Page Bibliothèque -->
-        <div id="library-page" class="page">
-            <div class="card glass">
-                <h2>Bibliothèque</h2>
-                <p style="margin-bottom: 20px; opacity: 0.8;">Votre savoir en un seul endroit.</p>
-                
-                <input type="file" id="pdf-upload" accept=".pdf" style="display: none;" onchange="handlePdfUpload(this.files[0])">
-                <button class="btn btn-primary" onclick="document.getElementById('pdf-upload').click()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                    </svg>
-                    Importer PDF
-                </button>
-            </div>
-
-            <div id="library-list" class="subject-grid">
-                <!-- Liste des PDFs dynamique -->
-            </div>
-        </div>
-
-        <!-- Page Paramètres -->
-        <div id="settings-page" class="page">
-            <div class="card glass">
-                <h2>Paramètres</h2>
-                <p style="margin-bottom: 20px; opacity: 0.8;">Personnalisez votre expérience d'apprentissage.</p>
-
-                <div class="form-group">
-                    <label class="form-label">Mode sombre</label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                        <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
-                        <span>Activer/désactiver</span>
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Rétention corbeille (jours)</label>
-                    <input type="number" id="trash-retention" class="form-input" value="30" min="1">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Export/Import</label>
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="exportData()">Exporter données</button>
-                        <input type="file" id="import-file" accept=".json,.carnet" style="display: none;" onchange="importData(this.files[0])">
-                        <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Importer données</button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Mode Développeur</label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                        <input type="checkbox" id="dev-mode-toggle" onchange="toggleDevMode()">
-                        <span>Activer/désactiver</span>
-                    </label>
-                </div>
-
-                <button class="btn btn-danger" onclick="showResetModal()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                    </svg>
-                    Réinitialiser l'application
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation inférieure -->
-    <div class="nav-bottom">
-        <div class="nav-item active" data-page="home-page">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-            </svg>
-            <span>Accueil</span>
-        </div>
-        <div class="nav-item" data-page="subjects-page">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
-            </svg>
-            <span>Matières</span>
-        </div>
-        <div class="nav-item" data-page="timetable-page">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-            </svg>
-            <span>Emploi du temps</span>
-        </div>
-        <div class="nav-item" data-page="library-page">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
-            </svg>
-            <span>Bibliothèque</span>
-        </div>
-        <div class="nav-item" data-page="settings-page">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-            </svg>
-            <span>Paramètres</span>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <div id="onboarding-modal" class="modal active">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 20px; text-align: center;">Bienvenue dans votre Carnet</h2>
-            <p style="margin-bottom: 30px; text-align: center; opacity: 0.8;">Commencez par personnaliser votre profil</p>
+    <!-- Onboarding -->
+    <div class="onboarding" id="onboarding">
+        <div class="onboarding-content">
+            <h1 class="onboarding-title">Bienvenue sur ton carnet</h1>
+            <p class="onboarding-subtitle">Chaque ligne apprise aujourd'hui allume une étoile pour demain.</p>
             
             <div class="form-group">
-                <label class="form-label">Votre nom</label>
-                <input type="text" id="user-name-input" class="form-input" placeholder="Votre nom">
+                <label class="form-label">Ton nom</label>
+                <input type="text" class="form-input" id="onboarding-name" placeholder="Alexandre">
             </div>
             
             <div class="form-group">
                 <label class="form-label">Je suis</label>
-                <select id="user-status" class="form-input">
+                <select class="form-input" id="onboarding-status">
                     <option value="school">Écolier</option>
                     <option value="student">Étudiant</option>
                 </select>
             </div>
             
             <div class="form-group">
-                <label class="form-label">Classe/Niveau</label>
-                <input type="text" id="user-class" class="form-input" placeholder="Ex: Terminale S, Licence 2...">
+                <label class="form-label">Ma classe</label>
+                <input type="text" class="form-input" id="onboarding-class" placeholder="Terminale S">
             </div>
             
-            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="completeOnboarding()">
-                Commencer l'aventure
-            </button>
+            <button class="btn btn-primary" onclick="completeOnboarding()">Commencer l'aventure</button>
         </div>
     </div>
 
-    <!-- Autres modals seront ajoutés dynamiquement -->
+    <!-- Main App -->
+    <div class="container" id="app" style="display: none;">
+        <!-- Home Page -->
+        <div class="page active" id="page-home">
+            <div class="header">
+                <div>
+                    <h1 class="greeting" id="greeting">Bonjour,</h1>
+                    <p class="subtitle" id="daily-motivation">Prêt à conquérir de nouveaux savoirs ?</p>
+                </div>
+                <div class="badge" id="streak-badge">🔥 7 jours</div>
+            </div>
+
+            <div class="glass">
+                <h2 style="margin-bottom: 16px;">Tes matières</h2>
+                <div id="subjects-list">
+                    <!-- Subjects will be populated here -->
+                </div>
+                <button class="btn btn-secondary" onclick="showAddSubjectModal()">
+                    <svg class="nav-icon"><use href="#svg-plus"></use></svg>
+                    Ajouter une matière
+                </button>
+            </div>
+
+            <div class="glass">
+                <h2 style="margin-bottom: 16px;">Progression générale</h2>
+                <canvas id="progress-chart" height="120"></canvas>
+            </div>
+        </div>
+
+        <!-- Subjects Page -->
+        <div class="page" id="page-subjects">
+            <div class="header">
+                <h1 class="greeting">Tes matières</h1>
+            </div>
+
+            <div id="subjects-detailed-list">
+                <!-- Detailed subjects list -->
+            </div>
+        </div>
+
+        <!-- Timetable Page -->
+        <div class="page" id="page-timetable">
+            <div class="header">
+                <h1 class="greeting">Emploi du temps</h1>
+                <div>
+                    <select class="form-input" id="timetable-context" onchange="loadTimetable()">
+                        <option value="school">À l'école</option>
+                        <option value="home">À la maison</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="glass">
+                <div class="timetable" id="timetable-grid">
+                    <!-- Timetable grid will be populated here -->
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="showAddTimeSlotModal()">
+                <svg class="nav-icon"><use href="#svg-plus"></use></svg>
+                Ajouter un créneau
+            </button>
+        </div>
+
+        <!-- Library Page -->
+        <div class="page" id="page-library">
+            <div class="header">
+                <h1 class="greeting">Bibliothèque</h1>
+            </div>
+
+            <div class="glass">
+                <div id="library-list">
+                    <!-- Library items will be populated here -->
+                </div>
+                
+                <input type="file" id="pdf-upload" accept=".pdf" style="display: none;" onchange="handlePdfUpload(this.files[0])">
+                <button class="btn btn-primary" onclick="document.getElementById('pdf-upload').click()">
+                    <svg class="nav-icon"><use href="#svg-upload"></use></svg>
+                    Importer un PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page" id="page-settings">
+            <div class="header">
+                <h1 class="greeting">Paramètres</h1>
+            </div>
+
+            <div class="glass">
+                <h2 style="margin-bottom: 16px;">Profil</h2>
+                <div class="form-group">
+                    <label class="form-label">Nom</label>
+                    <input type="text" class="form-input" id="settings-name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Statut</label>
+                    <select class="form-input" id="settings-status">
+                        <option value="school">Écolier</option>
+                        <option value="student">Étudiant</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Classe</label>
+                    <input type="text" class="form-input" id="settings-class">
+                </div>
+            </div>
+
+            <div class="glass">
+                <h2 style="margin-bottom: 16px;">Apparence</h2>
+                <div class="form-group">
+                    <label class="form-label">Thème</label>
+                    <select class="form-input" id="settings-theme" onchange="changeTheme(this.value)">
+                        <option value="light">Clair</option>
+                        <option value="dark">Sombre</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="glass">
+                <h2 style="margin-bottom: 16px;">Sauvegarde</h2>
+                <button class="btn btn-secondary" onclick="exportData()" style="margin-bottom: 12px;">
+                    <svg class="nav-icon"><use href="#svg-export"></use></svg>
+                    Exporter les données
+                </button>
+                <button class="btn btn-secondary" onclick="importData()" style="margin-bottom: 12px;">
+                    <svg class="nav-icon"><use href="#svg-import"></use></svg>
+                    Importer des données
+                </button>
+                <button class="btn btn-danger" onclick="showResetModal()">
+                    <svg class="nav-icon"><use href="#svg-reset"></use></svg>
+                    Réinitialiser l'application
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="nav-bottom">
+        <div class="nav-item active" onclick="showPage('home')">
+            <svg class="nav-icon"><use href="#svg-home"></use></svg>
+            <span class="nav-label">Accueil</span>
+        </div>
+        <div class="nav-item" onclick="showPage('subjects')">
+            <svg class="nav-icon"><use href="#svg-subjects"></use></svg>
+            <span class="nav-label">Matières</span>
+        </div>
+        <div class="nav-item" onclick="showPage('timetable')">
+            <svg class="nav-icon"><use href="#svg-timetable"></use></svg>
+            <span class="nav-label">Emploi du temps</span>
+        </div>
+        <div class="nav-item" onclick="showPage('library')">
+            <svg class="nav-icon"><use href="#svg-library"></use></svg>
+            <span class="nav-label">Bibliothèque</span>
+        </div>
+        <div class="nav-item" onclick="showPage('settings')">
+            <svg class="nav-icon"><use href="#svg-settings"></use></svg>
+            <span class="nav-label">Paramètres</span>
+        </div>
+    </div>
+
+    <!-- SVG Icons (Inline) -->
+    <svg style="display: none;">
+        <symbol id="svg-home" viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </symbol>
+        <symbol id="svg-subjects" viewBox="0 0 24 24">
+            <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+        </symbol>
+        <symbol id="svg-timetable" viewBox="0 0 24 24">
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+        </symbol>
+        <symbol id="svg-library" viewBox="0 0 24 24">
+            <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/>
+        </symbol>
+        <symbol id="svg-settings" viewBox="0 0 24 24">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+        </symbol>
+        <symbol id="svg-plus" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </symbol>
+        <symbol id="svg-upload" viewBox="0 0 24 24">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+        </symbol>
+        <symbol id="svg-export" viewBox="0 0 24 24">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/>
+        </symbol>
+        <symbol id="svg-import" viewBox="0 0 24 24">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </symbol>
+        <symbol id="svg-reset" viewBox="0 0 24 24">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </symbol>
+    </svg>
+
+    <!-- Modals -->
+    <div class="modal" id="modal-add-subject">
+        <div class="modal-content">
+            <h2 class="modal-title">Nouvelle matière</h2>
+            <div class="form-group">
+                <label class="form-label">Nom de la matière</label>
+                <input type="text" class="form-input" id="subject-name" placeholder="Mathématiques">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Couleur</label>
+                <input type="color" class="form-input" id="subject-color" value="#6c63ff">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Coefficient</label>
+                <input type="number" class="form-input" id="subject-coefficient" value="1" min="1" max="10">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideModal('modal-add-subject')">Annuler</button>
+                <button class="btn btn-primary" onclick="addSubject()">Ajouter</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-confirm-delete">
+        <div class="modal-content">
+            <h2 class="modal-title">Confirmer la suppression</h2>
+            <p>Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideModal('modal-confirm-delete')">Annuler</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-type-confirm">
+        <div class="modal-content">
+            <h2 class="modal-title">Confirmation finale</h2>
+            <p>Tapez <strong id="confirm-text">SUPPRIMER</strong> pour confirmer :</p>
+            <input type="text" class="form-input" id="confirm-input" placeholder="">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideModal('modal-type-confirm')">Annuler</button>
+                <button class="btn btn-danger" onclick="finalConfirmDelete()" id="final-confirm-btn" disabled>Confirmer</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // =============================================================================
-        // README INTERNE - Structure et Documentation
-        // =============================================================================
-        /*
-        CARNET DE L'ÉLÈVE/ÉTUDIANT - Application Web Complète
-        
-        STRUCTURE DES STORES INDEXEDDB:
-        - profile: { id: 1, name, status, class, streak, settings }
-        - subjects: { id, name, color, coefficient, createdAt }
-        - categories: { id, subjectId, name, type (photo/video/note/document), order }
-        - items: { id, categoryId, type, title, content, fileBlob, order, createdAt }
-        - grades: { id, subjectId, title, grade, coefficient, date, category }
-        - timetable: { id, context (school/home), day, startTime, endTime, subjectId, room, notes, reminder }
-        - library: { id, title, fileName, fileBlob, lastPage, totalPages, createdAt }
-        - backups: { id, timestamp, data, hash, encrypted }
-        - trash: { id, originalStore, originalData, deletedAt }
-        - logs: { id, action, timestamp, details }
-        
-        ALGORITHMES DE CALCUL DES MOYENNES:
-        - Moyenne matière: Σ(grade * coefficient) / Σ(coefficient)
-        - Moyenne générale: Σ(moyenne_matière * coefficient_matière) / Σ(coefficient_matière)
-        - Arrondi à 2 décimales, drop lowest n optionnel
-        - Conversion automatique sur 20
-        
-        FLOW DE SUPPRESSION / CORBEILLE:
-        1. Première confirmation modale "Êtes-vous sûr ?"
-        2. Deuxième confirmation avec saisie "SUPPRIMER" ou nom
-        3. Soft delete: déplacement vers trash avec deletedAt
-        4. Retention: 30 jours par défaut (configurable)
-        5. Restauration possible depuis corbeille
-        
-        BACKUPS & LASTPAGE:
-        - Export: JSON chiffré (AES-GCM) ou non avec mot de passe optionnel
-        - Import: Support .carnet (chiffré) et JSON, merge/overwrite
-        - LastPage PDF: Stockée dans IndexedDB + localStorage + backups
-        - Réinitialisation: Préserve lastPage via backup si disponible
-        - Si données navigateur supprimées manuellement: restauration impossible
-        
-        TRASH RETENTION DAYS:
-        - Modifiable dans Settings -> trash-retention input
-        - Valeur par défaut: 30 jours
-        
-        PBKDF2 ITERATIONS:
-        - Valeur production: 100000
-        - Pour debug: réduire à 1000 dans encryptJSON/decryptJSON
-        */
-
-        // =============================================================================
-        // VARIABLES GLOBALES ET INITIALISATION
-        // =============================================================================
+        // Database and State Management
         let db = null;
-        let currentSubjectId = null;
-        let currentTab = 'photo';
-        let currentContext = 'school';
+        let currentUser = null;
+        let deleteCallback = null;
+        let deleteData = null;
 
-        // Initialisation au chargement
-        document.addEventListener('DOMContentLoaded', async () => {
+        // Initialize the application
+        async function initApp() {
             await initDB();
-            await checkOnboarding();
-            setupNavigation();
-            loadAllData();
-        });
+            await loadUserProfile();
+            
+            if (!currentUser) {
+                document.getElementById('onboarding').style.display = 'flex';
+            } else {
+                document.getElementById('app').style.display = 'block';
+                updateUI();
+            }
+        }
 
-        // =============================================================================
-        // BASE DE DONNÉES INDEXEDDB
-        // =============================================================================
-        function initDB() {
+        // IndexedDB initialization
+        async function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('StudentNotebook', 1);
                 
@@ -817,46 +812,22 @@
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
                     
-                    // Stores principaux
-                    if (!db.objectStoreNames.contains('profile')) {
-                        db.createObjectStore('profile', { keyPath: 'id' });
-                    }
-                    if (!db.objectStoreNames.contains('subjects')) {
-                        db.createObjectStore('subjects', { keyPath: 'id', autoIncrement: true });
-                    }
-                    if (!db.objectStoreNames.contains('categories')) {
-                        db.createObjectStore('categories', { keyPath: 'id', autoIncrement: true });
-                    }
-                    if (!db.objectStoreNames.contains('items')) {
-                        db.createObjectStore('items', { keyPath: 'id', autoIncrement: true });
-                    }
-                    if (!db.objectStoreNames.contains('grades')) {
-                        db.createObjectStore('grades', { keyPath: 'id', autoIncrement: true });
-                    }
-                    if (!db.objectStoreNames.contains('timetable')) {
-                        db.createObjectStore('timetable', { keyPath: 'id', autoIncrement: true });
-                    }
-                    if (!db.objectStoreNames.contains('library')) {
-                        db.createObjectStore('library', { keyPath: 'id', autoIncrement: true });
-                    }
+                    // Create object stores
+                    const stores = [
+                        'profile', 'subjects', 'assignments', 'attachments',
+                        'timetable', 'library', 'backups', 'trash', 'logs'
+                    ];
                     
-                    // Stores système
-                    if (!db.objectStoreNames.contains('backups')) {
-                        db.createObjectStore('backups', { keyPath: 'id', autoIncrement: true });
-                    }
-                    if (!db.objectStoreNames.contains('trash')) {
-                        db.createObjectStore('trash', { keyPath: 'id', autoIncrement: true });
-                    }
-                    if (!db.objectStoreNames.contains('logs')) {
-                        db.createObjectStore('logs', { keyPath: 'id', autoIncrement: true });
-                    }
+                    stores.forEach(store => {
+                        if (!db.objectStoreNames.contains(store)) {
+                            db.createObjectStore(store, { keyPath: 'id', autoIncrement: true });
+                        }
+                    });
                 };
             });
         }
 
-        // =============================================================================
-        // FONCTIONS UTILITAIRES POUR INDEXEDDB
-        // =============================================================================
+        // Generic DB operations
         function dbAction(storeName, action, data = null) {
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction([storeName], 'readwrite');
@@ -886,897 +857,223 @@
             });
         }
 
-        // =============================================================================
-        // GESTION DE L'ONBOARDING
-        // =============================================================================
-        async function checkOnboarding() {
+        // User Profile Management
+        async function loadUserProfile() {
             const profile = await dbAction('profile', 'get', 1);
-            if (!profile) {
-                showModal('onboarding-modal');
-            } else {
-                document.getElementById('user-name').textContent = profile.name;
-                document.getElementById('streak-count').textContent = profile.streak || 0;
-                
-                // Appliquer les paramètres
-                if (profile.settings?.darkMode) {
-                    document.body.classList.add('dark-mode');
-                    document.getElementById('dark-mode-toggle').checked = true;
-                }
+            if (profile) {
+                currentUser = profile;
+                document.body.setAttribute('data-theme', profile.theme || 'light');
             }
         }
 
-        async function completeOnboarding() {
-            const name = document.getElementById('user-name-input').value;
-            const status = document.getElementById('user-status').value;
-            const userClass = document.getElementById('user-class').value;
+        async function saveUserProfile(profile) {
+            profile.id = 1;
+            await dbAction('profile', 'put', profile);
+            currentUser = profile;
+            updateUI();
+        }
+
+        // Onboarding
+        function completeOnboarding() {
+            const name = document.getElementById('onboarding-name').value;
+            const status = document.getElementById('onboarding-status').value;
+            const userClass = document.getElementById('onboarding-class').value;
             
-            if (!name.trim()) {
+            if (!name) {
                 alert('Veuillez entrer votre nom');
                 return;
             }
             
             const profile = {
-                id: 1,
-                name: name.trim(),
-                status: status,
-                class: userClass.trim(),
-                streak: 0,
+                name,
+                status,
+                class: userClass,
+                theme: 'light',
                 settings: {
-                    darkMode: false,
-                    trashRetentionDays: 30
-                },
-                createdAt: new Date()
+                    trashRetentionDays: 30,
+                    dropLowestN: 0,
+                    enableNotifications: true
+                }
             };
             
-            await dbAction('profile', 'put', profile);
-            document.getElementById('user-name').textContent = profile.name;
-            hideModal('onboarding-modal');
-            loadAllData();
+            saveUserProfile(profile);
+            document.getElementById('onboarding').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
         }
 
-        // =============================================================================
-        // NAVIGATION ET UI
-        // =============================================================================
-        function setupNavigation() {
-            // Navigation principale
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    // Mettre à jour l'état actif
-                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Afficher la page correspondante
-                    const pageId = this.getAttribute('data-page');
-                    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-                    document.getElementById(pageId).classList.add('active');
+        // UI Navigation
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(`page-${page}`).classList.add('active');
+            document.querySelector(`.nav-item:nth-child(${getNavIndex(page)})`).classList.add('active');
+            
+            updatePageContent(page);
+        }
+
+        function getNavIndex(page) {
+            const pages = ['home', 'subjects', 'timetable', 'library', 'settings'];
+            return pages.indexOf(page) + 1;
+        }
+
+        function updateUI() {
+            if (!currentUser) return;
+            
+            document.getElementById('greeting').textContent = `Bonjour, ${currentUser.name}`;
+            document.getElementById('settings-name').value = currentUser.name;
+            document.getElementById('settings-status').value = currentUser.status;
+            document.getElementById('settings-class').value = currentUser.class;
+            document.getElementById('settings-theme').value = currentUser.theme;
+            
+            updatePageContent('home');
+        }
+
+        async function updatePageContent(page) {
+            switch (page) {
+                case 'home':
+                    await updateHomePage();
+                    break;
+                case 'subjects':
+                    await updateSubjectsPage();
+                    break;
+                case 'timetable':
+                    await updateTimetablePage();
+                    break;
+                case 'library':
+                    await updateLibraryPage();
+                    break;
+            }
+        }
+
+        // Home Page
+        async function updateHomePage() {
+            const subjects = await dbAction('subjects', 'getAll');
+            const assignments = await dbAction('assignments', 'getAll');
+            
+            const subjectsList = document.getElementById('subjects-list');
+            subjectsList.innerHTML = '';
+            
+            subjects.forEach(subject => {
+                const subjectAssignments = assignments.filter(a => a.subjectId === subject.id);
+                const average = calculateSubjectAverage(subjectAssignments);
+                
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.onclick = () => showSubjectDetail(subject.id);
+                
+                card.innerHTML = `
+                    <div class="subject-header">
+                        <div class="subject-name">${subject.name}</div>
+                        <div class="subject-average">${average.toFixed(2)}</div>
+                    </div>
+                    <div class="sparkline">
+                        <canvas width="200" height="40" data-subject-id="${subject.id}"></canvas>
+                    </div>
+                `;
+                
+                subjectsList.appendChild(card);
+            });
+            
+            // Render sparklines
+            setTimeout(() => {
+                subjects.forEach(subject => {
+                    renderSparkline(subject.id);
                 });
-            });
-
-            // Gestion des onglets dans le détail matière
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('tab')) {
-                    const tabs = e.target.parentElement.querySelectorAll('.tab');
-                    tabs.forEach(tab => tab.classList.remove('active'));
-                    e.target.classList.add('active');
-                    
-                    currentTab = e.target.getAttribute('data-tab');
-                    loadSubjectDetailContent();
-                }
-            });
+            }, 100);
         }
 
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            document.querySelector(`.nav-item[data-page="${pageId}"]`).classList.add('active');
-        }
-
-        function goBack() {
-            showPage('subjects-page');
-        }
-
-        function showFormules() {
-            loadFormulesPage();
-            showPage('formules-page');
-        }
-
-        // =============================================================================
-        // GESTION DES MATIÈRES
-        // =============================================================================
-        async function loadAllData() {
-            await loadHomePage();
-            await loadSubjectsPage();
-            await loadTimetablePage();
-            await loadLibraryPage();
-        }
-
-        async function loadHomePage() {
-            const subjects = await dbAction('subjects', 'getAll');
-            const grades = await dbAction('grades', 'getAll');
-            
-            const container = document.getElementById('subjects-overview');
-            container.innerHTML = '';
-            
-            subjects.forEach(subject => {
-                const subjectGrades = grades.filter(g => g.subjectId === subject.id);
-                const average = calculateSubjectAverage(subjectGrades);
-                
-                const card = document.createElement('div');
-                card.className = 'card subject-card glass';
-                card.innerHTML = `
-                    <div class="subject-color" style="background: ${subject.color || '#6C63FF'}"></div>
-                    <h3>${subject.name}</h3>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-                        <span style="font-size: 24px; font-weight: bold;">${average}</span>
-                        <canvas class="sparkline" width="100" height="40"></canvas>
-                    </div>
-                    <p style="margin-top: 8px; opacity: 0.7; font-size: 14px;">Coefficient: ${subject.coefficient || 1}</p>
-                `;
-                
-                card.addEventListener('click', () => openSubjectDetail(subject.id));
-                container.appendChild(card);
-                
-                // Dessiner le sparkline
-                setTimeout(() => drawSparkline(card.querySelector('.sparkline'), subjectGrades), 100);
-            });
-        }
-
-        async function loadSubjectsPage() {
-            const subjects = await dbAction('subjects', 'getAll');
-            const container = document.getElementById('subjects-list');
-            container.innerHTML = '';
-            
-            subjects.forEach(subject => {
-                const card = document.createElement('div');
-                card.className = 'card subject-card glass ripple';
-                card.innerHTML = `
-                    <div class="subject-color" style="background: ${subject.color || '#6C63FF'}"></div>
-                    <h3>${subject.name}</h3>
-                    <p style="margin: 12px 0; opacity: 0.7;">${subject.description || 'Aucune description'}</p>
-                    <div style="display: flex; gap: 8px; margin-top: 16px;">
-                        <button class="btn btn-primary" onclick="openSubjectDetail(${subject.id})">Ouvrir</button>
-                        <button class="btn btn-danger" onclick="deleteSubject(${subject.id})">Supprimer</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
+        // Subject Management
         function showAddSubjectModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal active';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h3>Nouvelle matière</h3>
-                    <div class="form-group">
-                        <label class="form-label">Nom de la matière</label>
-                        <input type="text" id="subject-name" class="form-input" placeholder="Mathématiques, Physique...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Couleur</label>
-                        <input type="color" id="subject-color" class="form-input" value="#6C63FF">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Coefficient</label>
-                        <input type="number" id="subject-coefficient" class="form-input" value="1" min="1" step="0.5">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea id="subject-description" class="form-input" placeholder="Description de la matière..."></textarea>
-                    </div>
-                    <div style="display: flex; gap: 12px; margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="addSubject()">Créer</button>
-                        <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            document.getElementById('modal-add-subject').classList.add('active');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
         }
 
         async function addSubject() {
             const name = document.getElementById('subject-name').value;
             const color = document.getElementById('subject-color').value;
-            const coefficient = parseFloat(document.getElementById('subject-coefficient').value);
-            const description = document.getElementById('subject-description').value;
+            const coefficient = parseInt(document.getElementById('subject-coefficient').value);
             
-            if (!name.trim()) {
+            if (!name) {
                 alert('Veuillez entrer un nom pour la matière');
                 return;
             }
             
             const subject = {
-                name: name.trim(),
-                color: color,
-                coefficient: coefficient,
-                description: description.trim(),
-                createdAt: new Date()
+                name,
+                color,
+                coefficient,
+                createdAt: new Date().toISOString()
             };
             
             await dbAction('subjects', 'add', subject);
-            hideModal(document.querySelector('.modal.active'));
-            loadAllData();
+            hideModal('modal-add-subject');
+            updateHomePage();
+            
+            // Reset form
+            document.getElementById('subject-name').value = '';
+            document.getElementById('subject-color').value = '#6c63ff';
+            document.getElementById('subject-coefficient').value = '1';
         }
 
-        // =============================================================================
-        // PAGE FORMULES
-        // =============================================================================
-        async function loadFormulesPage() {
-            const subjects = await dbAction('subjects', 'getAll');
-            const container = document.getElementById('formules-list');
-            container.innerHTML = '';
+        // Calculations
+        function calculateSubjectAverage(assignments) {
+            if (assignments.length === 0) return 0;
             
-            subjects.forEach(subject => {
-                const card = document.createElement('div');
-                card.className = 'card subject-card glass ripple';
-                card.innerHTML = `
-                    <div class="subject-color" style="background: ${subject.color || '#6C63FF'}"></div>
-                    <h3>${subject.name}</h3>
-                    <p style="margin: 12px 0; opacity: 0.7;">Formules et concepts clés</p>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="openFormulesDetail(${subject.id})">
-                        Voir les formules
-                    </button>
-                `;
-                container.appendChild(card);
-            });
+            const totalWeighted = assignments.reduce((sum, assignment) => {
+                return sum + (assignment.grade * assignment.coefficient);
+            }, 0);
+            
+            const totalCoefficients = assignments.reduce((sum, assignment) => {
+                return sum + assignment.coefficient;
+            }, 0);
+            
+            return totalWeighted / totalCoefficients;
         }
 
-        function openFormulesDetail(subjectId) {
-            currentSubjectId = subjectId;
-            document.getElementById('subject-detail-title').textContent = 'Formules - ' + getSubjectName(subjectId);
-            showPage('subject-detail-page');
-            loadSubjectDetailContent();
-        }
-
-        // =============================================================================
-        // DÉTAIL MATIÈRE/FORMULES
-        // =============================================================================
-        async function openSubjectDetail(subjectId) {
-            currentSubjectId = subjectId;
-            document.getElementById('subject-detail-title').textContent = getSubjectName(subjectId);
-            showPage('subject-detail-page');
-            loadSubjectDetailContent();
-        }
-
-        async function loadSubjectDetailContent() {
-            await loadCategories();
-            await loadCategoryContent();
-        }
-
-        async function loadCategories() {
-            const categories = await dbAction('categories', 'getAll');
-            const subjectCategories = categories.filter(c => c.subjectId === currentSubjectId && c.type === currentTab);
+        // Sparkline rendering
+        function renderSparkline(subjectId) {
+            const canvas = document.querySelector(`canvas[data-subject-id="${subjectId}"]`);
+            if (!canvas) return;
             
-            const container = document.getElementById('categories-list');
-            container.innerHTML = '';
-            
-            subjectCategories.forEach(category => {
-                const badge = document.createElement('span');
-                badge.className = 'category-badge';
-                badge.innerHTML = `
-                    ${category.name}
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" onclick="deleteCategory(${category.id})" style="cursor: pointer;">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                    </svg>
-                `;
-                container.appendChild(badge);
-            });
-        }
-
-        function showAddCategoryModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal active';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h3>Nouvelle catégorie</h3>
-                    <div class="form-group">
-                        <label class="form-label">Nom de la catégorie</label>
-                        <input type="text" id="category-name" class="form-input" placeholder="Fiches, Exercices, Cours...">
-                    </div>
-                    <div style="display: flex; gap: 12px; margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="addCategory()">Créer</button>
-                        <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        async function addCategory() {
-            const name = document.getElementById('category-name').value;
-            
-            if (!name.trim()) {
-                alert('Veuillez entrer un nom pour la catégorie');
-                return;
-            }
-            
-            const category = {
-                subjectId: currentSubjectId,
-                name: name.trim(),
-                type: currentTab,
-                order: 0,
-                createdAt: new Date()
-            };
-            
-            await dbAction('categories', 'add', category);
-            hideModal(document.querySelector('.modal.active'));
-            loadCategories();
-        }
-
-       async function loadCategoryContent() {
-    const categories = await dbAction('categories', 'getAll');
-    const subjectCategories = categories.filter(c => c.subjectId === currentSubjectId && c.type === currentTab);
-    const items = await dbAction('items', 'getAll');
-    
-    const container = document.getElementById('content-area');
-    
-    if (subjectCategories.length === 0) {
-        container.innerHTML = `
-            <div style="text-align: center; padding: 40px; opacity: 0.7;">
-                <p>Créez d'abord une catégorie pour ajouter du contenu ${currentTab}</p>
-                <button class="btn btn-primary" onclick="showAddCategoryModal()" style="margin-top: 16px;">
-                    Créer une catégorie
-                </button>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h4>Contenu ${currentTab.toUpperCase()}</h4>
-            <button class="btn btn-primary" onclick="showAddContentModal()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                </svg>
-                Ajouter
-            </button>
-        </div>
-    `;
-    
-    subjectCategories.forEach(category => {
-        const categoryItems = items.filter(item => item.categoryId === category.id)
-                                  .sort((a, b) => a.order - b.order);
-        
-        html += `
-            <div class="card" style="margin-bottom: 20px;">
-                <h5 style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-                    ${category.name}
-                    <span class="badge">${categoryItems.length} élément(s)</span>
-                </h5>
-                <div id="category-${category.id}-content">
-                    ${renderCategoryItems(categoryItems)}
-                </div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
-
-function renderCategoryItems(items) {
-    if (items.length === 0) {
-        return '<p style="text-align: center; opacity: 0.7; padding: 20px;">Aucun contenu dans cette catégorie</p>';
-    }
-    
-    let html = '<div style="display: grid; gap: 12px;">';
-    
-    items.forEach(item => {
-        html += `
-            <div class="card" style="padding: 16px; display: flex; justify-content: space-between; align-items: start;">
-                <div style="flex: 1;">
-                    <h6 style="margin-bottom: 8px;">${item.title}</h6>
-                    ${renderItemContent(item)}
-                </div>
-                <div style="display: flex; gap: 8px; margin-left: 12px;">
-                    <button class="btn btn-secondary" onclick="moveItemUp(${item.id})" style="padding: 6px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 14l5-5 5 5z"/>
-                        </svg>
-                    </button>
-                    <button class="btn btn-secondary" onclick="moveItemDown(${item.id})" style="padding: 6px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 10l5 5 5-5z"/>
-                        </svg>
-                    </button>
-                    <button class="btn btn-danger" onclick="deleteContentItem(${item.id})" style="padding: 6px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-    
-    html += '</div>';
-    return html;
-}
-
-function renderItemContent(item) {
-    switch(item.type) {
-        case 'note':
-            return `<p style="opacity: 0.8; font-size: 14px;">${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}</p>`;
-        
-        case 'photo':
-            if (item.fileBlob) {
-                const blob = new Blob([item.fileBlob], { type: item.fileType });
-                const url = URL.createObjectURL(blob);
-                return `
-                    <div style="margin-top: 8px;">
-                        <img src="${url}" style="max-width: 100px; max-height: 80px; border-radius: 8px; cursor: pointer;" 
-                             onclick="openFullscreenImage('${url}')" alt="${item.title}">
-                    </div>
-                `;
-            }
-            break;
-            
-        case 'video':
-            if (item.fileBlob) {
-                const blob = new Blob([item.fileBlob], { type: item.fileType });
-                const url = URL.createObjectURL(blob);
-                return `
-                    <div style="margin-top: 8px;">
-                        <video src="${url}" style="max-width: 100px; max-height: 80px; border-radius: 8px; cursor: pointer;" 
-                               controls onclick="openFullscreenVideo('${url}')"></video>
-                    </div>
-                `;
-            }
-            break;
-            
-        case 'document':
-            return `<p style="opacity: 0.8; font-size: 14px;">📄 ${item.fileName}</p>`;
-    }
-    
-    return '';
-}
-function openFullscreenImage(url) {
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
-            <img src="${url}" style="max-width: 100%; max-height: 100%; border-radius: 12px;">
-            <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))" 
-                    style="position: absolute; top: 20px; right: 20px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-            </button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-function openFullscreenVideo(url) {
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;">
-            <video src="${url}" controls autoplay style="max-width: 100%; max-height: 100%; border-radius: 12px;"></video>
-            <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))" 
-                    style="position: absolute; top: 20px; right: 20px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-            </button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-async function moveItemUp(itemId) {
-    const items = await dbAction('items', 'getAll');
-    const item = items.find(i => i.id === itemId);
-    const categoryItems = items.filter(i => i.categoryId === item.categoryId)
-                              .sort((a, b) => a.order - b.order);
-    
-    const currentIndex = categoryItems.findIndex(i => i.id === itemId);
-    if (currentIndex > 0) {
-        // Échanger avec l'élément précédent
-        const tempOrder = categoryItems[currentIndex].order;
-        categoryItems[currentIndex].order = categoryItems[currentIndex - 1].order;
-        categoryItems[currentIndex - 1].order = tempOrder;
-        
-        await dbAction('items', 'put', categoryItems[currentIndex]);
-        await dbAction('items', 'put', categoryItems[currentIndex - 1]);
-        
-        loadCategoryContent();
-    }
-}
-
-async function moveItemDown(itemId) {
-    const items = await dbAction('items', 'getAll');
-    const item = items.find(i => i.id === itemId);
-    const categoryItems = items.filter(i => i.categoryId === item.categoryId)
-                              .sort((a, b) => a.order - b.order);
-    
-    const currentIndex = categoryItems.findIndex(i => i.id === itemId);
-    if (currentIndex < categoryItems.length - 1) {
-        // Échanger avec l'élément suivant
-        const tempOrder = categoryItems[currentIndex].order;
-        categoryItems[currentIndex].order = categoryItems[currentIndex + 1].order;
-        categoryItems[currentIndex + 1].order = tempOrder;
-        
-        await dbAction('items', 'put', categoryItems[currentIndex]);
-        await dbAction('items', 'put', categoryItems[currentIndex + 1]);
-        
-        loadCategoryContent();
-    }
-}
-
-async function deleteContentItem(itemId) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
-        const confirmation = prompt('Tapez "SUPPRIMER" pour confirmer :');
-        if (confirmation === 'SUPPRIMER') {
-            // Soft delete - déplacer vers la corbeille
-            const item = await dbAction('items', 'get', itemId);
-            const trashItem = {
-                originalStore: 'items',
-                originalData: item,
-                deletedAt: new Date()
-            };
-            
-            await dbAction('trash', 'add', trashItem);
-            await dbAction('items', 'delete', itemId);
-            
-            loadCategoryContent();
-            showNotification('Élément déplacé vers la corbeille');
-        }
-    }
-}
-
-function showNotification(message) {
-    // Créer une notification toast
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--primary);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
-}
-        // =============================================================================
-        // EMPLOI DU TEMPS
-        // =============================================================================
-       async function loadTimetablePage() {
-    const timetable = await dbAction('timetable', 'getAll');
-    const subjects = await dbAction('subjects', 'getAll');
-    const contextTimetable = timetable.filter(t => t.context === currentContext);
-    
-    const container = document.getElementById('timetable-container');
-    
-    if (contextTimetable.length === 0) {
-        container.innerHTML = `
-            <div class="card glass" style="text-align: center; padding: 40px;">
-                <h3>Aucun créneau programmé</h3>
-                <p style="margin: 16px 0; opacity: 0.7;">Commencez par ajouter votre premier créneau</p>
-                <button class="btn btn-primary" onclick="showAddTimeslotModal()">
-                    Ajouter un créneau
-                </button>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = `
-        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <h3>Emploi du temps - ${currentContext === 'school' ? 'École/Université' : 'Maison'}</h3>
-            <button class="btn btn-secondary" onclick="exportTimetable()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-                Exporter
-            </button>
-        </div>
-        <div class="timetable">
-            <div class="timetable-header">Horaire</div>
-            <div class="timetable-header">Lundi</div>
-            <div class="timetable-header">Mardi</div>
-            <div class="timetable-header">Mercredi</div>
-            <div class="timetable-header">Jeudi</div>
-            <div class="timetable-header">Vendredi</div>
-            <div class="timetable-header">Samedi</div>
-            <div class="timetable-header">Dimanche</div>
-            
-            ${generateTimetableGrid(contextTimetable, subjects)}
-        </div>
-    `;
-}
-
-function generateTimetableGrid(timetable, subjects) {
-    let html = '';
-    const timeSlots = generateTimeSlots();
-    const days = [1, 2, 3, 4, 5, 6, 7];
-    
-    timeSlots.forEach(timeSlot => {
-        const [startTime, endTime] = timeSlot.split('-');
-        html += `<div class="timetable-header">${timeSlot}</div>`;
-        
-        days.forEach(day => {
-            const slots = timetable.filter(t => 
-                t.day === day && 
-                t.startTime === startTime && 
-                t.endTime === endTime
-            );
-            
-            html += `<div class="timetable-cell" data-day="${day}" data-time="${timeSlot}">`;
-            
-            slots.forEach(slot => {
-                const subject = subjects.find(s => s.id === slot.subjectId);
-                const subjectName = subject ? subject.name : 'Sans matière';
-                const subjectColor = subject ? subject.color : '#6C63FF';
-                
-                html += `
-                    <div class="time-slot" 
-                         style="background: ${subjectColor}; cursor: pointer;"
-                         onclick="editTimeslot(${slot.id})"
-                         title="Cliquer pour modifier">
-                        <div style="font-weight: 600; margin-bottom: 2px;">${subjectName}</div>
-                        ${slot.room ? `<div style="font-size: 10px; opacity: 0.9;">${slot.room}</div>` : ''}
-                        ${slot.notes ? `<div style="font-size: 9px; opacity: 0.8; margin-top: 2px;">${slot.notes}</div>` : ''}
-                    </div>
-                `;
-            });
-            
-            // Ajouter un bouton pour ajouter un créneau dans cette cellule
-            if (slots.length === 0) {
-                html += `
-                    <button class="btn btn-secondary" 
-                            style="width: 100%; padding: 4px; font-size: 10px; margin-top: 4px;"
-                            onclick="addTimeslotToCell(${day}, '${startTime}', '${endTime}')">
-                        +
-                    </button>
-                `;
-            }
-            
-            html += `</div>`;
-        });
-    });
-    
-    return html;
-}
-
-function generateTimeSlots() {
-    const slots = [];
-    for (let hour = 8; hour <= 20; hour++) {
-        for (let minute of ['00', '30']) {
-            const startTime = `${hour.toString().padStart(2, '0')}:${minute}`;
-            let endHour = hour;
-            let endMinute = minute === '00' ? '30' : '00';
-            
-            if (minute === '30') {
-                endHour = hour + 1;
-                endMinute = '00';
-            }
-            
-            const endTime = `${endHour.toString().padStart(2, '0')}:${endMinute}`;
-            slots.push(`${startTime}-${endTime}`);
-        }
-    }
-    return slots;
-}
-
-function addTimeslotToCell(day, startTime, endTime) {
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>Nouveau créneau</h3>
-            
-            <div class="form-group">
-                <label class="form-label">Jour: ${getDayName(day)}</label>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Horaire: ${startTime} - ${endTime}</label>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Matière</label>
-                <select id="cell-timeslot-subject" class="form-input">
-                    <option value="">Sélectionner une matière</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Salle/Lieu</label>
-                <input type="text" id="cell-timeslot-room" class="form-input" placeholder="Ex: Salle 201, Maison...">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Notes</label>
-                <textarea id="cell-timeslot-notes" class="form-input" placeholder="Notes supplémentaires..." rows="2"></textarea>
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="saveCellTimeslot(${day}, '${startTime}', '${endTime}')">
-                    Créer
-                </button>
-                <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // Charger les matières
-    loadSubjectsForCellTimeslot();
-}
-
-function getDayName(dayNumber) {
-    const days = ['', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-    return days[dayNumber];
-}
-
-async function loadSubjectsForCellTimeslot() {
-    const subjects = await dbAction('subjects', 'getAll');
-    const select = document.getElementById('cell-timeslot-subject');
-    
-    subjects.forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject.id;
-        option.textContent = subject.name;
-        select.appendChild(option);
-    });
-}
-
-async function saveCellTimeslot(day, startTime, endTime) {
-    const subjectId = document.getElementById('cell-timeslot-subject').value;
-    const room = document.getElementById('cell-timeslot-room').value;
-    const notes = document.getElementById('cell-timeslot-notes').value;
-    
-    if (!subjectId) {
-        alert('Veuillez sélectionner une matière');
-        return;
-    }
-    
-    const timeslot = {
-        context: currentContext,
-        day: day,
-        startTime: startTime,
-        endTime: endTime,
-        subjectId: parseInt(subjectId),
-        room: room.trim(),
-        notes: notes.trim(),
-        createdAt: new Date()
-    };
-    
-    await dbAction('timetable', 'add', timeslot);
-    hideModal(document.querySelector('.modal.active'));
-    loadTimetablePage();
-    showNotification('Créneau ajouté avec succès');
-}
-
-function exportTimetable() {
-    // Fonction d'export simplifiée
-    alert('Fonction d\'export à implémenter');
-}
-
-        function generateTimeSlots(timetable) {
-            let html = '';
-            const timeSlots = ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00', '12:00-13:00', 
-                              '13:00-14:00', '14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00'];
-            
-            timeSlots.forEach(timeSlot => {
-                html += `<div class="timetable-header">${timeSlot}</div>`;
-                
-                for (let day = 1; day <= 7; day++) {
-                    const slots = timetable.filter(t => t.day === day && t.startTime === timeSlot.split('-')[0]);
-                    html += `<div class="timetable-cell">`;
-                    slots.forEach(slot => {
-                        html += `<div class="time-slot">${getSubjectName(slot.subjectId)}</div>`;
-                    });
-                    html += `</div>`;
-                }
-            });
-            
-            return html;
-        }
-
-       function switchTimetableContext(context) {
-    currentContext = context;
-    document.getElementById('school-context-btn').classList.toggle('btn-primary', context === 'school');
-    document.getElementById('school-context-btn').classList.toggle('btn-secondary', context !== 'school');
-    document.getElementById('home-context-btn').classList.toggle('btn-primary', context === 'home');
-    document.getElementById('home-context-btn').classList.toggle('btn-secondary', context !== 'home');
-    
-    // Demander la permission pour les notifications au premier changement
-    if (Notification.permission === 'default') {
-        requestNotificationPermission();
-    }
-    
-    loadTimetablePage();
-}
-
-        // =============================================================================
-        // BIBLIOTHÈQUE PDF
-        // =============================================================================
-        async function loadLibraryPage() {
-            const library = await dbAction('library', 'getAll');
-            const container = document.getElementById('library-list');
-            container.innerHTML = '';
-            
-            library.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'card glass';
-                card.innerHTML = `
-                    <h3>${item.title}</h3>
-                    <p style="margin: 12px 0; opacity: 0.7;">Dernière page: ${item.lastPage || 1}</p>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-primary" onclick="openPdf(${item.id})">Lire</button>
-                        <button class="btn btn-danger" onclick="deletePdf(${item.id})">Supprimer</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        async function handlePdfUpload(file) {
-            if (!file || file.type !== 'application/pdf') {
-                alert('Veuillez sélectionner un fichier PDF valide');
-                return;
-            }
-            
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = {
-                title: file.name.replace('.pdf', ''),
-                fileName: file.name,
-                fileBlob: arrayBuffer,
-                lastPage: 1,
-                totalPages: 0,
-                createdAt: new Date()
-            };
-            
-            await dbAction('library', 'add', pdf);
-            loadLibraryPage();
-        }
-
-        // =============================================================================
-        // CALCULS ET STATISTIQUES
-        // =============================================================================
-        function calculateSubjectAverage(grades) {
-            if (!grades.length) return '--';
-            
-            const total = grades.reduce((sum, grade) => sum + (grade.grade * grade.coefficient), 0);
-            const totalCoefficient = grades.reduce((sum, grade) => sum + grade.coefficient, 0);
-            
-            return (total / totalCoefficient).toFixed(2);
-        }
-
-        function drawSparkline(canvas, grades) {
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
             const height = canvas.height;
             
-            if (!grades.length) {
-                ctx.fillStyle = '#ccc';
-                ctx.fillRect(0, height/2, width, 1);
-                return;
-            }
-            
-            const gradesValues = grades.map(g => g.grade).slice(-10); // Dernières 10 notes
-            const maxGrade = Math.max(...gradesValues);
-            const minGrade = Math.min(...gradesValues);
-            const range = maxGrade - minGrade || 1;
+            // Generate sample data (in real app, this would come from assignments)
+            const data = Array.from({length: 8}, () => Math.random() * 10 + 10);
             
             ctx.clearRect(0, 0, width, height);
+            
+            // Draw background
+            ctx.fillStyle = 'rgba(108, 99, 255, 0.1)';
             ctx.beginPath();
             
-            gradesValues.forEach((grade, index) => {
-                const x = (index / (gradesValues.length - 1)) * width;
-                const y = height - ((grade - minGrade) / range) * height;
+            const xStep = width / (data.length - 1);
+            ctx.moveTo(0, height - (data[0] / 20) * height);
+            
+            data.forEach((value, index) => {
+                const x = index * xStep;
+                const y = height - (value / 20) * height;
+                ctx.lineTo(x, y);
+            });
+            
+            ctx.lineTo(width, height);
+            ctx.lineTo(0, height);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw line
+            ctx.strokeStyle = '#6c63ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            data.forEach((value, index) => {
+                const x = index * xStep;
+                const y = height - (value / 20) * height;
                 
                 if (index === 0) {
                     ctx.moveTo(x, y);
@@ -1785,534 +1082,319 @@ function exportTimetable() {
                 }
             });
             
-            ctx.strokeStyle = '#6C63FF';
-            ctx.lineWidth = 2;
             ctx.stroke();
         }
 
-        // =============================================================================
-        // FONCTIONS UTILITAIRES
-        // =============================================================================
-        function getSubjectName(subjectId) {
-            // Implémentation simplifiée - en réalité il faudrait récupérer depuis la DB
-            return `Matière ${subjectId}`;
+        // Settings
+        function changeTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            if (currentUser) {
+                currentUser.theme = theme;
+                saveUserProfile(currentUser);
+            }
         }
 
-        function showModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
-
-        function hideModal(modalElement) {
-            if (typeof modalElement === 'string') {
-                document.getElementById(modalElement).classList.remove('active');
+        // Export/Import
+        async function exportData() {
+            const password = prompt('Mot de passe (facultatif) :');
+            const data = await getAllData();
+            
+            let exportData;
+            if (password) {
+                exportData = await encryptJSON(password, data);
             } else {
-                modalElement.classList.remove('active');
-                if (modalElement.parentElement) {
-                    modalElement.parentElement.removeChild(modalElement);
-                }
-            }
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            // Sauvegarder le préférence
-        }
-
-        // =============================================================================
-        // FONCTIONS STUB POUR LES FONCTIONNALITÉS MANQUANTES
-        // =============================================================================
-        function deleteSubject(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cette matière ?')) {
-                const confirmation = prompt('Tapez "SUPPRIMER" pour confirmer:');
-                if (confirmation === 'SUPPRIMER') {
-                    // Implémenter la suppression
-                    console.log('Suppression matière:', id);
-                }
-            }
-        }
-
-        function deleteCategory(id) {
-            if (confirm('Supprimer cette catégorie ?')) {
-                console.log('Suppression catégorie:', id);
-            }
-        }
-
-       function showAddContentModal() {
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>Ajouter du contenu - ${currentTab.toUpperCase()}</h3>
-            <div class="form-group">
-                <label class="form-label">Titre</label>
-                <input type="text" id="content-title" class="form-input" placeholder="Titre du contenu">
-            </div>
-            
-            ${getContentFieldsByType()}
-            
-            <div class="form-group">
-                <label class="form-label">Catégorie</label>
-                <select id="content-category" class="form-input">
-                    <option value="">Sélectionner une catégorie</option>
-                </select>
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="addContentItem()">Ajouter</button>
-                <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    loadCategoriesForModal();
-}
-
-function getContentFieldsByType() {
-    switch(currentTab) {
-        case 'photo':
-            return `
-                <div class="form-group">
-                    <label class="form-label">Image</label>
-                    <input type="file" id="content-file" class="form-input" accept="image/*" onchange="previewImage(this)">
-                    <div id="image-preview" style="margin-top: 10px;"></div>
-                </div>
-            `;
-        case 'video':
-            return `
-                <div class="form-group">
-                    <label class="form-label">Vidéo</label>
-                    <input type="file" id="content-file" class="form-input" accept="video/*" onchange="previewVideo(this)">
-                    <div id="video-preview" style="margin-top: 10px;"></div>
-                </div>
-            `;
-        case 'document':
-            return `
-                <div class="form-group">
-                    <label class="form-label">Document PDF</label>
-                    <input type="file" id="content-file" class="form-input" accept=".pdf">
-                </div>
-            `;
-        case 'note':
-            return `
-                <div class="form-group">
-                    <label class="form-label">Contenu de la note</label>
-                    <textarea id="content-text" class="form-input" placeholder="Écrivez votre note..." rows="6"></textarea>
-                </div>
-            `;
-        default:
-            return '';
-    }
-}
-
-async function loadCategoriesForModal() {
-    const categories = await dbAction('categories', 'getAll');
-    const subjectCategories = categories.filter(c => c.subjectId === currentSubjectId && c.type === currentTab);
-    const select = document.getElementById('content-category');
-    
-    subjectCategories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = category.name;
-        select.appendChild(option);
-    });
-}
-async function addContentItem() {
-    const title = document.getElementById('content-title').value;
-    const categoryId = document.getElementById('content-category').value;
-    
-    if (!title.trim()) {
-        alert('Veuillez entrer un titre');
-        return;
-    }
-    
-    if (!categoryId) {
-        alert('Veuillez sélectionner une catégorie');
-        return;
-    }
-    
-    const contentItem = {
-        categoryId: parseInt(categoryId),
-        type: currentTab,
-        title: title.trim(),
-        content: '',
-        fileBlob: null,
-        order: 0,
-        createdAt: new Date()
-    };
-    
-    // Gestion spécifique selon le type
-    switch(currentTab) {
-        case 'note':
-            const noteContent = document.getElementById('content-text').value;
-            if (!noteContent.trim()) {
-                alert('Veuillez écrire le contenu de la note');
-                return;
-            }
-            contentItem.content = noteContent.trim();
-            break;
-            
-        case 'photo':
-        case 'video':
-        case 'document':
-            const fileInput = document.getElementById('content-file');
-            if (!fileInput.files[0]) {
-                alert(`Veuillez sélectionner un fichier ${currentTab}`);
-                return;
+                exportData = JSON.stringify(data, null, 2);
             }
             
-            const arrayBuffer = await fileInput.files[0].arrayBuffer();
-            contentItem.fileBlob = arrayBuffer;
-            contentItem.fileName = fileInput.files[0].name;
-            contentItem.fileType = fileInput.files[0].type;
-            break;
-    }
-    
-    await dbAction('items', 'add', contentItem);
-    hideModal(document.querySelector('.modal.active'));
-    loadCategoryContent(); // Recharger l'affichage du contenu
-}
-function previewImage(input) {
-    const preview = document.getElementById('image-preview');
-    preview.innerHTML = '';
-    
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.style.maxWidth = '200px';
-            img.style.maxHeight = '150px';
-            img.style.borderRadius = '8px';
-            preview.appendChild(img);
+            const blob = new Blob([exportData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `carnet-backup-${new Date().toISOString().split('T')[0]}.${password ? 'carnet' : 'json'}`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
-        reader.readAsDataURL(input.files[0]);
-    }
-}
 
-function previewVideo(input) {
-    const preview = document.getElementById('video-preview');
-    preview.innerHTML = '';
-    
-    if (input.files && input.files[0]) {
-        const video = document.createElement('video');
-        video.src = URL.createObjectURL(input.files[0]);
-        video.controls = true;
-        video.style.maxWidth = '200px';
-        video.style.maxHeight = '150px';
-        video.style.borderRadius = '8px';
-        preview.appendChild(video);
-    }
-}
-
-       function showAddTimeslotModal(editingSlot = null) {
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>${editingSlot ? 'Modifier' : 'Nouveau'} créneau</h3>
+        async function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,.carnet';
             
-            <div class="form-group">
-                <label class="form-label">Jour</label>
-                <select id="timeslot-day" class="form-input">
-                    <option value="1">Lundi</option>
-                    <option value="2">Mardi</option>
-                    <option value="3">Mercredi</option>
-                    <option value="4">Jeudi</option>
-                    <option value="5">Vendredi</option>
-                    <option value="6">Samedi</option>
-                    <option value="7">Dimanche</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Horaire de début</label>
-                <select id="timeslot-start" class="form-input">
-                    ${generateTimeOptions()}
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Horaire de fin</label>
-                <select id="timeslot-end" class="form-input">
-                    ${generateTimeOptions()}
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Matière</label>
-                <select id="timeslot-subject" class="form-input">
-                    <option value="">Sélectionner une matière</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Salle/Lieu</label>
-                <input type="text" id="timeslot-room" class="form-input" placeholder="Ex: Salle 201, Maison...">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Notes</label>
-                <textarea id="timeslot-notes" class="form-input" placeholder="Notes supplémentaires..." rows="3"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Rappel</label>
-                <input type="datetime-local" id="timeslot-reminder" class="form-input">
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="saveTimeslot(${editingSlot ? editingSlot.id : 'null'})">
-                    ${editingSlot ? 'Modifier' : 'Créer'}
-                </button>
-                <button class="btn btn-secondary" onclick="hideModal(this.closest('.modal'))">Annuler</button>
-                ${editingSlot ? `
-                    <button class="btn btn-danger" onclick="deleteTimeslot(${editingSlot.id})" style="margin-left: auto;">
-                        Supprimer
-                    </button>
-                ` : ''}
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // Charger les matières
-    loadSubjectsForTimeslot();
-    
-    // Pré-remplir si édition
-    if (editingSlot) {
-        document.getElementById('timeslot-day').value = editingSlot.day;
-        document.getElementById('timeslot-start').value = editingSlot.startTime;
-        document.getElementById('timeslot-end').value = editingSlot.endTime;
-        document.getElementById('timeslot-subject').value = editingSlot.subjectId || '';
-        document.getElementById('timeslot-room').value = editingSlot.room || '';
-        document.getElementById('timeslot-notes').value = editingSlot.notes || '';
-        
-        if (editingSlot.reminder) {
-            const reminderDate = new Date(editingSlot.reminder);
-            document.getElementById('timeslot-reminder').value = reminderDate.toISOString().slice(0, 16);
-        }
-    } else {
-        // Définir l'heure de fin par défaut (1h après le début)
-        const startSelect = document.getElementById('timeslot-start');
-        const endSelect = document.getElementById('timeslot-end');
-        startSelect.addEventListener('change', function() {
-            const startTime = this.value;
-            if (startTime) {
-                const [hours, minutes] = startTime.split(':').map(Number);
-                let endHours = hours + 1;
-                if (endHours > 23) endHours = 23;
-                const endTime = `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                const text = await file.text();
                 
-                if (endSelect.querySelector(`option[value="${endTime}"]`)) {
-                    endSelect.value = endTime;
+                let data;
+                try {
+                    // Try to parse as JSON first
+                    data = JSON.parse(text);
+                } catch {
+                    // If it fails, try to decrypt
+                    const password = prompt('Ce fichier est chiffré. Entrez le mot de passe :');
+                    if (!password) return;
+                    
+                    try {
+                        data = await decryptJSON(password, text);
+                    } catch (error) {
+                        alert('Mot de passe incorrect ou fichier corrompu');
+                        return;
+                    }
                 }
-            }
-        });
-    }
-}
-
-function generateTimeOptions() {
-    let options = '';
-    for (let hour = 0; hour < 24; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-            options += `<option value="${time}">${time}</option>`;
-        }
-    }
-    return options;
-}
-
-async function loadSubjectsForTimeslot() {
-    const subjects = await dbAction('subjects', 'getAll');
-    const select = document.getElementById('timeslot-subject');
-    
-    subjects.forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject.id;
-        option.textContent = subject.name;
-        select.appendChild(option);
-    });
-}
-      
-      async function saveTimeslot(editingId = null) {
-    const day = parseInt(document.getElementById('timeslot-day').value);
-    const startTime = document.getElementById('timeslot-start').value;
-    const endTime = document.getElementById('timeslot-end').value;
-    const subjectId = document.getElementById('timeslot-subject').value;
-    const room = document.getElementById('timeslot-room').value;
-    const notes = document.getElementById('timeslot-notes').value;
-    const reminder = document.getElementById('timeslot-reminder').value;
-    
-    // Validation
-    if (!day) {
-        alert('Veuillez sélectionner un jour');
-        return;
-    }
-    
-    if (!startTime || !endTime) {
-        alert('Veuillez sélectionner les horaires de début et de fin');
-        return;
-    }
-    
-    if (startTime >= endTime) {
-        alert('L\'heure de fin doit être après l\'heure de début');
-        return;
-    }
-    
-    // Vérifier les conflits d'horaire
-    const existingSlots = await dbAction('timetable', 'getAll');
-    const contextSlots = existingSlots.filter(slot => 
-        slot.context === currentContext && 
-        slot.day === day &&
-        slot.id !== editingId // Exclure le créneau en cours d'édition
-    );
-    
-    const hasConflict = contextSlots.some(slot => {
-        return (startTime < slot.endTime && endTime > slot.startTime);
-    });
-    
-    if (hasConflict) {
-        if (!confirm('Ce créneau chevauche un autre créneau existant. Voulez-vous quand même l\'enregistrer ?')) {
-            return;
-        }
-    }
-    
-    const timeslot = {
-        context: currentContext,
-        day: day,
-        startTime: startTime,
-        endTime: endTime,
-        subjectId: subjectId ? parseInt(subjectId) : null,
-        room: room.trim(),
-        notes: notes.trim(),
-        reminder: reminder ? new Date(reminder) : null,
-        createdAt: new Date()
-    };
-    
-    if (editingId) {
-        timeslot.id = editingId;
-        await dbAction('timetable', 'put', timeslot);
-        showNotification('Créneau modifié avec succès');
-    } else {
-        await dbAction('timetable', 'add', timeslot);
-        showNotification('Créneau ajouté avec succès');
-    }
-    
-    hideModal(document.querySelector('.modal.active'));
-    loadTimetablePage();
-    
-    // Planifier le rappel si défini
-    if (reminder) {
-        scheduleReminder(timeslot);
-    }
-}
-
-      async function deleteTimeslot(slotId) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce créneau ?')) {
-        const confirmation = prompt('Tapez "SUPPRIMER" pour confirmer :');
-        if (confirmation === 'SUPPRIMER') {
-            // Soft delete
-            const slot = await dbAction('timetable', 'get', slotId);
-            const trashItem = {
-                originalStore: 'timetable',
-                originalData: slot,
-                deletedAt: new Date()
+                
+                // Validate data structure
+                if (!isValidBackup(data)) {
+                    alert('Format de fichier invalide');
+                    return;
+                }
+                
+                const confirmMerge = confirm('Voulez-vous fusionner avec les données existantes ? (Annuler pour écraser)');
+                await restoreData(data, confirmMerge);
+                alert('Données importées avec succès !');
+                location.reload();
             };
             
-            await dbAction('trash', 'add', trashItem);
-            await dbAction('timetable', 'delete', slotId);
+            input.click();
+        }
+
+        // Encryption utilities
+        async function encryptJSON(password, obj) {
+            const text = JSON.stringify(obj);
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
             
-            hideModal(document.querySelector('.modal.active'));
-            loadTimetablePage();
-            showNotification('Créneau supprimé');
+            // Generate salt and IV
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            
+            // Derive key
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode(password),
+                'PBKDF2',
+                false,
+                ['deriveKey']
+            );
+            
+            const key = await crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt']
+            );
+            
+            // Encrypt
+            const encrypted = await crypto.subtle.encrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: iv
+                },
+                key,
+                data
+            );
+            
+            // Combine salt + iv + encrypted data
+            const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+            result.set(salt);
+            result.set(iv, salt.length);
+            result.set(new Uint8Array(encrypted), salt.length + iv.length);
+            
+            return btoa(String.fromCharCode(...result));
         }
-    }
-}
 
-function editTimeslot(slotId) {
-    // Cette fonction sera appelée quand on clique sur un créneau
-    dbAction('timetable', 'get', slotId).then(slot => {
-        showAddTimeslotModal(slot);
-    });
-}
-
-function scheduleReminder(timeslot) {
-    if (!timeslot.reminder) return;
-    
-    const now = new Date();
-    const reminderTime = new Date(timeslot.reminder);
-    
-    if (reminderTime > now) {
-        const timeout = reminderTime.getTime() - now.getTime();
-        
-        setTimeout(() => {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('Rappel - Carnet de l\'élève', {
-                    body: `Créneau: ${getSubjectName(timeslot.subjectId)} - ${timeslot.startTime} à ${timeslot.endTime}`,
-                    icon: '/icon.png',
-                    tag: `reminder-${timeslot.id}`
-                });
-            } else {
-                alert(`📚 Rappel: ${getSubjectName(timeslot.subjectId)} de ${timeslot.startTime} à ${timeslot.endTime}`);
+        async function decryptJSON(password, payload) {
+            try {
+                const data = Uint8Array.from(atob(payload), c => c.charCodeAt(0));
+                
+                // Extract salt, iv, and encrypted data
+                const salt = data.slice(0, 16);
+                const iv = data.slice(16, 28);
+                const encrypted = data.slice(28);
+                
+                // Derive key
+                const encoder = new TextEncoder();
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw',
+                    encoder.encode(password),
+                    'PBKDF2',
+                    false,
+                    ['deriveKey']
+                );
+                
+                const key = await crypto.subtle.deriveKey(
+                    {
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: 100000,
+                        hash: 'SHA-256'
+                    },
+                    keyMaterial,
+                    { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['decrypt']
+                );
+                
+                // Decrypt
+                const decrypted = await crypto.subtle.decrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv
+                    },
+                    key,
+                    encrypted
+                );
+                
+                const text = new TextDecoder().decode(decrypted);
+                return JSON.parse(text);
+            } catch (error) {
+                throw new Error('Decryption failed');
             }
-        }, timeout);
-    }
-}
-
-// Demander la permission pour les notifications
-function requestNotificationPermission() {
-    if ('Notification' in window) {
-        Notification.requestPermission();
-    }
-}
-        function openPdf(id) {
-            alert(`Ouvrir PDF ${id} - Fonctionnalité à implémenter`);
         }
 
-        function deletePdf(id) {
-            if (confirm('Supprimer ce PDF ?')) {
-                console.log('Suppression PDF:', id);
+        // Data management
+        async function getAllData() {
+            const stores = ['profile', 'subjects', 'assignments', 'attachments', 'timetable', 'library'];
+            const data = {};
+            
+            for (const store of stores) {
+                data[store] = await dbAction(store, 'getAll');
+            }
+            
+            return data;
+        }
+
+        function isValidBackup(data) {
+            const requiredStores = ['profile', 'subjects', 'assignments', 'library'];
+            return requiredStores.every(store => Array.isArray(data[store]));
+        }
+
+        async function restoreData(data, merge = false) {
+            const stores = Object.keys(data);
+            
+            for (const store of stores) {
+                if (!merge) {
+                    // Clear existing data
+                    const allItems = await dbAction(store, 'getAll');
+                    for (const item of allItems) {
+                        await dbAction(store, 'delete', item.id);
+                    }
+                }
+                
+                // Add new data
+                for (const item of data[store]) {
+                    await dbAction(store, 'add', item);
+                }
             }
         }
 
-        function exportData() {
-            alert('Fonctionnalité export à implémenter');
+        // Modal functions for delete confirmation flow
+        function showDeleteConfirmation(callback, data, confirmText = 'SUPPRIMER') {
+            deleteCallback = callback;
+            deleteData = data;
+            document.getElementById('confirm-text').textContent = confirmText;
+            document.getElementById('confirm-input').value = '';
+            document.getElementById('final-confirm-btn').disabled = true;
+            
+            hideModal('modal-confirm-delete');
+            document.getElementById('modal-type-confirm').classList.add('active');
         }
 
-        function importData(file) {
-            alert('Fonctionnalité import à implémenter');
+        function confirmDelete() {
+            // First confirmation
+            hideModal('modal-confirm-delete');
+            // Second confirmation handled in showDeleteConfirmation
         }
 
-        function toggleDevMode() {
-            alert('Mode développeur activé/désactivé');
+        function finalConfirmDelete() {
+            if (deleteCallback) {
+                deleteCallback(deleteData);
+            }
+            hideModal('modal-type-confirm');
+        }
+
+        // Enable final confirm button when text matches
+        document.getElementById('confirm-input').addEventListener('input', function() {
+            const confirmText = document.getElementById('confirm-text').textContent;
+            const finalConfirmBtn = document.getElementById('final-confirm-btn');
+            finalConfirmBtn.disabled = this.value !== confirmText;
+        });
+
+        // Placeholder functions for unimplemented features
+        function showSubjectDetail(subjectId) {
+            alert(`Détails de la matière ${subjectId} - À implémenter`);
+        }
+
+        function updateSubjectsPage() {
+            document.getElementById('subjects-detailed-list').innerHTML = '<p>Liste détaillée des matières - À implémenter</p>';
+        }
+
+        function updateTimetablePage() {
+            document.getElementById('timetable-grid').innerHTML = '<p>Grille emploi du temps - À implémenter</p>';
+        }
+
+        function updateLibraryPage() {
+            document.getElementById('library-list').innerHTML = '<p>Liste des documents - À implémenter</p>';
+        }
+
+        function loadTimetable() {
+            // À implémenter
+        }
+
+        function showAddTimeSlotModal() {
+            alert('Modal ajout créneau - À implémenter');
+        }
+
+        function handlePdfUpload(file) {
+            alert(`Upload PDF ${file.name} - À implémenter`);
         }
 
         function showResetModal() {
-            if (confirm('Réinitialiser toutes les données ? Cette action est irréversible.')) {
-                const confirmation = prompt('Tapez "RÉINITIALISER" pour confirmer:');
-                if (confirmation === 'RÉINITIALISER') {
-                    alert('Réinitialisation - Fonctionnalité à implémenter');
+            if (confirm('Êtes-vous sûr de vouloir réinitialiser l\'application ? Toutes les données locales seront supprimées.')) {
+                if (confirm('Tapez RÉINITIALISER pour confirmer :') === 'RÉINITIALISER') {
+                    indexedDB.deleteDatabase('StudentNotebook');
+                    localStorage.clear();
+                    alert('Application réinitialisée. La page va se recharger.');
+                    location.reload();
                 }
             }
         }
 
-        // =============================================================================
-        // SELF-TEST POUR LE MODE DÉVELOPPEUR
-        // =============================================================================
-        function selfTest() {
-            console.log('=== SELF-TEST MODE DÉVELOPPEUR ===');
+        // Self-test function for development
+        async function selfTest() {
+            console.log('Running self-test...');
             
-            // Test de moyenne
-            const testGrades = [
+            // Test averages calculation
+            const testAssignments = [
                 { grade: 15, coefficient: 1 },
                 { grade: 18, coefficient: 2 },
                 { grade: 12, coefficient: 1 }
             ];
-            console.log('Test moyenne:', calculateSubjectAverage(testGrades));
             
-            // Test autres fonctionnalités...
-            console.log('=== SELF-TEST COMPLÉTÉ ===');
+            const average = calculateSubjectAverage(testAssignments);
+            console.assert(average === 16.5, 'Average calculation failed');
+            
+            // Test encryption roundtrip
+            const testData = { message: 'Hello, World!' };
+            const password = 'test123';
+            
+            try {
+                const encrypted = await encryptJSON(password, testData);
+                const decrypted = await decryptJSON(password, encrypted);
+                console.assert(JSON.stringify(testData) === JSON.stringify(decrypted), 'Encryption roundtrip failed');
+            } catch (error) {
+                console.error('Encryption test failed:', error);
+            }
+            
+            console.log('Self-test completed');
         }
+
+        // Initialize the app when the page loads
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
