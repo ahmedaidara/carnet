@@ -1,139 +1,226 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>StudySync - Matières</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <style>
-        .subject-card {
-            transition: all 0.3s ease;
-        }
-        .subject-card:hover {
-            transform: translateY(-3px);
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .tab-button.active {
-            color: #6C63FF;
-            border-bottom: 2px solid #6C63FF;
-        }
-        [contenteditable]:focus {
-            outline: none;
-            background-color: #F5F3FF;
-            border-radius: 4px;
-        }
+        .subject-card { transition: all 0.3s ease; }
+        .subject-card:hover { transform: translateY(-3px); }
+        [contenteditable]:focus { outline: none; background-color: #F5F3FF; border-radius: 4px; }
+        .tab-button.active { color: #6C63FF; border-bottom: 2px solid #6C63FF; }
+        /* gallery small styling */
+        .thumb { object-fit: cover; width: 100%; height: 140px; border-radius: 8px; cursor:pointer; }
+        .select-overlay { position:absolute; top:8px; right:8px; }
+        .fullscreen-media { max-width: 95vw; max-height: 85vh; }
+        .hidden { display:none; }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-10">
+    <header class="bg-white shadow-sm sticky top-0 z-20">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <a href="index.html" class="text-gray-600">
+                <a id="backToSubjects" href="#" class="text-gray-600 hidden">
                     <i data-feather="arrow-left"></i>
                 </a>
-                <h1 class="text-xl font-bold text-gray-800">Matières</h1>
+                <h1 id="headerTitle" class="text-xl font-bold text-gray-800">Matières</h1>
             </div>
-            <button id="addSubjectBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
-                <i data-feather="plus"></i>
-            </button>
+            <div class="flex items-center space-x-3">
+                <button id="addSubjectBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                    <i data-feather="plus"></i>
+                </button>
+                <button id="toggleSelectModeBtn" class="p-2 rounded-full bg-gray-100 text-gray-600 hidden" title="Mode sélection">
+                    <i data-feather="check-square"></i>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-6 pb-20">
+    <!-- Main -->
+    <main class="container mx-auto px-4 py-6 pb-24">
         <!-- Add Subject Modal -->
         <div id="addSubjectModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
             <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Ajouter une matière</h2>
-                    <button id="closeModal" class="text-gray-500 hover:text-gray-700">
-                        <i data-feather="x"></i>
-                    </button>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700"><i data-feather="x"></i></button>
                 </div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la matière</label>
-                        <input type="text" id="subjectName" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                        <input type="text" id="subjectName" class="w-full px-4 py-2 rounded-lg border border-gray-300">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Coefficient</label>
-                        <input type="number" id="subjectCoeff" min="1" value="1" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                        <input type="number" id="subjectCoeff" min="1" value="1" class="w-full px-4 py-2 rounded-lg border border-gray-300">
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
-                        <button id="cancelAddSubject" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
-                        <button id="confirmAddSubject" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
+                        <button id="cancelAddSubject" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700">Annuler</button>
+                        <button id="confirmAddSubject" class="px-4 py-2 rounded-lg bg-purple-600 text-white">Ajouter</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Subjects List -->
-        <div id="subjectsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Subjects will be added here dynamically -->
+        <div id="subjectsView">
+            <div id="subjectsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- dynamique -->
+            </div>
+
+            <div id="noSubjects" class="text-center py-12">
+                <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <i data-feather="book-open" class="text-gray-400 w-12 h-12"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-700 mb-1">Aucune matière ajoutée</h3>
+                <p class="text-gray-500 mb-4">Commencez par ajouter vos matières pour organiser vos cours</p>
+                <button id="addFirstSubject" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    <i data-feather="plus" class="mr-2 inline"></i> Ajouter une matière
+                </button>
+            </div>
         </div>
 
-        <!-- No Subjects Placeholder -->
-        <div id="noSubjects" class="text-center py-12">
-            <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                <i data-feather="book-open" class="text-gray-400 w-12 h-12"></i>
+        <!-- Subject Detail View (hidden initially) -->
+        <div id="subjectDetailView" class="hidden">
+            <div class="mb-4 flex items-center justify-between">
+                <div>
+                    <h2 id="subjectDetailTitle" class="text-2xl font-bold text-gray-800"></h2>
+                    <p id="subjectDetailCoeff" class="text-sm text-gray-500"></p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="createFolderBtn" class="px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200">
+                        <i data-feather="folder-plus"></i> Créer dossier
+                    </button>
+                    <button id="editSubjectBtn" class="px-3 py-2 bg-gray-100 rounded-lg"><i data-feather="edit-2"></i></button>
+                    <button id="deleteSubjectBtn" class="px-3 py-2 bg-red-100 text-red-700 rounded-lg"><i data-feather="trash-2"></i></button>
+                </div>
             </div>
-            <h3 class="text-lg font-medium text-gray-700 mb-1">Aucune matière ajoutée</h3>
-            <p class="text-gray-500 mb-4">Commencez par ajouter vos matières pour organiser vos cours</p>
-            <button id="addFirstSubject" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                <i data-feather="plus" class="mr-2 inline"></i> Ajouter une matière
-            </button>
+
+            <!-- Tabs -->
+            <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+                <div class="flex space-x-6 border-b pb-2">
+                    <button class="tab-button font-medium pb-2 active" data-tab="documents">DOCUMENT</button>
+                    <button class="tab-button font-medium pb-2" data-tab="photos">PHOTO</button>
+                    <button class="tab-button font-medium pb-2" data-tab="videos">VIDÉO</button>
+                    <button class="tab-button font-medium pb-2" data-tab="notes">NOTE</button>
+                </div>
+
+                <div class="mt-4">
+                    <!-- Upload + buttons -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div id="currentFolderLabel" class="text-sm text-gray-600">Dossier: <span class="font-medium">Aucun</span></div>
+                        <div class="flex items-center space-x-2">
+                            <label id="addFilesLabel" class="flex items-center space-x-2 px-3 py-2 bg-purple-600 text-white rounded-lg cursor-pointer hidden">
+                                <i data-feather="plus"></i><span id="addFilesText">Ajouter</span>
+                                <input id="fileInput" type="file" class="hidden"/>
+                            </label>
+                            <button id="toggleSelectBtn" class="px-3 py-2 bg-gray-100 rounded-lg" title="Sélection">
+                                <i data-feather="layers"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Content area -->
+                    <div id="tabContents">
+                        <div id="documents" class="tab-content active grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                        <div id="photos" class="tab-content grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                        <div id="videos" class="tab-content grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                        <div id="notes" class="tab-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Fullscreen viewer modal -->
+    <div id="viewerModal" class="fixed inset-0 z-50 bg-black bg-opacity-80 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-5xl w-full">
+            <button id="closeViewer" class="absolute right-2 top-2 text-white bg-gray-800 rounded-full p-2"><i data-feather="x"></i></button>
+            <div id="viewerContent" class="flex items-center justify-center">
+                <!-- dynamic content -->
+            </div>
+            <div id="viewerControls" class="mt-3 flex items-center justify-between text-white">
+                <div>
+                    <button id="zoomIn" class="px-3 py-2 bg-white/10 rounded mr-2">+</button>
+                    <button id="zoomOut" class="px-3 py-2 bg-white/10 rounded">-</button>
+                </div>
+                <div>
+                    <button id="downloadMedia" class="px-3 py-2 bg-white/10 rounded">Télécharger</button>
+                    <button id="deleteMedia" class="px-3 py-2 bg-red-600 rounded">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note editor modal -->
+    <div id="noteEditorModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-3xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Éditeur de note</h3>
+                <div class="flex items-center space-x-2">
+                    <input id="noteColor" type="color" class="w-10 h-8 p-0 border-0"/>
+                    <select id="noteFontSize" class="px-2 py-1 border rounded">
+                        <option value="16">16px</option>
+                        <option value="18">18px</option>
+                        <option value="20" selected>20px</option>
+                        <option value="22">22px</option>
+                        <option value="24">24px</option>
+                    </select>
+                    <button id="noteBold" class="px-3 py-1 border rounded">B</button>
+                    <button id="noteItalic" class="px-3 py-1 border rounded">I</button>
+                    <button id="noteUnderline" class="px-3 py-1 border rounded">U</button>
+                    <button id="saveNoteBtn" class="px-4 py-2 bg-purple-600 text-white rounded">Sauvegarder</button>
+                </div>
+            </div>
+            <div id="noteEditor" contenteditable="true" class="w-full min-h-[40vh] border p-4 rounded"></div>
+        </div>
+    </div>
+
+    <!-- Templates and hidden inputs -->
+    <input id="multiFileInput" type="file" multiple class="hidden"/>
+
     <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
         <div class="container mx-auto flex justify-around">
             <a href="index.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
-                <i data-feather="home" class="w-6 h-6"></i>
-                <span class="text-xs mt-1">Accueil</span>
+                <i data-feather="home" class="w-6 h-6"></i><span class="text-xs mt-1">Accueil</span>
             </a>
             <a href="subjects.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
-                <i data-feather="book" class="w-6 h-6"></i>
-                <span class="text-xs mt-1">Matières</span>
+                <i data-feather="book" class="w-6 h-6"></i><span class="text-xs mt-1">Matières</span>
             </a>
             <a href="library.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
-                <i data-feather="bookmark" class="w-6 h-6"></i>
-                <span class="text-xs mt-1">Bibliothèque</span>
+                <i data-feather="bookmark" class="w-6 h-6"></i><span class="text-xs mt-1">Bibliothèque</span>
             </a>
             <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
-                <i data-feather="calendar" class="w-6 h-6"></i>
-                <span class="text-xs mt-1">Emploi du temps</span>
+                <i data-feather="calendar" class="w-6 h-6"></i><span class="text-xs mt-1">Emploi du temps</span>
             </a>
             <a href="settings.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
-                <i data-feather="settings" class="w-6 h-6"></i>
-                <span class="text-xs mt-1">Paramètres</span>
+                <i data-feather="settings" class="w-6 h-6"></i><span class="text-xs mt-1">Paramètres</span>
             </a>
         </div>
     </nav>
 
     <script>
-        // Initialize Feather Icons
         feather.replace();
-        
-        // Sample subjects data
-        let subjects = [
-            { id: 1, name: "Mathématiques", coefficient: 5, color: "purple" },
-            { id: 2, name: "Physique", coefficient: 4, color: "red" },
-            { id: 3, name: "Informatique", coefficient: 3, color: "blue" },
-            { id: 4, name: "Histoire-Géo", coefficient: 2, color: "yellow" },
-            { id: 5, name: "Philosophie", coefficient: 2, color: "green" },
-            { id: 6, name: "Anglais", coefficient: 2, color: "indigo" }
-        ];
-        
-        // DOM Elements
+
+        // ----- DATA STRUCTURES -----
+        // subjects array stored in localStorage as 'subjects'
+        // for each subject, we store subject_data_{id}:
+        // { folders: [{id, name, createdAt, items: [{id,type, name, dataURL, mime, createdAt}]}], itemsOutsideFolders: [...] }
+
+        // initial sample subjects
+        let subjects = JSON.parse(localStorage.getItem('subjects') || '[]');
+        if (subjects.length === 0) {
+            subjects = [
+                { id: 1, name: "Mathématiques", coefficient: 5, color: "purple" },
+                { id: 2, name: "Physique", coefficient: 4, color: "red" }
+            ];
+            localStorage.setItem('subjects', JSON.stringify(subjects));
+        }
+
+        // DOM refs
         const subjectsList = document.getElementById('subjectsList');
         const noSubjects = document.getElementById('noSubjects');
         const addSubjectModal = document.getElementById('addSubjectModal');
@@ -144,70 +231,123 @@
         const confirmAddSubjectBtn = document.getElementById('confirmAddSubject');
         const subjectNameInput = document.getElementById('subjectName');
         const subjectCoeffInput = document.getElementById('subjectCoeff');
-        
-        // Colors for subject cards
-        const cardColors = {
-            purple: { bg: 'purple-100', text: 'purple-600', hover: 'purple-200' },
-            red: { bg: 'red-100', text: 'red-600', hover: 'red-200' },
-            blue: { bg: 'blue-100', text: 'blue-600', hover: 'blue-200' },
-            yellow: { bg: 'yellow-100', text: 'yellow-600', hover: 'yellow-200' },
-            green: { bg: 'green-100', text: 'green-600', hover: 'green-200' },
-            indigo: { bg: 'indigo-100', text: 'indigo-600', hover: 'indigo-200' }
-        };
-        
-        // Icons for subjects
-        const subjectIcons = {
-            "Mathématiques": "divide",
-            "Physique": "atom",
-            "Informatique": "code",
-            "Histoire-Géo": "globe",
-            "Philosophie": "feather",
-            "Anglais": "message-square",
-            "default": "book"
-        };
-        
-        // Render subjects
+        const subjectDetailView = document.getElementById('subjectDetailView');
+        const subjectsView = document.getElementById('subjectsView');
+        const headerTitle = document.getElementById('headerTitle');
+        const backToSubjects = document.getElementById('backToSubjects');
+        const subjectDetailTitle = document.getElementById('subjectDetailTitle');
+        const subjectDetailCoeff = document.getElementById('subjectDetailCoeff');
+        const createFolderBtn = document.getElementById('createFolderBtn');
+        const addFilesLabel = document.getElementById('addFilesLabel');
+        const addFilesText = document.getElementById('addFilesText');
+        const fileInput = document.getElementById('fileInput');
+        const tabButtons = Array.from(document.querySelectorAll('.tab-button'));
+        const tabContents = document.getElementById('tabContents');
+        const viewerModal = document.getElementById('viewerModal');
+        const viewerContent = document.getElementById('viewerContent');
+        const viewerControls = document.getElementById('viewerControls');
+        const closeViewer = document.getElementById('closeViewer');
+        const zoomIn = document.getElementById('zoomIn');
+        const zoomOut = document.getElementById('zoomOut');
+        const downloadMedia = document.getElementById('downloadMedia');
+        const deleteMedia = document.getElementById('deleteMedia');
+        const noteEditorModal = document.getElementById('noteEditorModal');
+        const noteEditor = document.getElementById('noteEditor');
+        const saveNoteBtn = document.getElementById('saveNoteBtn');
+        const noteColor = document.getElementById('noteColor');
+        const noteFontSize = document.getElementById('noteFontSize');
+        const noteBold = document.getElementById('noteBold');
+        const noteItalic = document.getElementById('noteItalic');
+        const noteUnderline = document.getElementById('noteUnderline');
+        const currentFolderLabel = document.getElementById('currentFolderLabel');
+        const toggleSelectBtn = document.getElementById('toggleSelectBtn');
+        const toggleSelectModeBtn = document.getElementById('toggleSelectModeBtn');
+
+        // State for current subject view
+        let currentSubjectId = null;
+        let currentTab = 'documents';
+        let currentFolderId = null; // null means root (outside folders)
+        let selectionMode = false;
+        let selectedItems = new Set();
+        let viewerCurrentItem = null;
+        let viewerZoom = 1;
+
+        // Helper: get subject data object
+        function getSubjectData(id) {
+            const raw = localStorage.getItem('subject_data_' + id);
+            if (!raw) {
+                const init = { folders: [], itemsOutsideFolders: [] };
+                localStorage.setItem('subject_data_' + id, JSON.stringify(init));
+                return init;
+            }
+            return JSON.parse(raw);
+        }
+        function saveSubjectData(id, data) {
+            localStorage.setItem('subject_data_' + id, JSON.stringify(data));
+        }
+
+        // Save subjects list
+        function saveSubjects() {
+            localStorage.setItem('subjects', JSON.stringify(subjects));
+        }
+
+        // Render subjects list
         function renderSubjects() {
             if (subjects.length === 0) {
                 noSubjects.classList.remove('hidden');
                 subjectsList.classList.add('hidden');
-            } else {
-                noSubjects.classList.add('hidden');
-                subjectsList.classList.remove('hidden');
-                
-                subjectsList.innerHTML = '';
-                subjects.forEach(subject => {
-                    const color = cardColors[subject.color] || cardColors.purple;
-                    const icon = subjectIcons[subject.name] || subjectIcons.default;
-                    
-                    const subjectCard = document.createElement('a');
-                    subjectCard.href = `subject.html?id=${subject.id}`;
-                    subjectCard.className = `subject-card bg-white rounded-xl shadow-sm p-4 hover:shadow-md border border-gray-100`;
-                    subjectCard.innerHTML = `
-                        <div class="flex items-start justify-between mb-2">
-                            <div class="w-10 h-10 rounded-full bg-${color.bg} flex items-center justify-center">
-                                <i data-feather="${icon}" class="text-${color.text}"></i>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button class="edit-subject p-1 rounded-full hover:bg-gray-100" data-id="${subject.id}">
-                                    <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
-                                </button>
-                                <button class="delete-subject p-1 rounded-full hover:bg-gray-100" data-id="${subject.id}">
-                                    <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <h3 class="font-medium text-gray-800 mb-1">${subject.name}</h3>
-                        <div class="text-sm text-gray-500">Coeff: ${subject.coefficient}</div>
-                    `;
-                    
-                    subjectsList.appendChild(subjectCard);
-                });
-                feather.replace();
+                return;
             }
+            noSubjects.classList.add('hidden');
+            subjectsList.classList.remove('hidden');
+            subjectsList.innerHTML = '';
+            subjects.forEach(sub => {
+                const card = document.createElement('div');
+                card.className = `subject-card bg-white rounded-xl shadow-sm p-4 border border-gray-100 cursor-pointer`;
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                            <i data-feather="book" class="text-gray-600"></i>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="edit-subject p-1 rounded-full hover:bg-gray-100" data-id="${sub.id}">
+                                <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                            <button class="delete-subject p-1 rounded-full hover:bg-gray-100" data-id="${sub.id}">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <h3 class="font-medium text-gray-800 mb-1">${sub.name}</h3>
+                    <div class="text-sm text-gray-500">Coeff: ${sub.coefficient}</div>
+                `;
+                // open subject on click (but not when clicking edit/delete)
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.edit-subject') || e.target.closest('.delete-subject')) return;
+                    openSubject(sub.id);
+                });
+                // edit & delete handlers
+                card.querySelector('.edit-subject').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const newName = prompt('Nouveau nom de la matière', sub.name);
+                    if (newName) { sub.name = newName; saveSubjects(); renderSubjects(); }
+                });
+                card.querySelector('.delete-subject').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm('Supprimer cette matière et tout son contenu ?')) {
+                        // remove data
+                        localStorage.removeItem('subject_data_' + sub.id);
+                        subjects = subjects.filter(s => s.id !== sub.id);
+                        saveSubjects();
+                        renderSubjects();
+                    }
+                });
+                subjectsList.appendChild(card);
+            });
+            feather.replace();
         }
-        
-        // Toggle modal
+
+        // Modal toggle
         function toggleModal(show) {
             if (show) {
                 addSubjectModal.classList.remove('hidden');
@@ -219,66 +359,531 @@
                 subjectCoeffInput.value = '1';
             }
         }
-        
-        // Add new subject
+
+        // Add subject
         function addSubject() {
             const name = subjectNameInput.value.trim();
             const coeff = parseInt(subjectCoeffInput.value);
-            
-            if (name && coeff > 0) {
-                const colors = Object.keys(cardColors);
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                const newSubject = {
-                    id: subjects.length > 0 ? Math.max(...subjects.map(s => s.id)) + 1 : 1,
-                    name,
-                    coefficient: coeff,
-                    color: randomColor
-                };
-                
-                subjects.push(newSubject);
-                localStorage.setItem('subjects', JSON.stringify(subjects));
-                renderSubjects();
-                toggleModal(false);
+            if (!name || coeff <= 0) { alert('Remplis le nom et un coefficient valide'); return; }
+            const id = subjects.length ? Math.max(...subjects.map(s=>s.id))+1 : 1;
+            subjects.push({ id, name, coefficient: coeff, color: 'purple' });
+            saveSubjects();
+            renderSubjects();
+            toggleModal(false);
+        }
+
+        // Open subject detail
+        function openSubject(id) {
+            currentSubjectId = id;
+            currentFolderId = null;
+            selectedItems.clear();
+            selectionMode = false;
+            updateSelectionUI();
+
+            const subj = subjects.find(s => s.id === id);
+            subjectDetailTitle.textContent = subj.name;
+            subjectDetailCoeff.textContent = `Coefficient: ${subj.coefficient}`;
+            subjectsView.classList.add('hidden');
+            subjectDetailView.classList.remove('hidden');
+            backToSubjects.classList.remove('hidden');
+            headerTitle.textContent = 'Matière — ' + subj.name;
+
+            // default tab
+            setTab('documents');
+            renderCurrentTab();
+        }
+
+        // Back to subjects list
+        backToSubjects.addEventListener('click', (e) => {
+            e.preventDefault();
+            subjectDetailView.classList.add('hidden');
+            subjectsView.classList.remove('hidden');
+            backToSubjects.classList.add('hidden');
+            headerTitle.textContent = 'Matières';
+            currentSubjectId = null;
+            currentFolderId = null;
+        });
+
+        // Create folder (ask name)
+        createFolderBtn.addEventListener('click', () => {
+            const defaultName = prompt('Nom du dossier (proposition : titre de la leçon)', 'Nouvelle leçon');
+            if (!defaultName) return;
+            const data = getSubjectData(currentSubjectId);
+            const id = Date.now();
+            data.folders.push({ id, name: defaultName, createdAt: new Date().toISOString(), items: [] });
+            saveSubjectData(currentSubjectId, data);
+            renderCurrentTab();
+        });
+
+        // set tab
+        function setTab(tab) {
+            currentTab = tab;
+            tabButtons.forEach(btn => {
+                if (btn.dataset.tab === tab) btn.classList.add('active'); else btn.classList.remove('active');
+            });
+            // adapt addFiles label accept types
+            addFilesLabel.classList.remove('hidden');
+            if (tab === 'photos') {
+                fileInput.accept = 'image/*';
+                addFilesText.textContent = 'Ajouter des photos';
+                fileInput.multiple = true;
+            } else if (tab === 'videos') {
+                fileInput.accept = 'video/*';
+                addFilesText.textContent = 'Ajouter des vidéos';
+                fileInput.multiple = true;
+            } else if (tab === 'documents') {
+                fileInput.accept = '.pdf,.doc,.docx,.txt,application/pdf,application/msword';
+                addFilesText.textContent = 'Ajouter des documents';
+                fileInput.multiple = true;
+            } else if (tab === 'notes') {
+                fileInput.accept = '';
+                addFilesLabel.classList.add('hidden'); // notes have separate "new note" action
+            }
+            // show/hide addFilesLabel
+            if (tab === 'notes') addFilesLabel.classList.add('hidden'); else addFilesLabel.classList.remove('hidden');
+            // update folder label
+            updateCurrentFolderLabel();
+        }
+
+        // tab click handlers
+        tabButtons.forEach(btn => btn.addEventListener('click', () => {
+            setTab(btn.dataset.tab);
+            renderCurrentTab();
+        }));
+
+        // Update folder label
+        function updateCurrentFolderLabel() {
+            const data = getSubjectData(currentSubjectId);
+            if (!currentFolderId) {
+                currentFolderLabel.innerHTML = 'Dossier: <span class="font-medium">Aucun</span>';
+            } else {
+                const f = data.folders.find(ff => ff.id === currentFolderId);
+                currentFolderLabel.innerHTML = 'Dossier: <span class="font-medium">' + (f ? f.name : '—') + '</span>';
             }
         }
-        
-        // Delete subject
-        function deleteSubject(id) {
-            // Show confirmation dialog
-            const confirmDelete = confirm("Voulez-vous vraiment supprimer cette matière?");
-            if (confirmDelete) {
-                subjects = subjects.filter(subject => subject.id !== id);
-                localStorage.setItem('subjects', JSON.stringify(subjects));
-                renderSubjects();
+
+        // Render current tab content
+        function renderCurrentTab() {
+            const data = getSubjectData(currentSubjectId);
+            // clear all
+            document.getElementById('documents').innerHTML = '';
+            document.getElementById('photos').innerHTML = '';
+            document.getElementById('videos').innerHTML = '';
+            document.getElementById('notes').innerHTML = '';
+
+            // Helper: create item card
+            const createCard = (item, container) => {
+                const card = document.createElement('div');
+                card.className = 'relative bg-white border p-2 rounded shadow-sm';
+                // selection checkbox overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'select-overlay';
+                overlay.innerHTML = `<input type="checkbox" class="select-checkbox" data-id="${item.id}" ${selectedItems.has(item.id)?'checked':''} />`;
+                overlay.style.position = 'absolute';
+                overlay.style.top = '8px';
+                overlay.style.right = '8px';
+                if (!selectionMode) overlay.style.display = 'none';
+                card.appendChild(overlay);
+
+                if (item.type === 'photo') {
+                    card.innerHTML += `<img src="${item.dataURL}" class="thumb" data-id="${item.id}" />`;
+                } else if (item.type === 'video') {
+                    // create poster if provided else video tag thumbnail
+                    card.innerHTML += `<div class="h-36 bg-gray-100 rounded overflow-hidden flex items-center justify-center"><video src="${item.dataURL}" class="w-full h-full object-cover" muted></video></div>`;
+                } else if (item.type === 'document') {
+                    card.innerHTML += `<div class="h-24 flex items-center justify-center text-sm text-gray-700">${item.name}</div>`;
+                } else if (item.type === 'note') {
+                    card.innerHTML += `<div class="h-36 p-2 overflow-hidden text-sm">${item.content ? item.content.substring(0,240) : ''}</div>`;
+                }
+
+                // footer
+                const footer = document.createElement('div');
+                footer.className = 'mt-2 flex justify-between items-center';
+                footer.innerHTML = `<div class="text-xs text-gray-500">${new Date(item.createdAt).toLocaleString()}</div>
+                                    <div class="flex space-x-2">
+                                        <button class="open-item p-1 rounded hover:bg-gray-100" data-id="${item.id}"><i data-feather="eye" class="w-4 h-4"></i></button>
+                                        <button class="delete-item p-1 rounded hover:bg-gray-100" data-id="${item.id}"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                                    </div>`;
+                card.appendChild(footer);
+                // events
+                card.querySelectorAll('.open-item').forEach(b => b.addEventListener('click', () => openItem(item.id)));
+                card.querySelectorAll('.delete-item').forEach(b => b.addEventListener('click', () => {
+                    if (confirm('Supprimer cet élément ?')) { deleteItem(item.id); }
+                }));
+                // checkbox
+                overlay.querySelector('.select-checkbox').addEventListener('change', (e) => {
+                    if (e.target.checked) selectedItems.add(item.id); else selectedItems.delete(item.id);
+                });
+
+                container.appendChild(card);
+                feather.replace();
+            };
+
+            // render folders list first (as cards) for all tabs
+            const addFolderCards = (container) => {
+                data.folders.forEach(folder => {
+                    const fcard = document.createElement('div');
+                    fcard.className = 'bg-white border p-4 rounded shadow-sm cursor-pointer';
+                    fcard.innerHTML = `<div class="flex items-center justify-between">
+                        <div><i data-feather="folder" class="mr-2"></i><span class="font-medium">${folder.name}</span></div>
+                        <div class="flex items-center space-x-2">
+                            <button class="open-folder p-1 rounded hover:bg-gray-100" data-folder="${folder.id}"><i data-feather="arrow-right"></i></button>
+                            <button class="rename-folder p-1 rounded hover:bg-gray-100" data-folder="${folder.id}"><i data-feather="edit-2"></i></button>
+                            <button class="delete-folder p-1 rounded hover:bg-gray-100" data-folder="${folder.id}"><i data-feather="trash-2"></i></button>
+                        </div>
+                    </div>`;
+                    container.appendChild(fcard);
+                    // events
+                    fcard.querySelector('.open-folder').addEventListener('click', () => {
+                        currentFolderId = folder.id;
+                        updateCurrentFolderLabel();
+                        renderCurrentTab();
+                    });
+                    fcard.querySelector('.rename-folder').addEventListener('click', () => {
+                        const newName = prompt('Renommer dossier', folder.name);
+                        if (newName) { folder.name = newName; saveSubjectData(currentSubjectId, data); renderCurrentTab(); }
+                    });
+                    fcard.querySelector('.delete-folder').addEventListener('click', () => {
+                        if (confirm('Supprimer le dossier et tout son contenu ?')) {
+                            data.folders = data.folders.filter(ff => ff.id !== folder.id);
+                            saveSubjectData(currentSubjectId, data);
+                            currentFolderId = null;
+                            updateCurrentFolderLabel();
+                            renderCurrentTab();
+                        }
+                    });
+                });
+            };
+
+            // pick source items: if in folder -> folder.items else itemsOutsideFolders
+            function listItemsFor(type) {
+                let items = [];
+                if (currentFolderId) {
+                    const f = data.folders.find(ff => ff.id === currentFolderId);
+                    if (f) items = f.items || [];
+                } else {
+                    items = data.itemsOutsideFolders || [];
+                }
+                return items.filter(it => it.type === type);
+            }
+
+            // Documents tab
+            const docsContainer = document.getElementById('documents');
+            addFolderCards(docsContainer);
+            const docs = listItemsFor('document');
+            docs.forEach(it => createCard(it, docsContainer));
+
+            // Photos
+            const photosContainer = document.getElementById('photos');
+            addFolderCards(photosContainer);
+            const photos = listItemsFor('photo');
+            photos.forEach(it => createCard(it, photosContainer));
+
+            // Videos
+            const videosContainer = document.getElementById('videos');
+            addFolderCards(videosContainer);
+            const videos = listItemsFor('video');
+            videos.forEach(it => createCard(it, videosContainer));
+
+            // Notes
+            const notesContainer = document.getElementById('notes');
+            addFolderCards(notesContainer);
+            const notes = (function(){ let items = []; if (currentFolderId){ const f = data.folders.find(ff=>ff.id===currentFolderId); if(f) items=f.items; } else items=data.itemsOutsideFolders || []; return items.filter(it=>it.type==='note'); })();
+            notes.forEach(it => createCard(it, notesContainer));
+        }
+
+        // Open item in viewer/editor
+        function openItem(itemId) {
+            const data = getSubjectData(currentSubjectId);
+            let items = [];
+            if (currentFolderId) {
+                const f = data.folders.find(ff=>ff.id===currentFolderId);
+                items = f ? f.items : [];
+            } else items = data.itemsOutsideFolders || [];
+            const item = items.find(i=>i.id===itemId);
+            if (!item) return;
+            if (item.type === 'photo' || item.type === 'video' || item.type === 'document') {
+                openViewer(item);
+            } else if (item.type === 'note') {
+                openNoteEditor(item);
             }
         }
-        
-        // Load subjects from localStorage if available
-        if (localStorage.getItem('subjects')) {
-            subjects = JSON.parse(localStorage.getItem('subjects'));
+
+        // Open viewer
+        function openViewer(item) {
+            viewerModal.classList.remove('hidden');
+            viewerContent.innerHTML = '';
+            viewerCurrentItem = item;
+            viewerZoom = 1;
+            if (item.type === 'photo') {
+                const img = document.createElement('img');
+                img.src = item.dataURL;
+                img.className = 'fullscreen-media';
+                img.style.transform = 'scale(1)';
+                viewerContent.appendChild(img);
+            } else if (item.type === 'video') {
+                const vid = document.createElement('video');
+                vid.src = item.dataURL;
+                vid.controls = true;
+                vid.autoplay = true;
+                vid.className = 'fullscreen-media';
+                viewerContent.appendChild(vid);
+            } else if (item.type === 'document') {
+                // for documents, attempt to embed pdf or show name + download
+                if (item.mime === 'application/pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = item.dataURL;
+                    iframe.className = 'w-full h-[80vh]';
+                    viewerContent.appendChild(iframe);
+                } else {
+                    viewerContent.innerHTML = `<div class="p-4 bg-white text-black rounded">${item.name}</div>`;
+                }
+            }
+            downloadMedia.onclick = () => {
+                const link = document.createElement('a');
+                link.href = item.dataURL;
+                link.download = item.name || 'download';
+                link.click();
+            };
+            deleteMedia.onclick = () => {
+                if (confirm('Supprimer cet élément ?')) {
+                    deleteItem(item.id);
+                    viewerModal.classList.add('hidden');
+                }
+            };
         }
-        
-        // Event Listeners
+
+        closeViewer.addEventListener('click', () => { viewerModal.classList.add('hidden'); viewerContent.innerHTML = ''; });
+
+        // Zoom controls (works for images only)
+        zoomIn.addEventListener('click', () => {
+            viewerZoom = Math.min(viewerZoom + 0.25, 4);
+            const el = viewerContent.querySelector('img');
+            if (el) el.style.transform = `scale(${viewerZoom})`;
+        });
+        zoomOut.addEventListener('click', () => {
+            viewerZoom = Math.max(viewerZoom - 0.25, 0.25);
+            const el = viewerContent.querySelector('img');
+            if (el) el.style.transform = `scale(${viewerZoom})`;
+        });
+
+        // Delete item
+        function deleteItem(itemId) {
+            const data = getSubjectData(currentSubjectId);
+            if (currentFolderId) {
+                const f = data.folders.find(ff=>ff.id===currentFolderId);
+                if (f) f.items = f.items.filter(i=>i.id!==itemId);
+            } else {
+                data.itemsOutsideFolders = (data.itemsOutsideFolders || []).filter(i=>i.id!==itemId);
+            }
+            // also remove from any folders (safe)
+            data.folders.forEach(ff => ff.items = ff.items.filter(i=>i.id!==itemId));
+            saveSubjectData(currentSubjectId, data);
+            renderCurrentTab();
+        }
+
+        // Add files through input
+        fileInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+            const data = getSubjectData(currentSubjectId);
+            for (const f of files) {
+                const id = Date.now() + Math.floor(Math.random()*1000);
+                const mime = f.type || '';
+                const reader = new FileReader();
+                const p = new Promise(resolve => {
+                    reader.onload = () => resolve(reader.result);
+                });
+                reader.readAsDataURL(f);
+                const dataURL = await p;
+                let item = { id, type: '', name: f.name, dataURL, mime, createdAt: new Date().toISOString() };
+                if (mime.startsWith('image/')) item.type = 'photo';
+                else if (mime.startsWith('video/')) item.type = 'video';
+                else item.type = 'document';
+                if (currentFolderId) {
+                    const folder = data.folders.find(ff => ff.id === currentFolderId);
+                    if (!folder) continue;
+                    folder.items.push(item);
+                } else {
+                    data.itemsOutsideFolders = data.itemsOutsideFolders || [];
+                    data.itemsOutsideFolders.push(item);
+                }
+            }
+            saveSubjectData(currentSubjectId, data);
+            e.target.value = '';
+            renderCurrentTab();
+        });
+
+        // Notes: create new note button keyboard? We'll open note editor to create.
+        // For simplicity, add a "double-click on notes tab area" to create a note
+        document.getElementById('notes').addEventListener('dblclick', () => {
+            openNoteEditor(null); // new note
+        });
+
+        // Note editor open
+        function openNoteEditor(item) {
+            noteEditorModal.classList.remove('hidden');
+            if (item) {
+                noteEditor.innerHTML = item.content || '';
+                noteEditor.dataset.editingId = item.id;
+                noteFontSize.value = item.fontSize || 20;
+                noteColor.value = item.color || '#000000';
+            } else {
+                noteEditor.innerHTML = '';
+                delete noteEditor.dataset.editingId;
+                noteFontSize.value = 20;
+                noteColor.value = '#000000';
+            }
+            applyNoteStyle();
+        }
+
+        // apply style when color or font size changes
+        function applyNoteStyle() {
+            noteEditor.style.color = noteColor.value;
+            noteEditor.style.fontSize = noteFontSize.value + 'px';
+        }
+        noteColor.addEventListener('change', applyNoteStyle);
+        noteFontSize.addEventListener('change', applyNoteStyle);
+
+        // formatting buttons
+        noteBold.addEventListener('click', () => document.execCommand('bold'));
+        noteItalic.addEventListener('click', () => document.execCommand('italic'));
+        noteUnderline.addEventListener('click', () => document.execCommand('underline'));
+
+        // save note
+        saveNoteBtn.addEventListener('click', () => {
+            const content = noteEditor.innerHTML;
+            const color = noteColor.value;
+            const fontSize = parseInt(noteFontSize.value,10);
+            const data = getSubjectData(currentSubjectId);
+            const id = noteEditor.dataset.editingId ? Number(noteEditor.dataset.editingId) : (Date.now()+Math.floor(Math.random()*1000));
+            const item = { id, type:'note', content, color, fontSize, createdAt: new Date().toISOString() };
+            if (noteEditor.dataset.editingId) {
+                // update in current folder or outside
+                if (currentFolderId) {
+                    const f = data.folders.find(ff=>ff.id===currentFolderId);
+                    if (f) {
+                        f.items = f.items.map(it => it.id === id ? {...it, ...item} : it);
+                    }
+                } else {
+                    data.itemsOutsideFolders = (data.itemsOutsideFolders || []).map(it => it.id === id ? {...it, ...item} : it);
+                }
+            } else {
+                if (currentFolderId) {
+                    const f = data.folders.find(ff=>ff.id===currentFolderId);
+                    if (f) f.items.push(item);
+                } else {
+                    data.itemsOutsideFolders = data.itemsOutsideFolders || [];
+                    data.itemsOutsideFolders.push(item);
+                }
+            }
+            saveSubjectData(currentSubjectId, data);
+            noteEditorModal.classList.add('hidden');
+            renderCurrentTab();
+        });
+
+        // toggle selection mode
+        toggleSelectBtn.addEventListener('click', () => {
+            selectionMode = !selectionMode;
+            updateSelectionUI();
+        });
+        function updateSelectionUI() {
+            toggleSelectModeBtn.classList.toggle('hidden', !selectionMode);
+            // show/hide checkboxes for current rendered items
+            document.querySelectorAll('.select-overlay').forEach(div => {
+                div.style.display = selectionMode ? 'block' : 'none';
+            });
+            if (!selectionMode) selectedItems.clear();
+        }
+
+        // mass delete via bottom visible toggleSelectModeBtn
+        toggleSelectModeBtn.addEventListener('click', () => {
+            if (selectedItems.size === 0) { alert('Aucun élément sélectionné'); return; }
+            if (!confirm('Supprimer les éléments sélectionnés ?')) return;
+            const data = getSubjectData(currentSubjectId);
+            const ids = Array.from(selectedItems);
+            // remove from outside
+            data.itemsOutsideFolders = (data.itemsOutsideFolders || []).filter(it => !ids.includes(it.id));
+            // remove from folders
+            data.folders.forEach(ff => ff.items = ff.items.filter(it => !ids.includes(it.id)));
+            saveSubjectData(currentSubjectId, data);
+            selectedItems.clear();
+            updateSelectionUI();
+            renderCurrentTab();
+        });
+
+        // Edit and delete subject buttons in header area
+        document.getElementById('editSubjectBtn').addEventListener('click', () => {
+            const subj = subjects.find(s => s.id === currentSubjectId);
+            const newName = prompt('Modifier nom de la matière', subj.name);
+            if (newName) { subj.name = newName; saveSubjects(); subjectDetailTitle.textContent = newName; renderSubjects(); }
+        });
+        document.getElementById('deleteSubjectBtn').addEventListener('click', () => {
+            if (confirm('Supprimer cette matière et tout son contenu ?')) {
+                subjects = subjects.filter(s => s.id !== currentSubjectId);
+                localStorage.removeItem('subject_data_' + currentSubjectId);
+                saveSubjects();
+                subjectDetailView.classList.add('hidden');
+                subjectsView.classList.remove('hidden');
+                renderSubjects();
+            }
+        });
+
+        // Add files label proxy to fileInput
+        addFilesLabel.addEventListener('click', () => fileInput.click());
+
+        // When creating items outside folder vs inside folder: let user choose currentFolderId by clicking folder first.
+        // 'Retour dossier' functionality: if in folder we show a small breadcrumb to leave folder
+        function showBreadcrumbIfInFolder() {
+            if (currentFolderId) {
+                currentFolderLabel.innerHTML += ` <button id="leaveFolderBtn" class="ml-3 px-2 py-1 bg-gray-100 rounded">Retour</button>`;
+                document.getElementById('leaveFolderBtn').addEventListener('click', () => {
+                    currentFolderId = null;
+                    updateCurrentFolderLabel();
+                    renderCurrentTab();
+                });
+            }
+        }
+
+        // Render initial
+        renderSubjects();
+
+        // Add subject events
         addSubjectBtn.addEventListener('click', () => toggleModal(true));
         addFirstSubjectBtn.addEventListener('click', () => toggleModal(true));
         closeModalBtn.addEventListener('click', () => toggleModal(false));
         cancelAddSubjectBtn.addEventListener('click', () => toggleModal(false));
         confirmAddSubjectBtn.addEventListener('click', addSubject);
-        
-        // Handle delete buttons (delegated event)
-        subjectsList.addEventListener('click', (e) => {
-            if (e.target.closest('.delete-subject')) {
-                const id = parseInt(e.target.closest('.delete-subject').dataset.id);
-                deleteSubject(id);
+
+        // Update render when page shown
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) renderSubjects();
+        });
+
+        // keyboard: ESC to close modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                addSubjectModal.classList.add('hidden');
+                viewerModal.classList.add('hidden');
+                noteEditorModal.classList.add('hidden');
             }
         });
-        
-        // Initial render
-        renderSubjects();
-        
-        // Prevent blue highlight on mobile taps
-        document.addEventListener('touchstart', function() {}, true);
+
+        // When rendering a tab, also show breadcrumb if in folder
+        const originalRenderCurrentTab = renderCurrentTab;
+        renderCurrentTab = function() {
+            originalRenderCurrentTab();
+            showBreadcrumbIfInFolder();
+        };
+
+        // Ensure UI consistency
+        setTab('documents');
+
+        // Small hint: double-click note area to create new note
+        const notesDiv = document.getElementById('notes');
+        notesDiv.addEventListener('dblclick', () => openNoteEditor(null));
+
+        // End of s cri pt
     </script>
 </body>
 </html>
