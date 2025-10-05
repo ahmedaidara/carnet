@@ -1100,7 +1100,8 @@ function generateOtherScheduleTable() {
                 <div class="contents">
                     <!-- Colonne des horaires (gauche) -->
                     <div class="bg-gray-50 p-2 md:p-3 flex items-center justify-between border-r border-gray-200 border-t border-gray-200 time-header-mobile">
-                        <span class="text-xs md:text-sm font-medium whitespace-nowrap">${timeSlot.start} - ${timeSlot.end}</span>
+                        <span class="text-xs md:text-sm font-medium whitespace-normal break-words">${timeSlot.start} - ${timeSlot.end}</span>
+
                         <button class="remove-time-row text-red-500 hover:text-red-700 ml-1 md:ml-2" data-index="${index}">
                             <i data-feather="trash-2" class="w-3 h-3 md:w-4 md:h-4"></i>
                         </button>
@@ -1218,6 +1219,47 @@ function removeOtherTimeSlot(index) {
     }
 }
 
+      // Fonction pour afficher la confirmation de suppression
+function showDeleteConfirmation(scheduleId) {
+    // Créer la modale de confirmation
+    const confirmationModal = document.createElement('div');
+    confirmationModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+    confirmationModal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
+                <i data-feather="alert-triangle" class="w-6 h-6 text-red-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-center mb-2">Confirmer la suppression</h3>
+            <p class="text-gray-600 text-center mb-6">Voulez-vous vraiment supprimer cet emploi du temps ?</p>
+            <div class="flex justify-center space-x-3">
+                <button id="cancelDelete" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Annuler</button>
+                <button id="confirmDelete" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors" data-id="${scheduleId}">Supprimer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(confirmationModal);
+    feather.replace();
+    
+    // Événements
+    document.getElementById('cancelDelete').addEventListener('click', () => {
+        document.body.removeChild(confirmationModal);
+    });
+    
+    document.getElementById('confirmDelete').addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        deleteOtherSchedule(id);
+        document.body.removeChild(confirmationModal);
+    });
+    
+    // Fermer en cliquant à l'extérieur
+    confirmationModal.addEventListener('click', (e) => {
+        if (e.target === confirmationModal) {
+            document.body.removeChild(confirmationModal);
+        }
+    });
+}
+      
 function createOtherSchedule() {
     const name = document.getElementById('otherScheduleName').value.trim() || 'Nouvel emploi du temps';
     const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
@@ -1302,7 +1344,8 @@ function renderOtherSchedules() {
                         <div class="contents">
                             <!-- Colonne horaire -->
                             <div class="bg-gray-50 p-3 border-r border-gray-200 border-t border-gray-200">
-                                <div class="text-xs text-gray-500 whitespace-nowrap">${timeSlot.start} - ${timeSlot.end}</div>
+                                <div class="text-xs text-gray-500 whitespace-normal break-words">${timeSlot.start} - ${timeSlot.end}</div>
+
                             </div>
                             
                             <!-- Colonnes des matières -->
