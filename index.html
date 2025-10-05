@@ -3,2096 +3,359 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduManager - Gestion Scolaire</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>StudySync - Accueil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <style>
-        /* Variables CSS */
         :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #6b8cbc;
-            --accent-color: #ff7e5f;
-            --light-color: #f5f7fa;
-            --dark-color: #2c3e50;
-            --success-color: #2ecc71;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --text-color: #333;
-            --border-radius: 12px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --primary: #6C63FF;
+            --secondary: #4D44DB;
+            --accent: #FF6584;
+            --light: #F8F9FA;
+            --dark: #343A40;
         }
-
-        /* Reset et styles de base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            background-color: var(--light-color);
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F7FB;
         }
-
-        /* Styles pour la navigation */
-        .nav-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: white;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: var(--dark-color);
-            font-size: 0.8rem;
-            padding: 5px;
-            transition: var(--transition);
-        }
-
-        .nav-item.active {
-            color: var(--primary-color);
-        }
-
-        .nav-item i {
-            font-size: 1.2rem;
-            margin-bottom: 3px;
-        }
-
-        /* Styles pour les pages */
-        .page {
-            display: none;
-            padding: 20px;
-            padding-bottom: 80px;
-            min-height: 100vh;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        /* Styles pour l'en-tête */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
         .greeting {
-            font-size: 1.2rem;
-            font-weight: 600;
+            animation: fadeIn 1s ease-in-out;
         }
-
-        .search-bar {
-            flex-grow: 1;
-            max-width: 200px;
-            margin-left: 15px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .search-bar input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-size: 0.9rem;
+        .subject-card {
+            transition: all 0.3s ease;
         }
-
-        /* Styles pour les cartes */
-        .card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: var(--transition);
-        }
-
-        .card:hover {
+        .subject-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        /* Styles pour les boutons */
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: var(--transition);
-            text-align: center;
-        }
-
-        .btn:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background-color: var(--danger-color);
-        }
-
-        .btn-success {
-            background-color: var(--success-color);
-        }
-
-        .btn-warning {
-            background-color: var(--warning-color);
-        }
-
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 0.8rem;
-        }
-
-        /* Styles pour les formulaires */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-        }
-
-        /* Styles pour les modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .modal-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--dark-color);
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        /* Styles pour les listes */
-        .list {
-            list-style: none;
-        }
-
-        .list-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .list-item:last-child {
-            border-bottom: none;
-        }
-
-        .list-item:hover {
-            background-color: #f9f9f9;
-        }
-
-        /* Styles pour les onglets */
-        .tabs {
-            display: flex;
-            overflow-x: auto;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .tab {
-            padding: 10px 15px;
-            white-space: nowrap;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-        }
-
-        .tab.active {
-            border-bottom: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Styles pour le compte à rebours */
         .countdown {
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-            margin: 15px 0;
+            font-feature-settings: "tnum";
         }
-
-        .countdown-item {
-            flex: 1;
-            padding: 10px;
+        .nav-item.active {
+            border-bottom: 3px solid var(--primary);
         }
-
-        .countdown-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
+        input:focus, textarea:focus, select:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2) !important;
         }
-
-        .countdown-label {
-            font-size: 0.8rem;
-            color: var(--dark-color);
-        }
-
-        /* Styles pour les graphiques */
-        .chart-container {
-            height: 200px;
-            margin: 20px 0;
-        }
-
-        /* Styles pour la corbeille */
-        .trash-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .trash-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Styles pour l'emploi du temps */
-        .schedule {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-
-        .schedule th, .schedule td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-
-        .schedule th {
-            background-color: #f2f2f2;
-            font-weight: 600;
-        }
-
-        /* Styles pour le bulletin de notes */
-        .grade-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-
-        .grade-table th, .grade-table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .grade-table th {
-            background-color: #f2f2f2;
-            font-weight: 600;
-        }
-
-        .grade-table input {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        /* Styles pour les fichiers */
-        .file-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
-        }
-
-        .file-item {
-            text-align: center;
-            padding: 10px;
-            border-radius: var(--border-radius);
-            background-color: #f9f9f9;
-            transition: var(--transition);
-        }
-
-        .file-item:hover {
-            background-color: #f0f0f0;
-        }
-
-        .file-icon {
-            font-size: 2rem;
-            margin-bottom: 5px;
-            color: var(--primary-color);
-        }
-
-        .file-name {
-            font-size: 0.8rem;
-            word-break: break-word;
-        }
-
-        /* Styles pour les alertes personnalisées */
-        .custom-alert {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            z-index: 3000;
-            text-align: center;
-            max-width: 300px;
-            width: 90%;
-        }
-
-        .custom-alert.active {
-            display: block;
-        }
-
-        .alert-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        /* Responsive */
-        @media (min-width: 768px) {
-            .nav-container {
-                position: static;
-                flex-direction: column;
-                width: 80px;
-                height: 100vh;
-                justify-content: flex-start;
-                padding-top: 20px;
-                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            }
-
-            .page {
-                margin-left: 80px;
-                padding-bottom: 20px;
-            }
-
-            .nav-item {
-                margin-bottom: 20px;
-                font-size: 0.7rem;
-            }
-
-            .nav-item i {
-                font-size: 1.5rem;
-            }
+        [contenteditable]:focus {
+            outline: none;
         }
     </style>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="nav-container">
-        <a href="#" class="nav-item active" data-page="accueil">
-            <i class="fas fa-home"></i>
-            <span>Accueil</span>
-        </a>
-        <a href="#" class="nav-item" data-page="matiere">
-            <i class="fas fa-book"></i>
-            <span>Matière</span>
-        </a>
-        <a href="#" class="nav-item" data-page="bibliotheque">
-            <i class="fas fa-book-open"></i>
-            <span>Bibliothèque</span>
-        </a>
-        <a href="#" class="nav-item" data-page="emploi">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Emploi du temps</span>
-        </a>
-        <a href="#" class="nav-item" data-page="parametre">
-            <i class="fas fa-cog"></i>
-            <span>Paramètre</span>
-        </a>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i data-feather="book-open" class="text-purple-600"></i>
+                <h1 class="text-xl font-bold text-gray-800">StudySync</h1>
+            </div>
+            
+            <div class="relative w-1/2">
+                <input type="text" placeholder="Rechercher une matière, document..." 
+                       class="w-full px-4 py-2 rounded-full border border-gray-200 focus:border-purple-400 focus:ring-0">
+                <i data-feather="search" class="absolute right-3 top-2.5 text-gray-400"></i>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div id="greeting" class="greeting font-medium text-gray-700">Bonjour</div>
+                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                    <i data-feather="user" class="text-purple-600"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+        <!-- Date & Countdown -->
+        <section class="mb-8 bg-white rounded-xl shadow-sm p-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                        <i data-feather="calendar" class="text-purple-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-gray-500">Aujourd'hui</div>
+                        <div id="current-date" class="font-semibold text-lg">Lundi 12 juin 2023</div>
+                    </div>
+                </div>
+                
+                <div id="reminder-display" class="flex-grow max-w-md px-4"></div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <div class="text-gray-500">Prochain devoir</div>
+                        <div id="countdown" class="font-bold text-purple-600 countdown">BAC 2026: 256j 21h 03m 27s</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tomorrow's Schedule -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i data-feather="clock" class="mr-2"></i> Emploi du temps de demain
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl shadow-sm p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-medium">Emploi du temps scolaire</h3>
+                        <a href="schedule.html" class="text-sm text-purple-600 flex items-center">
+                            Voir plus <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                        </a>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-2 bg-purple-50 rounded-lg">
+                            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                <i data-feather="book" class="text-purple-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium">Mathématiques</div>
+                                <div class="text-sm text-gray-500">08:00 - 10:00 • Salle A12</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-2 bg-blue-50 rounded-lg">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <i data-feather="globe" class="text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium">Histoire-Géo</div>
+                                <div class="text-sm text-gray-500">10:15 - 12:15 • Salle B07</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-medium">Emploi du temps personnel</h3>
+                        <a href="schedule.html" class="text-sm text-purple-600 flex items-center">
+                            Voir plus <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                        </a>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-2 bg-green-50 rounded-lg">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                <i data-feather="home" class="text-green-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium">Révision Chimie</div>
+                                <div class="text-sm text-gray-500">16:00 - 18:00 • Maison</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bulletin & Evolution -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Bulletin -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-feather="file-text" class="mr-2"></i> Bulletin de notes
+                </h2>
+                <div class="mb-4">
+                    <div class="text-gray-500 mb-1">Dernier bulletin</div>
+                    <div class="font-medium">1er Trimestre 2023-2024</div>
+                    <div class="text-sm text-gray-500">Moyenne: 14.5/20</div>
+                </div>
+                <a href="grades.html" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                    <i data-feather="plus" class="mr-2 w-4 h-4"></i> Nouveau bulletin
+                </a>
+            </div>
+            
+            <!-- Evolution -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-feather="trending-up" class="mr-2"></i> Évolution
+                </h2>
+                <div class="h-48">
+                    <canvas id="evolutionChart"></canvas>
+                </div>
+                <div class="mt-4 text-right">
+                    <a href="grades.html#evolution" class="text-purple-600 text-sm flex items-center justify-end">
+                        Voir le détail <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Matières récentes -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i data-feather="layers" class="mr-2"></i> Mes matières récentes
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <a href="subject.html?id=1" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                        <i data-feather="code" class="text-blue-600"></i>
+                    </div>
+                    <div class="font-medium">Informatique</div>
+                    <div class="text-xs text-gray-500">Coeff: 3</div>
+                </a>
+                <a href="subject.html?id=2" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
+                        <i data-feather="atom" class="text-red-600"></i>
+                    </div>
+                    <div class="font-medium">Physique</div>
+                    <div class="text-xs text-gray-500">Coeff: 4</div>
+                </a>
+                <a href="subject.html?id=3" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
+                        <i data-feather="divide" class="text-green-600"></i>
+                    </div>
+                    <div class="font-medium">Maths</div>
+                    <div class="text-xs text-gray-500">Coeff: 5</div>
+                </a>
+                <a href="subject.html?id=4" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
+                        <i data-feather="globe" class="text-yellow-600"></i>
+                    </div>
+                    <div class="font-medium">Histoire</div>
+                    <div class="text-xs text-gray-500">Coeff: 2</div>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
+        <div class="container mx-auto flex justify-around">
+            <a href="index.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Accueil</span>
+            </a>
+            <a href="subjects.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="book" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Matières</span>
+            </a>
+            <a href="library.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="bookmark" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Bibliothèque</span>
+            </a>
+            <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="calendar" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Emploi du temps</span>
+            </a>
+            <a href="settings.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="settings" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Paramètres</span>
+            </a>
+        </div>
     </nav>
 
-    <!-- Pages -->
-    <!-- Page d'accueil -->
-    <section id="accueil" class="page active">
-        <div class="header">
-            <div class="greeting" id="greeting">Bonjour</div>
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Rechercher...">
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-clock"></i> Date et heure
-                </div>
-            </div>
-            <div id="datetime"></div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-tasks"></i> Devoir à préparer
-                </div>
-            </div>
-            <div id="homework-countdown"></div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-calendar-day"></i> Emploi du temps de demain
-                </div>
-                <a href="#" class="btn btn-small" data-page="emploi">Voir plus</a>
-            </div>
-            <div id="tomorrow-schedule"></div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-chart-line"></i> Évolution
-                </div>
-                <a href="#" class="btn btn-small" id="view-evolution">Voir détails</a>
-            </div>
-            <div class="chart-container" id="evolution-chart"></div>
-        </div>
-    </section>
-
-    <!-- Page Matière -->
-    <section id="matiere" class="page">
-        <div class="header">
-            <div class="card-title">Matières</div>
-            <button class="btn" id="add-subject-btn">Ajouter une matière</button>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Liste des matières</div>
-            </div>
-            <ul class="list" id="subjects-list"></ul>
-        </div>
-    </section>
-
-    <!-- Page Bibliothèque -->
-    <section id="bibliotheque" class="page">
-        <div class="header">
-            <div class="card-title">Bibliothèque</div>
-            <button class="btn" id="add-book-btn">Ajouter un livre</button>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Livres disponibles</div>
-            </div>
-            <div class="file-grid" id="books-grid"></div>
-        </div>
-    </section>
-
-    <!-- Page Emploi du temps -->
-    <section id="emploi" class="page">
-        <div class="header">
-            <div class="card-title">Emploi du temps</div>
-            <div>
-                <button class="btn" id="add-schedule-btn">Nouvel emploi</button>
-                <button class="btn" id="add-homework-btn">Devoir à venir</button>
-                <button class="btn" id="add-reminder-btn">Rappel</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Mes emplois du temps</div>
-            </div>
-            <div id="schedules-container"></div>
-        </div>
-    </section>
-
-    <!-- Page Paramètres -->
-    <section id="parametre" class="page">
-        <div class="header">
-            <div class="card-title">Paramètres</div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Compte</div>
-            </div>
-            <form id="user-form">
-                <div class="form-group">
-                    <label for="user-firstname">Prénom</label>
-                    <input type="text" id="user-firstname" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="user-lastname">Nom</label>
-                    <input type="text" id="user-lastname" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="user-status">Statut</label>
-                    <select id="user-status" class="form-control">
-                        <option value="eleve">Élève</option>
-                        <option value="etudiant">Étudiant</option>
-                        <option value="professeur">Professeur</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="user-class">Classe</label>
-                    <input type="text" id="user-class" class="form-control">
-                </div>
-                <button type="submit" class="btn">Enregistrer</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Corbeille</div>
-            </div>
-            <div id="trash-container"></div>
-        </div>
-    </section>
-
-    <!-- Modals -->
-    <!-- Modal Ajouter une matière -->
-    <div class="modal" id="add-subject-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Ajouter une matière</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="add-subject-form">
-                <div class="form-group">
-                    <label for="subject-name">Nom de la matière</label>
-                    <input type="text" id="subject-name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="subject-coefficient">Coefficient</label>
-                    <input type="number" id="subject-coefficient" class="form-control" min="1" value="1">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Ajouter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Détails d'une matière -->
-    <div class="modal" id="subject-details-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="subject-details-title">Détails de la matière</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="tabs">
-                <div class="tab active" data-tab="documents">Documents</div>
-                <div class="tab" data-tab="photos">Photos</div>
-                <div class="tab" data-tab="videos">Vidéos</div>
-                <div class="tab" data-tab="notes">Notes</div>
-            </div>
-
-            <div class="tab-content active" id="documents-tab">
-                <button class="btn" id="add-document-btn">Ajouter un document</button>
-                <div class="file-grid" id="documents-grid"></div>
-            </div>
-
-            <div class="tab-content" id="photos-tab">
-                <button class="btn" id="add-photo-btn">Ajouter une photo</button>
-                <div class="file-grid" id="photos-grid"></div>
-            </div>
-
-            <div class="tab-content" id="videos-tab">
-                <button class="btn" id="add-video-btn">Ajouter une vidéo</button>
-                <div class="file-grid" id="videos-grid"></div>
-            </div>
-
-            <div class="tab-content" id="notes-tab">
-                <button class="btn" id="add-note-btn">Ajouter une note</button>
-                <div class="file-grid" id="notes-grid"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Ajouter un fichier -->
-    <div class="modal" id="add-file-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="add-file-title">Ajouter un fichier</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="add-file-form">
-                <div class="form-group">
-                    <label for="file-title">Titre</label>
-                    <input type="text" id="file-title" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="file-content">Contenu</label>
-                    <textarea id="file-content" class="form-control" rows="5"></textarea>
-                </div>
-                <div class="form-group" id="file-upload-container">
-                    <label for="file-upload">Fichier</label>
-                    <input type="file" id="file-upload" class="form-control">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Ajouter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Bulletin de notes -->
-    <div class="modal" id="grades-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Bulletin de notes</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="header">
-                <div id="student-name">Nom Prénom</div>
-                <div id="student-class">Classe</div>
-            </div>
-            <table class="grade-table" id="grades-table">
-                <thead>
-                    <tr>
-                        <th>Matière</th>
-                        <th>Coefficient</th>
-                        <th>Note</th>
-                    </tr>
-                </thead>
-                <tbody id="grades-body"></tbody>
-                <tfoot>
-                    <tr>
-                        <td>Total</td>
-                        <td id="total-coeff">0</td>
-                        <td id="total-points">0</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">Moyenne</td>
-                        <td id="average-grade">0.00</td>
-                    </tr>
-                </tfoot>
-            </table>
-            <div class="form-group">
-                <label for="grade-report-name">Nom du bulletin</label>
-                <input type="text" id="grade-report-name" class="form-control" placeholder="Ex: Bulletin du 1er semestre">
-            </div>
-            <div class="modal-footer">
-                <button class="btn" id="calculate-grades-btn">Calculer la moyenne</button>
-                <button class="btn btn-success" id="save-grades-btn">Enregistrer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Alertes personnalisées -->
-    <div class="custom-alert" id="delete-confirm-alert">
-        <div class="alert-title">Confirmer la suppression</div>
-        <div class="alert-message">Êtes-vous sûr de vouloir supprimer cet élément ?</div>
-        <div class="alert-buttons">
-            <button class="btn btn-danger" id="confirm-delete">Supprimer</button>
-            <button class="btn" id="cancel-delete">Annuler</button>
-        </div>
-    </div>
-
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Données de l'application
-        let appData = {
-            user: {
-                firstname: "",
-                lastname: "",
-                status: "eleve",
-                class: ""
-            },
-            subjects: [],
-            books: [],
-            schedules: [],
-            homework: [],
-            reminders: [],
-            gradeReports: [],
-            trash: []
-        };
-
-        // Éléments DOM
-        const pages = document.querySelectorAll('.page');
-        const navItems = document.querySelectorAll('.nav-item');
-        const modals = document.querySelectorAll('.modal');
-        const closeModalButtons = document.querySelectorAll('.close-modal');
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            initNavigation();
-            initModals();
-            initTabs();
-            updateGreeting();
-            updateDateTime();
-            displaySubjects();
-            displayBooks();
-            displaySchedules();
-            displayTrash();
-            setInterval(updateDateTime, 1000);
-            setInterval(updateHomeworkCountdown, 1000);
-        });
-
-        // Navigation entre les pages
-        function initNavigation() {
-            navItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pageId = this.getAttribute('data-page');
-                    
-                    // Mettre à jour la navigation active
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Afficher la page correspondante
-                    pages.forEach(page => page.classList.remove('active'));
-                    document.getElementById(pageId).classList.add('active');
-                });
-            });
-        }
-
-        // Gestion des modals
-        function initModals() {
-            // Ouvrir les modals
-            document.getElementById('add-subject-btn').addEventListener('click', () => {
-                openModal('add-subject-modal');
-            });
-
-            document.getElementById('add-book-btn').addEventListener('click', () => {
-                openModal('add-book-modal');
-            });
-
-            document.getElementById('add-schedule-btn').addEventListener('click', () => {
-                openModal('add-schedule-modal');
-            });
-
-            document.getElementById('add-homework-btn').addEventListener('click', () => {
-                openModal('add-homework-modal');
-            });
-
-            document.getElementById('add-reminder-btn').addEventListener('click', () => {
-                openModal('add-reminder-modal');
-            });
-
-            document.getElementById('view-evolution').addEventListener('click', () => {
-                openModal('evolution-modal');
-            });
-
-            // Fermer les modals
-            closeModalButtons.forEach(button => {
-                button.addEventListener('click', closeAllModals);
-            });
-
-            // Fermer en cliquant en dehors
-            modals.forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeAllModals();
-                    }
-                });
-            });
-
-            // Formulaires
-            document.getElementById('user-form').addEventListener('submit', saveUserSettings);
-            document.getElementById('add-subject-form').addEventListener('submit', addSubject);
-        }
-
-        // Onglets
-        function initTabs() {
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // Mettre à jour les onglets actifs
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Afficher le contenu correspondant
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                });
-            });
-        }
-
-        // Fonctions utilitaires
-        function openModal(modalId) {
-            closeAllModals();
-            document.getElementById(modalId).classList.add('active');
-        }
-
-        function closeAllModals() {
-            modals.forEach(modal => modal.classList.remove('active'));
-        }
-
-        function updateGreeting() {
-            const greetings = [
-                "Bonjour", "Bonsoir", "Salut", "Hello", "Hey", "Comment ça va?",
-                "Bienvenue", "Salutations", "Yo", "Hi", "Howdy", "Coucou"
-            ];
-            const now = new Date();
-            const hour = now.getHours();
-            
-            let greeting;
-            if (hour < 12) {
-                greeting = greetings[0]; // Bonjour
-            } else if (hour < 18) {
-                greeting = greetings[1]; // Bonsoir
-            } else {
-                greeting = greetings[2]; // Salut
-            }
-            
-            // Changer aléatoirement parfois
-            if (Math.random() > 0.7) {
-                greeting = greetings[Math.floor(Math.random() * greetings.length)];
-            }
-            
-            const userName = appData.user.firstname || '';
-            document.getElementById('greeting').textContent = userName ? `${greeting}, ${userName}` : greeting;
-        }
-
-        function updateDateTime() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            document.getElementById('datetime').textContent = now.toLocaleDateString('fr-FR', options);
-        }
-
-        function updateHomeworkCountdown() {
-            // Simuler un compte à rebours pour le prochain devoir
-            const homeworkElement = document.getElementById('homework-countdown');
-            if (appData.homework.length > 0) {
-                const nextHomework = appData.homework[0];
-                const examDate = new Date(nextHomework.date);
-                const now = new Date();
-                const diff = examDate - now;
-                
-                if (diff > 0) {
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    
-                    homeworkElement.innerHTML = `
-                        <div class="countdown">
-                            <div class="countdown-item">
-                                <div class="countdown-value">${days}</div>
-                                <div class="countdown-label">Jours</div>
-                            </div>
-                            <div class="countdown-item">
-                                <div class="countdown-value">${hours}</div>
-                                <div class="countdown-label">Heures</div>
-                            </div>
-                            <div class="countdown-item">
-                                <div class="countdown-value">${minutes}</div>
-                                <div class="countdown-label">Minutes</div>
-                            </div>
-                            <div class="countdown-item">
-                                <div class="countdown-value">${seconds}</div>
-                                <div class="countdown-label">Secondes</div>
-                            </div>
-                        </div>
-                        <div><strong>${nextHomework.name}</strong></div>
-                    `;
-                } else {
-                    homeworkElement.innerHTML = `<div>Pas de devoir à venir</div>`;
-                }
-            } else {
-                homeworkElement.innerHTML = `<div>Pas de devoir à venir</div>`;
-            }
-        }
-
-        // Gestion des matières
-        function displaySubjects() {
-            const subjectsList = document.getElementById('subjects-list');
-            subjectsList.innerHTML = '';
-            
-            appData.subjects.forEach((subject, index) => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-item';
-                listItem.innerHTML = `
-                    <div>
-                        <div><strong>${subject.name}</strong></div>
-                        <div>Coefficient: ${subject.coefficient}</div>
-                    </div>
-                    <div>
-                        <button class="btn btn-small" onclick="viewSubjectDetails(${index})">Voir</button>
-                        <button class="btn btn-small btn-warning" onclick="editSubject(${index})">Modifier</button>
-                        <button class="btn btn-small btn-danger" onclick="confirmDelete('subject', ${index})">Supprimer</button>
-                    </div>
-                `;
-                subjectsList.appendChild(listItem);
-            });
-        }
-
-        function addSubject(e) {
-            e.preventDefault();
-            const name = document.getElementById('subject-name').value;
-            const coefficient = parseInt(document.getElementById('subject-coefficient').value) || 1;
-            
-            appData.subjects.push({
-                name,
-                coefficient,
-                documents: [],
-                photos: [],
-                videos: [],
-                notes: []
-            });
-            
-            saveData();
-            displaySubjects();
-            closeAllModals();
-            document.getElementById('add-subject-form').reset();
-        }
-
-        function viewSubjectDetails(index) {
-            const subject = appData.subjects[index];
-            document.getElementById('subject-details-title').textContent = subject.name;
-            
-            // Afficher les documents, photos, etc.
-            displaySubjectFiles('documents', subject.documents);
-            displaySubjectFiles('photos', subject.photos);
-            displaySubjectFiles('videos', subject.videos);
-            displaySubjectFiles('notes', subject.notes);
-            
-            // Configurer les boutons d'ajout
-            document.getElementById('add-document-btn').onclick = () => openAddFileModal('document', index);
-            document.getElementById('add-photo-btn').onclick = () => openAddFileModal('photo', index);
-            document.getElementById('add-video-btn').onclick = () => openAddFileModal('video', index);
-            document.getElementById('add-note-btn').onclick = () => openAddFileModal('note', index);
-            
-            openModal('subject-details-modal');
-        }
-
-        function displaySubjectFiles(type, files) {
-            const grid = document.getElementById(`${type}-grid`);
-            grid.innerHTML = '';
-            
-            files.forEach((file, fileIndex) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <div class="file-icon">
-                        <i class="fas fa-${getFileIcon(type)}"></i>
-                    </div>
-                    <div class="file-name">${file.title || 'Sans titre'}</div>
-                    <div>
-                        <button class="btn btn-small" onclick="viewFile('${type}', ${fileIndex})">Voir</button>
-                        <button class="btn btn-small btn-danger" onclick="confirmDelete('${type}', ${fileIndex})">Supprimer</button>
-                    </div>
-                `;
-                grid.appendChild(fileItem);
-            });
-        }
-
-        function getFileIcon(type) {
-            switch(type) {
-                case 'documents': return 'file-alt';
-                case 'photos': return 'image';
-                case 'videos': return 'video';
-                case 'notes': return 'sticky-note';
-                default: return 'file';
-            }
-        }
-
-        function openAddFileModal(type, subjectIndex) {
-            document.getElementById('add-file-title').textContent = `Ajouter un ${type}`;
-            
-            // Afficher ou masquer le champ de téléchargement selon le type
-            const uploadContainer = document.getElementById('file-upload-container');
-            if (type === 'photo' || type === 'video' || type === 'document') {
-                uploadContainer.style.display = 'block';
-            } else {
-                uploadContainer.style.display = 'none';
-            }
-            
-            // Configurer le formulaire
-            document.getElementById('add-file-form').onsubmit = function(e) {
-                e.preventDefault();
-                addFileToSubject(type, subjectIndex);
-            };
-            
-            openModal('add-file-modal');
-        }
-
-        function addFileToSubject(type, subjectIndex) {
-            const title = document.getElementById('file-title').value;
-            const content = document.getElementById('file-content').value;
-            
-            const fileData = {
-                title,
-                content,
-                date: new Date().toISOString()
-            };
-            
-            // Ajouter le fichier à la matière
-            appData.subjects[subjectIndex][type + 's'].push(fileData);
-            
-            saveData();
-            viewSubjectDetails(subjectIndex); // Recharger les détails
-            closeAllModals();
-            document.getElementById('add-file-form').reset();
-        }
-
-        // Gestion des livres
-        function displayBooks() {
-            const booksGrid = document.getElementById('books-grid');
-            booksGrid.innerHTML = '';
-            
-            appData.books.forEach((book, index) => {
-                const bookItem = document.createElement('div');
-                bookItem.className = 'file-item';
-                bookItem.innerHTML = `
-                    <div class="file-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <div class="file-name">${book.title}</div>
-                    <div>
-                        <button class="btn btn-small" onclick="viewBook(${index})">Voir</button>
-                        <button class="btn btn-small btn-warning" onclick="editBook(${index})">Modifier</button>
-                        <button class="btn btn-small btn-danger" onclick="confirmDelete('book', ${index})">Supprimer</button>
-                    </div>
-                `;
-                booksGrid.appendChild(bookItem);
-            });
-        }
-
-        // Gestion des emplois du temps
-        function displaySchedules() {
-            const container = document.getElementById('schedules-container');
-            container.innerHTML = '';
-            
-            appData.schedules.forEach((schedule, index) => {
-                const scheduleCard = document.createElement('div');
-                scheduleCard.className = 'card';
-                scheduleCard.innerHTML = `
-                    <div class="card-header">
-                        <div class="card-title">${schedule.name}</div>
-                        <div>
-                            <button class="btn btn-small" onclick="viewSchedule(${index})">Voir</button>
-                            <button class="btn btn-small btn-warning" onclick="editSchedule(${index})">Modifier</button>
-                            <button class="btn btn-small btn-danger" onclick="confirmDelete('schedule', ${index})">Supprimer</button>
-                        </div>
-                    </div>
-                    <div>${schedule.description || ''}</div>
-                `;
-                container.appendChild(scheduleCard);
-            });
-        }
-
-        // Gestion de la corbeille
-        function displayTrash() {
-            const container = document.getElementById('trash-container');
-            container.innerHTML = '';
-            
-            if (appData.trash.length === 0) {
-                container.innerHTML = '<div class="trash-item">Corbeille vide</div>';
-                return;
-            }
-            
-            appData.trash.forEach((item, index) => {
-                const trashItem = document.createElement('div');
-                trashItem.className = 'trash-item';
-                trashItem.innerHTML = `
-                    <div>
-                        <div><strong>${item.name || item.title || 'Élément sans nom'}</strong></div>
-                        <div>Type: ${item.type}</div>
-                        <div>Date de suppression: ${new Date(item.deletedAt).toLocaleDateString('fr-FR')}</div>
-                    </div>
-                    <div class="trash-actions">
-                        <button class="btn btn-small btn-success" onclick="restoreFromTrash(${index})">Restaurer</button>
-                        <button class="btn btn-small btn-danger" onclick="permanentlyDelete(${index})">Supprimer</button>
-                    </div>
-                `;
-                container.appendChild(trashItem);
-            });
-            
-            // Ajouter le bouton pour vider toute la corbeille
-            const emptyTrashBtn = document.createElement('button');
-            emptyTrashBtn.className = 'btn btn-danger';
-            emptyTrashBtn.textContent = 'Vider la corbeille';
-            emptyTrashBtn.onclick = emptyTrash;
-            container.appendChild(emptyTrashBtn);
-        }
-
-        // Fonctions de confirmation de suppression
-        function confirmDelete(type, index) {
-            const alert = document.getElementById('delete-confirm-alert');
-            alert.classList.add('active');
-            
-            document.getElementById('confirm-delete').onclick = function() {
-                moveToTrash(type, index);
-                alert.classList.remove('active');
-            };
-            
-            document.getElementById('cancel-delete').onclick = function() {
-                alert.classList.remove('active');
-            };
-        }
-
-        function moveToTrash(type, index) {
-            let item;
-            
-            switch(type) {
-                case 'subject':
-                    item = appData.subjects[index];
-                    item.type = 'subject';
-                    appData.subjects.splice(index, 1);
-                    break;
-                case 'book':
-                    item = appData.books[index];
-                    item.type = 'book';
-                    appData.books.splice(index, 1);
-                    break;
-                case 'schedule':
-                    item = appData.schedules[index];
-                    item.type = 'schedule';
-                    appData.schedules.splice(index, 1);
-                    break;
-                // Ajouter d'autres types au besoin
-            }
-            
-            if (item) {
-                item.deletedAt = new Date().toISOString();
-                appData.trash.push(item);
-                saveData();
-                
-                // Mettre à jour l'affichage
-                displaySubjects();
-                displayBooks();
-                displaySchedules();
-                displayTrash();
-            }
-        }
-
-        function restoreFromTrash(index) {
-            const item = appData.trash[index];
-            
-            switch(item.type) {
-                case 'subject':
-                    appData.subjects.push(item);
-                    break;
-                case 'book':
-                    appData.books.push(item);
-                    break;
-                case 'schedule':
-                    appData.schedules.push(item);
-                    break;
-            }
-            
-            appData.trash.splice(index, 1);
-            saveData();
-            displayTrash();
-            displaySubjects();
-            displayBooks();
-            displaySchedules();
-        }
-
-        function permanentlyDelete(index) {
-            appData.trash.splice(index, 1);
-            saveData();
-            displayTrash();
-        }
-
-        function emptyTrash() {
-            appData.trash = [];
-            saveData();
-            displayTrash();
-        }
-
-        // Gestion des paramètres utilisateur
-        function saveUserSettings(e) {
-            e.preventDefault();
-            appData.user.firstname = document.getElementById('user-firstname').value;
-            appData.user.lastname = document.getElementById('user-lastname').value;
-            appData.user.status = document.getElementById('user-status').value;
-            appData.user.class = document.getElementById('user-class').value;
-            
-            saveData();
-            updateGreeting();
-            alert('Paramètres enregistrés avec succès!');
-        }
-
-        // Persistance des données
-        function saveData() {
-            localStorage.setItem('eduManagerData', JSON.stringify(appData));
-        }
-
-        function loadData() {
-            const savedData = localStorage.getItem('eduManagerData');
-            if (savedData) {
-                appData = JSON.parse(savedData);
-                
-                // Remplir le formulaire utilisateur
-                document.getElementById('user-firstname').value = appData.user.firstname || '';
-                document.getElementById('user-lastname').value = appData.user.lastname || '';
-                document.getElementById('user-status').value = appData.user.status || 'eleve';
-                document.getElementById('user-class').value = appData.user.class || '';
-            }
-            
-            // Données par défaut si vide
-            if (appData.subjects.length === 0) {
-                appData.subjects = [
-                    { name: "Mathématiques", coefficient: 3, documents: [], photos: [], videos: [], notes: [] },
-                    { name: "Français", coefficient: 2, documents: [], photos: [], videos: [], notes: [] },
-                    { name: "Histoire-Géographie", coefficient: 2, documents: [], photos: [], videos: [], notes: [] }
-                ];
-            }
-            
-            if (appData.books.length === 0) {
-                appData.books = [
-                    { title: "Manuel de Mathématiques" },
-                    { title: "Anthologie de la Littérature Française" },
-                    { title: "Atlas Historique" }
-                ];
-            }
-            
-            if (appData.schedules.length === 0) {
-                appData.schedules = [
-                    { name: "Emploi du temps scolaire", description: "Emploi du temps de la semaine" },
-                    { name: "Emploi du temps à la maison", description: "Planning de révision" }
-                ];
-            }
-            
-            if (appData.homework.length === 0) {
-                const nextWeek = new Date();
-                nextWeek.setDate(nextWeek.getDate() + 7);
-                appData.homework = [
-                    { name: "Examen de Mathématiques", date: nextWeek.toISOString() }
-                ];
-            }
-            
-            saveData();
-        }
-
-        // Fonctions à implémenter (placeholders)
-      // Fonction pour visualiser un fichier
-function viewFile(type, index) {
-    const currentSubjectIndex = getCurrentSubjectIndex();
-    if (currentSubjectIndex === -1) return;
-    
-    const subject = appData.subjects[currentSubjectIndex];
-    const file = subject[type + 's'][index];
-    
-    // Créer un modal pour afficher le fichier
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 90%; max-height: 90%;">
-            <div class="modal-header">
-                <div class="modal-title">${file.title || 'Fichier sans titre'}</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div style="padding: 20px; max-height: 70vh; overflow-y: auto;">
-                ${getFileContentPreview(file, type)}
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger close-modal">Fermer</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Gérer la fermeture
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-
-function getFileContentPreview(file, type) {
-    switch(type) {
-        case 'documents':
-            return `<div style="white-space: pre-wrap;">${file.content || 'Aucun contenu'}</div>`;
-        case 'photos':
-            if (file.fileUrl) {
-                return `<img src="${file.fileUrl}" style="max-width: 100%; height: auto;" alt="${file.title}">`;
-            }
-            return `<p>Aucune image disponible</p>`;
-        case 'videos':
-            if (file.fileUrl) {
-                return `<video controls style="max-width: 100%;"><source src="${file.fileUrl}"></video>`;
-            }
-            return `<p>Aucune vidéo disponible</p>`;
-        case 'notes':
-            return `<div style="white-space: pre-wrap;">${file.content || 'Aucune note'}</div>`;
-        default:
-            return `<p>Type de fichier non supporté</p>`;
-    }
-}
-
-// Fonction pour modifier une matière
-function editSubject(index) {
-    const subject = appData.subjects[index];
-    
-    // Créer le formulaire de modification
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Modifier la matière</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="edit-subject-form">
-                <div class="form-group">
-                    <label for="edit-subject-name">Nom de la matière</label>
-                    <input type="text" id="edit-subject-name" class="form-control" value="${subject.name}" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-subject-coefficient">Coefficient</label>
-                    <input type="number" id="edit-subject-coefficient" class="form-control" min="1" value="${subject.coefficient}">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Gérer la soumission du formulaire
-    modal.querySelector('#edit-subject-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+        // Initialize Feather Icons
+        feather.replace();
         
-        const name = document.getElementById('edit-subject-name').value;
-        const coefficient = parseInt(document.getElementById('edit-subject-coefficient').value) || 1;
+        // Set current date
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
         
-        // Mettre à jour la matière
-        appData.subjects[index].name = name;
-        appData.subjects[index].coefficient = coefficient;
+        // Dynamic greeting
+        const greetings = [
+            "Bonjour", "Salut", "Hello", "Hey", "Bonsoir", "Salam", "Hi there", 
+            "Comment ça va?", "How are you?", "Hola", "Ciao"
+        ];
+        const hour = now.getHours();
+        let greeting;
         
-        saveData();
-        displaySubjects();
-        modal.remove();
-    });
-    
-    // Gérer la fermeture
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-
-// Fonction pour visualiser un livre
-function viewBook(index) {
-    const book = appData.books[index];
-    
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 90%; max-height: 90%;">
-            <div class="modal-header">
-                <div class="modal-title">${book.title}</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div style="padding: 20px; text-align: center;">
-                ${book.fileUrl ? 
-                    `<iframe src="${book.fileUrl}" style="width: 100%; height: 70vh; border: none;"></iframe>` :
-                    `<p>Aucun fichier disponible pour ce livre</p>`
-                }
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger close-modal">Fermer</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-
-// Fonction pour modifier un livre
-function editBook(index) {
-    const book = appData.books[index];
-    
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Modifier le livre</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="edit-book-form">
-                <div class="form-group">
-                    <label for="edit-book-title">Titre du livre</label>
-                    <input type="text" id="edit-book-title" class="form-control" value="${book.title}" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-book-file">Fichier PDF/Image</label>
-                    <input type="file" id="edit-book-file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
-                    ${book.fileUrl ? `<p class="file-info">Fichier actuel: ${book.fileUrl}</p>` : ''}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    modal.querySelector('#edit-book-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const title = document.getElementById('edit-book-title').value;
-        const fileInput = document.getElementById('edit-book-file');
-        
-        // Mettre à jour le livre
-        appData.books[index].title = title;
-        
-        // Gérer le fichier uploadé
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const fileUrl = URL.createObjectURL(file);
-            appData.books[index].fileUrl = fileUrl;
-        }
-        
-        saveData();
-        displayBooks();
-        modal.remove();
-    });
-    
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-
-// Fonction pour visualiser un emploi du temps
-function viewSchedule(index) {
-    const schedule = appData.schedules[index];
-    
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 95%;">
-            <div class="modal-header">
-                <div class="modal-title">${schedule.name}</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div style="padding: 20px;">
-                ${schedule.description ? `<p>${schedule.description}</p>` : ''}
-                <div class="schedule-view">
-                    ${renderScheduleTable(schedule)}
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger close-modal">Fermer</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-
-function renderScheduleTable(schedule) {
-    if (!schedule.data || schedule.data.length === 0) {
-        return '<p>Aucun cours programmé</p>';
-    }
-    
-    let html = `
-        <table class="schedule" style="width: 100%;">
-            <thead>
-                <tr>
-                    <th>Heure</th>
-                    <th>Lundi</th>
-                    <th>Mardi</th>
-                    <th>Mercredi</th>
-                    <th>Jeudi</th>
-                    <th>Vendredi</th>
-                    <th>Samedi</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    
-    // Heures typiques pour un emploi du temps scolaire
-    const timeSlots = [
-        '8h-9h', '9h-10h', '10h-11h', '11h-12h',
-        '12h-13h', '13h-14h', '14h-15h', '15h-16h', '16h-17h'
-    ];
-    
-    timeSlots.forEach(time => {
-        html += `<tr><td>${time}</td>`;
-        for (let i = 0; i < 6; i++) {
-            const course = schedule.data.find(c => c.time === time && c.day === i);
-            html += `<td style="background-color: ${course ? course.color : 'transparent'}; padding: 8px;">${course ? course.subject : ''}</td>`;
-        }
-        html += '</tr>';
-    });
-    
-    html += '</tbody></table>';
-    return html;
-}
-
-// Fonction pour modifier un emploi du temps
-function editSchedule(index) {
-    const schedule = appData.schedules[index];
-    
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 95%;">
-            <div class="modal-header">
-                <div class="modal-title">Modifier l'emploi du temps</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="edit-schedule-form">
-                <div class="form-group">
-                    <label for="edit-schedule-name">Nom</label>
-                    <input type="text" id="edit-schedule-name" class="form-control" value="${schedule.name}" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-schedule-description">Description</label>
-                    <textarea id="edit-schedule-description" class="form-control">${schedule.description || ''}</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Ajouter un cours</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;">
-                        <select id="new-course-day" class="form-control">
-                            <option value="0">Lundi</option>
-                            <option value="1">Mardi</option>
-                            <option value="2">Mercredi</option>
-                            <option value="3">Jeudi</option>
-                            <option value="4">Vendredi</option>
-                            <option value="5">Samedi</option>
-                        </select>
-                        <select id="new-course-time" class="form-control">
-                            <option value="8h-9h">8h-9h</option>
-                            <option value="9h-10h">9h-10h</option>
-                            <option value="10h-11h">10h-11h</option>
-                            <option value="11h-12h">11h-12h</option>
-                            <option value="12h-13h">12h-13h</option>
-                            <option value="13h-14h">13h-14h</option>
-                            <option value="14h-15h">14h-15h</option>
-                            <option value="15h-16h">15h-16h</option>
-                            <option value="16h-17h">16h-17h</option>
-                        </select>
-                        <input type="text" id="new-course-subject" class="form-control" placeholder="Matière">
-                        <input type="color" id="new-course-color" class="form-control" value="#4a6fa5">
-                        <button type="button" class="btn btn-small" id="add-course-btn">+</button>
-                    </div>
-                </div>
-                
-                <div id="courses-list">
-                    ${renderCoursesList(schedule)}
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Initialiser les données si elles n'existent pas
-    if (!schedule.data) {
-        schedule.data = [];
-    }
-    
-    // Ajouter un cours
-    modal.querySelector('#add-course-btn').addEventListener('click', function() {
-        const day = parseInt(modal.querySelector('#new-course-day').value);
-        const time = modal.querySelector('#new-course-time').value;
-        const subject = modal.querySelector('#new-course-subject').value;
-        const color = modal.querySelector('#new-course-color').value;
-        
-        if (subject.trim()) {
-            schedule.data.push({ day, time, subject, color });
-            modal.querySelector('#courses-list').innerHTML = renderCoursesList(schedule);
-            
-            // Réinitialiser les champs
-            modal.querySelector('#new-course-subject').value = '';
-        }
-    });
-    
-    // Gérer la soumission du formulaire
-    modal.querySelector('#edit-schedule-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('edit-schedule-name').value;
-        const description = document.getElementById('edit-schedule-description').value;
-        
-        // Mettre à jour l'emploi du temps
-        appData.schedules[index].name = name;
-        appData.schedules[index].description = description;
-        
-        saveData();
-        displaySchedules();
-        modal.remove();
-    });
-    
-    // Gérer la fermeture
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-
-function renderCoursesList(schedule) {
-    if (!schedule.data || schedule.data.length === 0) {
-        return '<p>Aucun cours ajouté</p>';
-    }
-    
-    let html = '<h4>Cours programmés</h4><ul class="list">';
-    
-    schedule.data.forEach((course, courseIndex) => {
-        const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-        html += `
-            <li class="list-item">
-                <div>
-                    <span style="display: inline-block; width: 20px; height: 20px; background-color: ${course.color}; margin-right: 10px;"></span>
-                    ${days[course.day]} - ${course.time} - ${course.subject}
-                </div>
-                <button type="button" class="btn btn-small btn-danger" onclick="removeCourse(${courseIndex})">Supprimer</button>
-            </li>
-        `;
-    });
-    
-    html += '</ul>';
-    return html;
-}
-
-function removeCourse(courseIndex) {
-    const currentScheduleIndex = getCurrentScheduleIndex();
-    if (currentScheduleIndex === -1) return;
-    
-    appData.schedules[currentScheduleIndex].data.splice(courseIndex, 1);
-    
-    // Mettre à jour l'affichage
-    const modal = document.querySelector('.modal.active');
-    if (modal) {
-        modal.querySelector('#courses-list').innerHTML = renderCoursesList(appData.schedules[currentScheduleIndex]);
-    }
-}
-
-// Fonctions utilitaires
-function getCurrentSubjectIndex() {
-    const modalTitle = document.getElementById('subject-details-title');
-    if (!modalTitle) return -1;
-    
-    const subjectName = modalTitle.textContent.replace('Détails de la matière', '').trim();
-    return appData.subjects.findIndex(subject => subject.name === subjectName);
-}
-
-function getCurrentScheduleIndex() {
-    const modalTitle = document.querySelector('.modal.active .modal-title');
-    if (!modalTitle) return -1;
-    
-    const scheduleName = modalTitle.textContent.replace('Modifier l\'emploi du temps', '').trim();
-    return appData.schedules.findIndex(schedule => schedule.name === scheduleName);
-}
-      
-      // Fonction pour visualiser un fichier - VERSION CORRIGÉE
-function viewFile(type, fileIndex) {
-    // Récupérer l'index de la matière actuelle
-    const subjectIndex = getCurrentSubjectIndex();
-    if (subjectIndex === -1) return;
-    
-    const subject = appData.subjects[subjectIndex];
-    const file = subject[type + 's'][fileIndex];
-    
-    if (!file) return;
-    
-    // Créer un modal pour afficher le fichier
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 95%; max-height: 95%;">
-            <div class="modal-header">
-                <div class="modal-title">${file.title || 'Fichier sans titre'}</div>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div style="padding: 20px; max-height: 70vh; overflow-y: auto; text-align: center;">
-                ${getFileContentPreview(file, type)}
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger close-modal">Fermer</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Gérer la fermeture
-    const closeModal = () => modal.remove();
-    modal.querySelector('.close-modal').addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => e.target === modal && closeModal());
-}
-
-// Fonction améliorée pour l'aperçu des fichiers
-function getFileContentPreview(file, type) {
-    switch(type) {
-        case 'documents':
-            return `
-                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: left;">
-                    <h4>${file.title || 'Document sans titre'}</h4>
-                    <div style="white-space: pre-wrap; margin-top: 15px;">${file.content || 'Aucun contenu'}</div>
-                    ${file.date ? `<p style="color: #666; margin-top: 15px; font-size: 0.9em;">Créé le: ${new Date(file.date).toLocaleDateString('fr-FR')}</p>` : ''}
-                </div>
-            `;
-        case 'photos':
-            if (file.fileUrl) {
-                return `<img src="${file.fileUrl}" style="max-width: 100%; max-height: 60vh; border-radius: 8px;" alt="${file.title}">`;
-            } else if (file.content) {
-                // Si c'est une URL base64 ou un chemin
-                return `<img src="${file.content}" style="max-width: 100%; max-height: 60vh; border-radius: 8px;" alt="${file.title}">`;
-            }
-            return `<div style="padding: 40px; color: #666;">
-                <i class="fas fa-image" style="font-size: 3em; margin-bottom: 15px;"></i>
-                <p>Aucune image disponible</p>
-            </div>`;
-        case 'videos':
-            if (file.fileUrl) {
-                return `<video controls style="max-width: 100%; max-height: 60vh; border-radius: 8px;">
-                    <source src="${file.fileUrl}">
-                    Votre navigateur ne supporte pas la lecture vidéo.
-                </video>`;
-            } else if (file.content && file.content.startsWith('http')) {
-                return `<video controls style="max-width: 100%; max-height: 60vh; border-radius: 8px;">
-                    <source src="${file.content}">
-                    Votre navigateur ne supporte pas la lecture vidéo.
-                </video>`;
-            }
-            return `<div style="padding: 40px; color: #666;">
-                <i class="fas fa-video" style="font-size: 3em; margin-bottom: 15px;"></i>
-                <p>Aucune vidéo disponible</p>
-            </div>`;
-        case 'notes':
-            return `
-                <div style="background: #fff9e6; padding: 20px; border-radius: 8px; border-left: 4px solid #ffd700; text-align: left;">
-                    <h4>${file.title || 'Note sans titre'}</h4>
-                    <div style="white-space: pre-wrap; margin-top: 15px;">${file.content || 'Aucune note'}</div>
-                    ${file.date ? `<p style="color: #666; margin-top: 15px; font-size: 0.9em;">Créé le: ${new Date(file.date).toLocaleDateString('fr-FR')}</p>` : ''}
-                </div>
-            `;
-        default:
-            return `<p>Type de fichier non supporté</p>`;
-    }
-}
-
-// Fonction pour ajouter un fichier à une matière - VERSION CORRIGÉE
-function addFileToSubject(type, subjectIndex) {
-    const title = document.getElementById('file-title').value || `Sans titre - ${new Date().toLocaleString()}`;
-    const content = document.getElementById('file-content').value;
-    const fileInput = document.getElementById('file-upload');
-    
-    const fileData = {
-        title,
-        content,
-        date: new Date().toISOString()
-    };
-    
-    // Gérer l'upload de fichier pour les photos, vidéos et documents
-    if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        const fileUrl = URL.createObjectURL(file);
-        fileData.fileUrl = fileUrl;
-        fileData.fileName = file.name;
-        fileData.fileType = file.type;
-    }
-    
-    // Ajouter le fichier à la matière
-    appData.subjects[subjectIndex][type + 's'].push(fileData);
-    
-    saveData();
-    
-    // Recharger l'affichage des fichiers du type actuel
-    const activeTab = document.querySelector('.tab.active');
-    if (activeTab) {
-        const tabType = activeTab.getAttribute('data-tab');
-        displaySubjectFiles(tabType, appData.subjects[subjectIndex][tabType]);
-    }
-    
-    closeAllModals();
-    document.getElementById('add-file-form').reset();
-}
-
-// Fonction pour afficher les fichiers d'une matière - VERSION CORRIGÉE
-function displaySubjectFiles(type, files) {
-    const grid = document.getElementById(`${type}-grid`);
-    if (!grid) return;
-    
-    grid.innerHTML = '';
-    
-    if (files.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
-                <i class="fas fa-${getFileIcon(type)}" style="font-size: 3em; margin-bottom: 15px;"></i>
-                <p>Aucun ${getFileTypeLabel(type)}</p>
-            </div>
-        `;
-        return;
-    }
-    
-    files.forEach((file, fileIndex) => {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        fileItem.innerHTML = `
-            <div class="file-icon" onclick="viewFile('${type}', ${fileIndex})" style="cursor: pointer;">
-                <i class="fas fa-${getFileIcon(type)}"></i>
-            </div>
-            <div class="file-name" style="cursor: pointer;" onclick="viewFile('${type}', ${fileIndex})">
-                ${file.title || 'Sans titre'}
-            </div>
-            <div style="font-size: 0.7em; color: #666; margin: 5px 0;">
-                ${new Date(file.date).toLocaleDateString('fr-FR')}
-            </div>
-            <div>
-                <button class="btn btn-small" onclick="viewFile('${type}', ${fileIndex})">Voir</button>
-                <button class="btn btn-small btn-danger" onclick="confirmDeleteFile('${type}', ${fileIndex})">Supprimer</button>
-            </div>
-        `;
-        grid.appendChild(fileItem);
-    });
-}
-
-// Fonction utilitaire pour obtenir le libellé du type de fichier
-function getFileTypeLabel(type) {
-    const labels = {
-        'documents': 'document',
-        'photos': 'photo', 
-        'videos': 'vidéo',
-        'notes': 'note'
-    };
-    return labels[type] || 'fichier';
-}
-
-// Fonction de confirmation de suppression pour les fichiers
-function confirmDeleteFile(type, fileIndex) {
-    const alert = document.getElementById('delete-confirm-alert');
-    const alertMessage = alert.querySelector('.alert-message');
-    alertMessage.textContent = 'Êtes-vous sûr de vouloir supprimer ce fichier ?';
-    
-    alert.classList.add('active');
-    
-    document.getElementById('confirm-delete').onclick = function() {
-        deleteFile(type, fileIndex);
-        alert.classList.remove('active');
-    };
-    
-    document.getElementById('cancel-delete').onclick = function() {
-        alert.classList.remove('active');
-    };
-}
-
-// Fonction pour supprimer un fichier
-function deleteFile(type, fileIndex) {
-    const subjectIndex = getCurrentSubjectIndex();
-    if (subjectIndex === -1) return;
-    
-    const file = appData.subjects[subjectIndex][type + 's'][fileIndex];
-    
-    // Déplacer vers la corbeille
-    file.type = type.slice(0, -1); // Enlever le 's' final (documents -> document)
-    file.deletedAt = new Date().toISOString();
-    appData.trash.push(file);
-    
-    // Supprimer de la matière
-    appData.subjects[subjectIndex][type + 's'].splice(fileIndex, 1);
-    
-    saveData();
-    
-    // Recharger l'affichage
-    const activeTab = document.querySelector('.tab.active');
-    if (activeTab) {
-        const tabType = activeTab.getAttribute('data-tab');
-        displaySubjectFiles(tabType, appData.subjects[subjectIndex][tabType]);
-    }
-    
-    // Mettre à jour la corbeille
-    displayTrash();
-}
-
-// Fonction utilitaire pour obtenir l'index de la matière actuelle
-function getCurrentSubjectIndex() {
-    const modalTitle = document.getElementById('subject-details-title');
-    if (!modalTitle) return -1;
-    
-    const subjectName = modalTitle.textContent.replace('Détails de la matière', '').trim();
-    return appData.subjects.findIndex(subject => subject.name === subjectName);
-}
-
-// Initialisation améliorée pour les formulaires de fichiers
-function openAddFileModal(type, subjectIndex) {
-    document.getElementById('add-file-title').textContent = `Ajouter un ${getFileTypeLabel(type)}`;
-    
-    // Afficher ou masquer le champ de téléchargement selon le type
-    const uploadContainer = document.getElementById('file-upload-container');
-    const contentLabel = document.getElementById('file-content').previousElementSibling;
-    
-    if (type === 'photo' || type === 'video' || type === 'document') {
-        uploadContainer.style.display = 'block';
-        contentLabel.textContent = 'Description (optionnelle)';
-        
-        // Définir les types de fichiers acceptés
-        const fileInput = document.getElementById('file-upload');
-        if (type === 'photo') {
-            fileInput.accept = 'image/*';
-        } else if (type === 'video') {
-            fileInput.accept = 'video/*';
+        if (hour < 12) {
+            greeting = greetings[0]; // Bonjour
+        } else if (hour < 18) {
+            greeting = greetings[4]; // Bonsoir
         } else {
-            fileInput.accept = '.pdf,.doc,.docx,.txt';
+            greeting = greetings[Math.floor(Math.random() * greetings.length)];
         }
-    } else {
-        uploadContainer.style.display = 'none';
-        contentLabel.textContent = 'Contenu de la note';
-    }
-    
-    // Configurer le formulaire
-    const form = document.getElementById('add-file-form');
-    form.onsubmit = function(e) {
-        e.preventDefault();
-        addFileToSubject(type, subjectIndex);
-    };
-    
-    // Réinitialiser le fo rmulaire
-    form.reset();
-    
-    openModal('add-file-modal');
-}
+        
+        document.getElementById('greeting').textContent = greeting;
+        
+        // Countdown timer (example for BAC 2026)
+        function updateCountdown() {
+            const bacDate = new Date('2026-06-15T08:00:00');
+            const now = new Date();
+            const diff = bacDate - now;
+            
+            if (diff > 0) {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('countdown').textContent = 
+                    `BAC 2026: ${days}j ${hours}h ${minutes}m ${seconds}s`;
+            } else {
+                document.getElementById('countdown').textContent = "BAC 2026: Terminé!";
+            }
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        
+        // Sample reminder
+        const reminders = [
+            { title: "Révision", description: "Réviser les formules des alcanes" },
+            { title: "Histoire", description: "Apprendre la leçon L1 sur la révolution" }
+        ];
+        
+        const reminderDisplay = document.getElementById('reminder-display');
+        if (reminders.length > 0) {
+            reminderDisplay.innerHTML = `
+                <div class="flex items-start p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <i data-feather="bell" class="text-yellow-500 mr-2 mt-0.5"></i>
+                    <div>
+                        <div class="font-medium">${reminders[0].title}</div>
+                        <div class="text-sm text-gray-600">${reminders[0].description}</div>
+                    </div>
+                </div>
+            `;
+            feather.replace();
+        }
+        
+        // Evolution Chart
+        const ctx = document.getElementById('evolutionChart').getContext('2d');
+        const evolutionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Trim 1', 'Trim 2', 'Trim 3', 'Trim 1', 'Trim 2'],
+                datasets: [{
+                    label: 'Moyenne générale',
+                    data: [12.5, 13.2, 14.0, 14.5, 15.2],
+                    borderColor: '#6C63FF',
+                    backgroundColor: 'rgba(108, 99, 255, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 10,
+                        max: 20
+                    }
+                }
+            }
+        });
+        
+        // Prevent blue highlight on mobile taps
+        document.addEventListener('touchstart', function() {}, true);
     </script>
 </body>
 </html>
