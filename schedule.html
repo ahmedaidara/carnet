@@ -781,7 +781,7 @@
             saveSchedules();
             setCurrentSchedule(newSchedule.id);
             renderSchedulesList();
-            toggleScheduleModal(false);
+            toggleConfigureScheduleModal(false);
         }
         
         // Update schedule
@@ -915,36 +915,44 @@
         }
         
         // Event Listeners
-        addScheduleBtn.addEventListener('click', () => toggleScheduleModal(true));
-        closeScheduleModal.addEventListener('click', () => toggleScheduleModal(false));
-        cancelAddSchedule.addEventListener('click', () => toggleScheduleModal(false));
-        confirmAddSchedule.addEventListener('click', () => {
-            const name = document.getElementById('scheduleName').value.trim();
-            const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
-            
-            if (!name) {
-                alert('Veuillez donner un nom à votre emploi du temps');
-                return;
-            }
-            
-            openConfigureScheduleModal();
-            toggleScheduleModal(false);
-        });
-        
-        addTimeSlot.addEventListener('click', () => addTimeSlotElement());
-        
-        closeConfigureModal.addEventListener('click', () => toggleConfigureScheduleModal(false));
-        cancelConfigureSchedule.addEventListener('click', () => toggleConfigureScheduleModal(false));
-        confirmConfigureSchedule.addEventListener('click', () => {
-            const scheduleId = configureScheduleModal.getAttribute('data-schedule-id');
-            if (scheduleId) {
-                updateSchedule(scheduleId);
-            } else {
-                const name = document.getElementById('scheduleName').value.trim();
-                const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
-                createSchedule(name, color);
-            }
-        });
+      // Event Listeners
+addScheduleBtn.addEventListener('click', () => toggleScheduleModal(true));
+closeScheduleModal.addEventListener('click', () => toggleScheduleModal(false));
+cancelAddSchedule.addEventListener('click', () => toggleScheduleModal(false));
+confirmAddSchedule.addEventListener('click', () => {
+    const name = document.getElementById('scheduleName').value.trim();
+    const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+    
+    if (!name) {
+        alert('Veuillez donner un nom à votre emploi du temps');
+        return;
+    }
+    
+    openConfigureScheduleModal();
+    toggleScheduleModal(false);
+});
+
+addTimeSlot.addEventListener('click', () => addTimeSlotElement());
+
+closeConfigureModal.addEventListener('click', () => toggleConfigureScheduleModal(false));
+cancelConfigureSchedule.addEventListener('click', () => toggleConfigureScheduleModal(false));
+confirmConfigureSchedule.addEventListener('click', () => {
+    const scheduleId = configureScheduleModal.getAttribute('data-schedule-id');
+    if (scheduleId) {
+        updateSchedule(scheduleId);
+    } else {
+        const name = document.getElementById('scheduleName').value.trim();
+        const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+        if (!name) {
+            alert('Veuillez donner un nom à votre emploi du temps');
+            return;
+        }
+        createSchedule(name, color);
+    }
+    toggleConfigureScheduleModal(false);
+});
+
+// Dans createSchedule, supprimez la ligne : toggleScheduleModal(false);
         
         addExamBtn.addEventListener('click', () => toggleExamModal(true));
         addExamBtn2.addEventListener('click', () => toggleExamModal(true));
