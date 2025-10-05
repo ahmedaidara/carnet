@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Paramètres</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .profile-avatar {
+            transition: all 0.3s ease;
+        }
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+        .trash-item {
+            transition: all 0.3s ease;
+        }
+        .trash-item:hover {
+            background-color: #F5F3FF;
+        }
+        [contenteditable]:focus {
+            outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
+        }
+        .custom-alert {
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="text-gray-600">
+                    <i data-feather="arrow-left"></i>
+                </a>
+                <h1 class="text-xl font-bold text-gray-800">Paramètres</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6 pb-20">
+        <!-- Profile Section -->
+        <section class="mb-8">
+            <h2 class="text-lg font-semibold mb-4">Profil</h2>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex flex-col items-center mb-6">
+                    <div class="profile-avatar w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mb-3 overflow-hidden">
+                        <i data-feather="user" class="text-purple-600 w-10 h-10"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 id="userName" class="font-medium text-gray-800 text-lg" contenteditable="true">Jean Dupont</h3>
+                        <div class="flex items-center justify-center mt-1">
+                            <select id="userStatus" class="text-sm text-gray-500 bg-transparent border-none focus:ring-0">
+                                <option value="student">Élève</option>
+                                <option value="college">Étudiant</option>
+                                <option value="teacher">Professeur</option>
+                            </select>
+                            <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 ml-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Classe/Niveau</label>
+                        <input type="text" id="userClass" placeholder="Ex: Terminale S, Licence 2" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email (optionnel)</label>
+                        <input type="email" id="userEmail" placeholder="votre@email.com" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div class="pt-2">
+                        <button id="saveProfile" class="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trash Section -->
+        <section>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Corbeille</h2>
+                <button id="emptyTrash" class="text-sm text-purple-600 flex items-center">
+                    <i data-feather="trash-2" class="mr-1 w-4 h-4"></i> Vider la corbeille
+                </button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div id="trashList">
+                    <!-- Trash items will be loaded here -->
+                    <div class="trash-item px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                        <div>
+                            <div class="font-medium">Mathématiques</div>
+                            <div class="text-sm text-gray-500">Matière supprimée le 10/06/2023</div>
+                        </div>
+                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
+                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="trash-item px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                        <div>
+                            <div class="font-medium">Cours Algèbre.pdf</div>
+                            <div class="text-sm text-gray-500">Document supprimé le 08/06/2023</div>
+                        </div>
+                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
+                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="trash-item px-4 py-3 flex justify-between items-center">
+                        <div>
+                            <div class="font-medium">Photo tableau.png</div>
+                            <div class="text-sm text-gray-500">Photo supprimée le 05/06/2023</div>
+                        </div>
+                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
+                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="emptyTrashMessage" class="hidden text-center py-8">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                        <i data-feather="check" class="text-gray-400 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-gray-700 font-medium">Corbeille vide</h3>
+                    <p class="text-gray-500 text-sm mt-1">Les éléments que vous supprimez apparaîtront ici</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Settings -->
+        <section class="mt-8">
+            <h2 class="text-lg font-semibold mb-4">Autres paramètres</h2>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">Mode sombre</div>
+                        <div class="text-sm text-gray-500">Passer à l'interface sombre</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">Notifications</div>
+                        <div class="text-sm text-gray-500">Activer les rappels et alertes</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+                <a href="#" class="p-4 flex justify-between items-center text-red-600">
+                    <div>
+                        <div class="font-medium">Déconnexion</div>
+                    </div>
+                    <i data-feather="log-out" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- Confirmation Modal -->
+        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 custom-alert">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Confirmation</h2>
+                    <button id="closeConfirmModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <p id="confirmMessage">Voulez-vous vraiment vider la corbeille ? Cette action est irréversible.</p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button id="cancelConfirm" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                    <button id="confirmAction" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Confirmer</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
+        <div class="container mx-auto flex justify-around">
+            <a href="index.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Accueil</span>
+            </a>
+            <a href="subjects.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="book" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Matières</span>
+            </a>
+            <a href="library.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="bookmark" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Bibliothèque</span>
+            </a>
+            <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="calendar" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Emploi du temps</span>
+            </a>
+            <a href="settings.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
+                <i data-feather="settings" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Paramètres</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // DOM Elements
+        const saveProfileBtn = document.getElementById('saveProfile');
+        const emptyTrashBtn = document.getElementById('emptyTrash');
+        const trashList = document.getElementById('trashList');
+        const emptyTrashMessage = document.getElementById('emptyTrashMessage');
+        const confirmModal = document.getElementById('confirmModal');
+        const closeConfirmModal = document.getElementById('closeConfirmModal');
+        const cancelConfirm = document.getElementById('cancelConfirm');
+        const confirmAction = document.getElementById('confirmAction');
+        const confirmMessage = document.getElementById('confirmMessage');
+        
+        // Load user data from localStorage if available
+        if (localStorage.getItem('userProfile')) {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            document.getElementById('userName').textContent = userProfile.name || 'Jean Dupont';
+            document.getElementById('userStatus').value = userProfile.status || 'student';
+            document.getElementById('userClass').value = userStorage.getItem('userProfile'));
+            document.getElementById('userName').textContent = userProfile.name || 'Jean Dupont';
+            document.getElementById('userStatus').value = userProfile.status || 'student';
+            document.getElementById('userClass').value = userProfile.class || '';
+            document.getElementById('userEmail').value = userProfile.email || '';
+        }
+        
+        // Save profile
+        saveProfileBtn.addEventListener('click', () => {
+            const userProfile = {
+                name: document.getElementById('userName').textContent,
+                status: document.getElementById('userStatus').value,
+                class: document.getElementById('userClass').value,
+                email: document.getElementById('userEmail').value
+            };
+            
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            
+            // Show success message
+            alert('Profil enregistré avec succès!');
+        });
+        
+        // Toggle confirmation modal
+        function toggleConfirmModal(show, message = '') {
+            if (show) {
+                confirmMessage.textContent = message;
+                confirmModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                confirmModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Empty trash
+        emptyTrashBtn.addEventListener('click', () => {
+            toggleConfirmModal(true, 'Voulez-vous vraiment vider la corbeille ? Cette action est irréversible.');
+            
+            confirmAction.onclick = function() {
+                // In a real app, this would delete all items permanently
+                trashList.innerHTML = '';
+                emptyTrashMessage.classList.remove('hidden');
+                toggleConfirmModal(false);
+            };
+        });
+        
+        // Restore item
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.restore-item')) {
+                const item = e.target.closest('.trash-item');
+                item.remove();
+                
+                // Check if trash is empty
+                if (trashList.children.length === 0) {
+                    emptyTrashMessage.classList.remove('hidden');
+                }
+                
+                // In a real app, this would restore the item to its original location
+                alert('Élément restauré avec succès!');
+            }
+        });
+        
+        // Confirmation modal handlers
+        closeConfirmModal.addEventListener('click', () => toggleConfirmModal(false));
+        cancelConfirm.addEventListener('click', () => toggleConfirmModal(false));
+        
+        // Prevent blue highlight on mobile taps
+        document.addEventListener('touchstart', function() {}, true);
+    </script>
+</body>
+</html>
