@@ -26,6 +26,17 @@
             background-color: #F5F3FF; 
             border-radius: 4px;
         }
+        .image-gallery {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 10px 0;
+        }
+        .image-gallery img {
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -48,7 +59,7 @@
     <main class="container mx-auto px-4 py-6 pb-20">
         <!-- Add Book Modal -->
         <div id="addBookModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Ajouter un livre</h2>
                     <button id="closeModal" class="text-gray-500 hover:text-gray-700">
@@ -65,23 +76,46 @@
                         <input type="text" id="bookAuthor" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fichier PDF/Images</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Photo de couverture</label>
                         <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                             <div class="space-y-1 text-center">
-                                <div class="flex text-sm text-gray-600">
+                                <div class="flex text-sm text-gray-600 justify-center">
                                     <label class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none">
-                                        <span>Téléverser un fichier</span>
-                                        <input id="bookFile" type="file" class="sr-only">
+                                        <span>Téléverser une couverture</span>
+                                        <input id="bookCover" type="file" accept="image/*" class="sr-only">
                                     </label>
-                                    <p class="pl-1">ou glisser-déposer</p>
                                 </div>
-                                <p class="text-xs text-gray-500">PDF, JPG, PNG jusqu'à 10MB</p>
+                                <p class="text-xs text-gray-500">JPG, PNG jusqu'à 5MB</p>
                             </div>
+                        </div>
+                        <div id="coverPreview" class="mt-2 hidden">
+                            <img id="coverPreviewImg" class="w-32 h-32 object-cover rounded-lg mx-auto">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fichiers PDF/Images</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-gray-600 justify-center">
+                                    <label class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none">
+                                        <span>Téléverser des fichiers</span>
+                                        <input id="bookFiles" type="file" multiple accept=".pdf,image/*" class="sr-only">
+                                    </label>
+                                </div>
+                                <p class="text-xs text-gray-500">PDF, JPG, PNG - Multiple fichiers autorisés</p>
+                            </div>
+                        </div>
+                        <div id="filesPreview" class="mt-2 hidden">
+                            <div class="image-gallery" id="filesPreviewContainer"></div>
                         </div>
                     </div>
                     <div class="flex justify-end space-x-3 pt-2">
-                        <button id="cancelAddBook" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
-                        <button id="confirmAddBook" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
+                        <button id="cancelAddBook" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center">
+                            <i data-feather="x" class="w-4 h-4 mr-2"></i> Annuler
+                        </button>
+                        <button id="confirmAddBook" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 flex items-center">
+                            <i data-feather="check" class="w-4 h-4 mr-2"></i> Ajouter
+                        </button>
                     </div>
                 </div>
             </div>
@@ -136,11 +170,7 @@
         feather.replace();
         
         // Sample books data
-        let books = [
-            { id: 1, title: "Physique Chimie Tle", author: "Dupont et Martin", cover: "http://static.photos/education/320x240/1" },
-            { id: 2, title: "Mathématiques Terminale", author: "Leblanc", cover: "http://static.photos/education/320x240/2" },
-            { id: 3, title: "Histoire-Géographie", author: "", cover: "http://static.photos/education/320x240/3" }
-        ];
+        let books = [];
         
         // Load from localStorage if available
         if (localStorage.getItem('books')) {
@@ -158,7 +188,60 @@
         const confirmAddBookBtn = document.getElementById('confirmAddBook');
         const bookTitleInput = document.getElementById('bookTitle');
         const bookAuthorInput = document.getElementById('bookAuthor');
-        const bookFileInput = document.getElementById('bookFile');
+        const bookCoverInput = document.getElementById('bookCover');
+        const bookFilesInput = document.getElementById('bookFiles');
+        const coverPreview = document.getElementById('coverPreview');
+        const coverPreviewImg = document.getElementById('coverPreviewImg');
+        const filesPreview = document.getElementById('filesPreview');
+        const filesPreviewContainer = document.getElementById('filesPreviewContainer');
+
+        // Preview cover image
+        bookCoverInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    coverPreviewImg.src = e.target.result;
+                    coverPreview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Preview files
+        bookFilesInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            filesPreviewContainer.innerHTML = '';
+            
+            if (files.length > 0) {
+                filesPreview.classList.remove('hidden');
+                
+                files.forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.alt = file.name;
+                            img.className = 'max-h-20 object-cover rounded';
+                            filesPreviewContainer.appendChild(img);
+                        }
+                        reader.readAsDataURL(file);
+                    } else if (file.type === 'application/pdf') {
+                        const div = document.createElement('div');
+                        div.className = 'flex flex-col items-center justify-center bg-gray-100 rounded p-2 min-w-20';
+                        div.innerHTML = `
+                            <i data-feather="file-text" class="w-8 h-8 text-gray-400"></i>
+                            <span class="text-xs mt-1 text-gray-600">PDF</span>
+                        `;
+                        filesPreviewContainer.appendChild(div);
+                    }
+                });
+                feather.replace();
+            } else {
+                filesPreview.classList.add('hidden');
+            }
+        });
         
         // Render books
         function renderBooks() {
@@ -173,201 +256,233 @@
                 books.forEach(book => {
                     const bookCard = document.createElement('div');
                     bookCard.className = 'book-card bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md';
-                   bookCard.innerHTML = `
-    <div class="relative">
-        ${book.fileType.startsWith('image/') 
-            ? `<img src="${book.fileUrl}" alt="${book.title}" class="w-full h-48 object-cover">`
-            : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center">
-                   <i data-feather="file-text" class="w-16 h-16 text-gray-400"></i>
-               </div>`
-        }
-        <div class="absolute top-2 right-2 book-actions flex space-x-1">
-            <button class="edit-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
-                <i data-feather="edit-2" class="w-4 h-4 text-gray-600"></i>
-            </button>
-            <button class="delete-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
-                <i data-feather="trash-2" class="w-4 h-4 text-gray-600"></i>
-            </button>
-        </div>
-    </div>
-    <div class="p-4">
-        <h3 class="font-medium text-gray-800 mb-1">${book.title}</h3>
-        <div class="text-sm text-gray-500">${book.author || 'Auteur non spécifié'}</div>
-        <div class="mt-3 flex justify-between items-center">
-            <span class="text-xs ${book.fileType === 'application/pdf' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'} px-2 py-1 rounded">
-                ${book.fileType.startsWith('image/') ? 'IMAGE' : 'PDF'}
-            </span>
-            <button class="open-file text-purple-600 text-sm flex items-center" data-id="${book.id}">
-                Ouvrir <i data-feather="${book.fileType === 'application/pdf' ? 'eye' : 'image'}" class="ml-1 w-4 h-4"></i>
-            </button>
-        </div>
-    </div>
-`;
+                    bookCard.innerHTML = `
+                        <div class="relative">
+                            ${book.coverUrl 
+                                ? `<img src="${book.coverUrl}" alt="${book.title}" class="w-full h-48 object-cover">`
+                                : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center">
+                                       <i data-feather="book" class="w-16 h-16 text-gray-400"></i>
+                                   </div>`
+                            }
+                            <div class="absolute top-2 right-2 book-actions flex space-x-1">
+                                <button class="edit-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
+                                    <i data-feather="edit-2" class="w-4 h-4 text-gray-600"></i>
+                                </button>
+                                <button class="delete-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
+                                    <i data-feather="trash-2" class="w-4 h-4 text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-gray-800 mb-1">${book.title}</h3>
+                            <div class="text-sm text-gray-500">${book.author || 'Auteur non spécifié'}</div>
+                            <div class="mt-2">
+                                <label class="text-xs text-gray-500">Dernière page lue:</label>
+                                <input type="text" class="last-page-input w-full px-2 py-1 text-xs border border-gray-300 rounded" 
+                                       value="${book.lastPage || '00'}" data-id="${book.id}"
+                                       placeholder="00">
+                            </div>
+                            <div class="mt-3 flex justify-between items-center">
+                                <span class="text-xs ${book.files && book.files.some(f => f.type === 'application/pdf') ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'} px-2 py-1 rounded">
+                                    ${book.files ? (book.files.some(f => f.type === 'application/pdf') ? 'PDF' : 'IMAGES') : 'FICHIER'}
+                                </span>
+                                <button class="open-file text-purple-600 text-sm flex items-center" data-id="${book.id}">
+                                    Ouvrir <i data-feather="eye" class="ml-1 w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
                     
                     booksList.appendChild(bookCard);
                 });
                 feather.replace();
+                
+                // Add event listeners for last page inputs
+                document.querySelectorAll('.last-page-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const bookId = parseInt(this.dataset.id);
+                        const book = books.find(b => b.id === bookId);
+                        if (book) {
+                            book.lastPage = this.value;
+                            localStorage.setItem('books', JSON.stringify(books));
+                        }
+                    });
+                });
             }
         }
         
         // Toggle modal
-      // Toggle modal
-function toggleModal(show) {
-    if (show) {
-        addBookModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    } else {
-        addBookModal.classList.add('hidden');
-        document.body.style.overflow = '';
-        bookTitleInput.value = '';
-        bookAuthorInput.value = '';
-        bookFileInput.value = '';
-        
-        // Réinitialiser le mode édition
-        delete confirmAddBook.dataset.editingId;
-        confirmAddBook.textContent = 'Ajouter';
-    }
-}
-        
-       // Open file in viewer
-function openFile(id) {
-    const book = books.find(b => b.id === id);
-    if (!book) return;
-    
-    if (book.fileType === 'application/pdf') {
-        // Ouvrir le PDF dans un nouvel onglet ou dans un modal
-        window.open(book.fileUrl, '_blank');
-    } else if (book.fileType.startsWith('image/')) {
-        // Afficher l'image en plein écran
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center';
-        modal.innerHTML = `
-            <div class="max-w-4xl max-h-full p-4">
-                <img src="${book.fileUrl}" alt="${book.title}" class="max-w-full max-h-full object-contain">
-                <button class="absolute top-4 right-4 text-white text-2xl">×</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        modal.querySelector('button').addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
-    }
-}
-      
-      // Edit book function
-function editBook(id) {
-    const book = books.find(b => b.id === id);
-    if (!book) return;
-    
-    // Remplir le modal avec les données existantes
-    bookTitleInput.value = book.title;
-    bookAuthorInput.value = book.author || '';
-    
-    // Stocker l'ID du livre en cours d'édition
-    confirmAddBook.dataset.editingId = id;
-    confirmAddBook.textContent = 'Modifier';
-    
-    // Afficher le modal
-    toggleModal(true);
-}
-      // Add new book
-// Add or edit book
-function addBook() {
-    const title = bookTitleInput.value.trim();
-    const author = bookAuthorInput.value.trim();
-    const file = bookFileInput.files[0];
-    const isEditing = confirmAddBook.dataset.editingId;
-    
-    if (title) {
-        if (isEditing) {
-            // Mode édition
-            const bookId = parseInt(isEditing);
-            const bookIndex = books.findIndex(b => b.id === bookId);
-            
-            if (bookIndex !== -1) {
-                books[bookIndex].title = title;
-                books[bookIndex].author = author || '';
+        function toggleModal(show) {
+            if (show) {
+                addBookModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addBookModal.classList.add('hidden');
+                document.body.style.overflow = '';
+                bookTitleInput.value = '';
+                bookAuthorInput.value = '';
+                bookCoverInput.value = '';
+                bookFilesInput.value = '';
+                coverPreview.classList.add('hidden');
+                filesPreview.classList.add('hidden');
                 
-                // Si un nouveau fichier est sélectionné
-                if (file) {
-                    // Libérer l'ancienne URL
-                    if (books[bookIndex].fileUrl) {
-                        URL.revokeObjectURL(books[bookIndex].fileUrl);
-                    }
-                    
-                    const fileUrl = URL.createObjectURL(file);
-                    const fileType = file.type;
-                    
-                    books[bookIndex].fileUrl = fileUrl;
-                    books[bookIndex].fileType = fileType;
-                    books[bookIndex].fileName = file.name;
-                    
-                    if (fileType.startsWith('image/')) {
-                        books[bookIndex].cover = fileUrl;
-                    }
-                }
-                
-                localStorage.setItem('books', JSON.stringify(books));
-                renderBooks();
-                toggleModal(false);
-                
-                // Réinitialiser le bouton
+                // Réinitialiser le mode édition
                 delete confirmAddBook.dataset.editingId;
-                confirmAddBook.textContent = 'Ajouter';
+                confirmAddBook.innerHTML = '<i data-feather="check" class="w-4 h-4 mr-2"></i> Ajouter';
+                feather.replace();
             }
-        } else {
-            // Mode ajout
-            if (!file) {
-                alert('Veuillez sélectionner un fichier');
-                return;
-            }
-            
-            const fileUrl = URL.createObjectURL(file);
-            const fileType = file.type;
-            
-            const newBook = {
-                id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
-                title,
-                author: author || '',
-                cover: fileType.startsWith('image/') ? fileUrl : 'pdf-icon.png',
-                fileUrl: fileUrl,
-                fileType: fileType,
-                fileName: file.name
-            };
-            
-            books.unshift(newBook);
-            localStorage.setItem('books', JSON.stringify(books));
-            renderBooks();
-            toggleModal(false);
-        }
-    } else {
-        alert('Veuillez remplir le titre');
-    }
-}
-        // Delete book (modifie pour libérer la mémoire)
-function deleteBook(id) {
-    const confirmDelete = confirm("Voulez-vous vraiment supprimer ce livre?");
-    if (confirmDelete) {
-        const bookIndex = books.findIndex(book => book.id === id);
-        if (bookIndex !== -1 && books[bookIndex].fileUrl) {
-            URL.revokeObjectURL(books[bookIndex].fileUrl);
         }
         
-        books = books.filter(book => book.id !== id);
-        localStorage.setItem('books', JSON.stringify(books));
-        renderBooks();
-    }
-}
-      
+        // Open file in viewer
+        function openFile(id) {
+            const book = books.find(b => b.id === id);
+            if (!book || !book.files) return;
+            
+            const imageFiles = book.files.filter(f => f.type.startsWith('image/'));
+            
+            if (imageFiles.length > 0) {
+                // Afficher la galerie d'images
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col';
+                modal.innerHTML = `
+                    <div class="flex justify-between items-center p-4 bg-black bg-opacity-50 text-white">
+                        <h3 class="text-lg font-semibold">${book.title}</h3>
+                        <button class="close-gallery text-2xl">×</button>
+                    </div>
+                    <div class="flex-1 overflow-auto">
+                        <div class="flex flex-col items-center p-4 space-y-4">
+                            ${imageFiles.map(file => `
+                                <img src="${file.url}" alt="${book.title}" class="max-w-full max-h-full object-contain">
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                modal.querySelector('.close-gallery').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+            } else if (book.files.some(f => f.type === 'application/pdf')) {
+                // Ouvrir le PDF
+                const pdfFile = book.files.find(f => f.type === 'application/pdf');
+                if (pdfFile) {
+                    window.open(pdfFile.url, '_blank');
+                }
+            }
+        }
+        
+        // Edit book function
+        function editBook(id) {
+            const book = books.find(b => b.id === id);
+            if (!book) return;
+            
+            // Remplir le modal avec les données existantes
+            bookTitleInput.value = book.title;
+            bookAuthorInput.value = book.author || '';
+            
+            // Stocker l'ID du livre en cours d'édition
+            confirmAddBook.dataset.editingId = id;
+            confirmAddBook.innerHTML = '<i data-feather="check" class="w-4 h-4 mr-2"></i> Modifier';
+            
+            // Afficher le modal
+            toggleModal(true);
+            feather.replace();
+        }
+        
+        // Add or edit book
+        function addBook() {
+            const title = bookTitleInput.value.trim();
+            const author = bookAuthorInput.value.trim();
+            const coverFile = bookCoverInput.files[0];
+            const files = Array.from(bookFilesInput.files);
+            const isEditing = confirmAddBook.dataset.editingId;
+            
+            if (title && (files.length > 0 || isEditing)) {
+                if (isEditing) {
+                    // Mode édition
+                    const bookId = parseInt(isEditing);
+                    const bookIndex = books.findIndex(b => b.id === bookId);
+                    
+                    if (bookIndex !== -1) {
+                        books[bookIndex].title = title;
+                        books[bookIndex].author = author || '';
+                        
+                        // Si une nouvelle couverture est sélectionnée
+                        if (coverFile) {
+                            if (books[bookIndex].coverUrl) {
+                                URL.revokeObjectURL(books[bookIndex].coverUrl);
+                            }
+                            books[bookIndex].coverUrl = URL.createObjectURL(coverFile);
+                        }
+                        
+                        // Si de nouveaux fichiers sont sélectionnés
+                        if (files.length > 0) {
+                            // Libérer les anciennes URLs
+                            if (books[bookIndex].files) {
+                                books[bookIndex].files.forEach(file => {
+                                    URL.revokeObjectURL(file.url);
+                                });
+                            }
+                            
+                            books[bookIndex].files = files.map(file => ({
+                                url: URL.createObjectURL(file),
+                                type: file.type,
+                                name: file.name
+                            }));
+                        }
+                        
+                        localStorage.setItem('books', JSON.stringify(books));
+                        renderBooks();
+                        toggleModal(false);
+                    }
+                } else {
+                    // Mode ajout
+                    const coverUrl = coverFile ? URL.createObjectURL(coverFile) : null;
+                    
+                    const newBook = {
+                        id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
+                        title,
+                        author: author || '',
+                        coverUrl: coverUrl,
+                        files: files.map(file => ({
+                            url: URL.createObjectURL(file),
+                            type: file.type,
+                            name: file.name
+                        })),
+                        lastPage: '00',
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    books.unshift(newBook);
+                    localStorage.setItem('books', JSON.stringify(books));
+                    renderBooks();
+                    toggleModal(false);
+                }
+            } else {
+                alert('Veuillez remplir le titre et sélectionner au moins un fichier');
+            }
+        }
+        
         // Delete book
         function deleteBook(id) {
-            // Show confirmation dialog
             const confirmDelete = confirm("Voulez-vous vraiment supprimer ce livre?");
             if (confirmDelete) {
-                books = books.filter(book => book.id !== id);
-                localStorage.setItem('books', JSON.stringify(books));
-                renderBooks();
+                const bookIndex = books.findIndex(book => book.id === id);
+                if (bookIndex !== -1) {
+                    // Libérer les URLs
+                    if (books[bookIndex].coverUrl) {
+                        URL.revokeObjectURL(books[bookIndex].coverUrl);
+                    }
+                    if (books[bookIndex].files) {
+                        books[bookIndex].files.forEach(file => {
+                            URL.revokeObjectURL(file.url);
+                        });
+                    }
+                    
+                    books = books.filter(book => book.id !== id);
+                    localStorage.setItem('books', JSON.stringify(books));
+                    renderBooks();
+                }
             }
         }
         
@@ -378,24 +493,23 @@ function deleteBook(id) {
         cancelAddBookBtn.addEventListener('click', () => toggleModal(false));
         confirmAddBookBtn.addEventListener('click', addBook);
         
-        // Handle delete and edit buttons (delegated events)
-       // Handle delete and edit buttons (delegated events)
-booksList.addEventListener('click', (e) => {
-    if (e.target.closest('.delete-book')) {
-        const id = parseInt(e.target.closest('.delete-book').dataset.id);
-        deleteBook(id);
-    }
-    
-    if (e.target.closest('.edit-book')) {
-        const id = parseInt(e.target.closest('.edit-book').dataset.id);
-        editBook(id);
-    }
-    
-    if (e.target.closest('.open-file')) {
-        const id = parseInt(e.target.closest('.open-file').dataset.id);
-        openFile(id);
-    }
-});
+        // Handle deleteand edit buttons (delegated ev ents)
+        booksList.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-book')) {
+                const id = parseInt(e.target.closest('.delete-book').dataset.id);
+                deleteBook(id);
+            }
+            
+            if (e.target.closest('.edit-book')) {
+                const id = parseInt(e.target.closest('.edit-book').dataset.id);
+                editBook(id);
+            }
+            
+            if (e.target.closest('.open-file')) {
+                const id = parseInt(e.target.closest('.open-file').dataset.id);
+                openFile(id);
+            }
+        });
         
         // Initial render
         renderBooks();
