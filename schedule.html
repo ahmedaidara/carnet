@@ -822,57 +822,77 @@ function loadHomeSchedules() {
         }
         
         // Render exams list
-        function renderExamsList() {
-            examsList.innerHTML = '';
-            
-            if (exams.length === 0) {
-                examsList.innerHTML = `
-                    <div class="text-center py-4 text-gray-500">
-                        <p>Aucun examen à venir</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Sort exams by date
-            exams.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
-            
-            exams.forEach(exam => {
-                const examDate = new Date(exam.date + 'T' + exam.time);
-                const now = new Date();
-                const diffTime = examDate - now;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                let bgColor = 'yellow';
-                let icon = 'edit-3';
-                
-                if (diffDays <= 3) {
-                    bgColor = 'red';
-                    icon = 'alert-triangle';
-                } else if (diffDays <= 7) {
-                    bgColor = 'orange';
-                    icon = 'clock';
-                }
-                
-                const examElement = document.createElement('div');
-                examElement.className = `flex items-center justify-between p-3 bg-${bgColor}-50 rounded-lg`;
-                examElement.innerHTML = `
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 rounded-full bg-${bgColor}-100 flex items-center justify-center mr-3">
-                            <i data-feather="${icon}" class="text-${bgColor}-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-medium">${exam.name}</div>
-                            <div class="text-sm text-gray-600">${formatDate(exam.date)} • ${exam.time}</div>
-                        </div>
-                    </div>
-                    <div class="text-sm font-medium text-${bgColor}-600">${diffDays > 0 ? `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}` : 'Aujourd\'hui'}</div>
-                `;
-                examsList.appendChild(examElement);
-            });
-            
-            feather.replace();
+       // Ajouter fonction deleteExam
+function deleteExam(examId) {
+    exams = exams.filter(e => e.id !== examId);
+    saveExams();
+    renderExamsList();
+}
+
+// Modifier renderExamsList
+function renderExamsList() {
+    examsList.innerHTML = '';
+    
+    if (exams.length === 0) {
+        examsList.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+                <p>Aucun examen à venir</p>
+            </div>
+        `;
+        return;
+    }
+    
+    exams.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+    
+    exams.forEach(exam => {
+        const examDate = new Date(exam.date + 'T' + exam.time);
+        const now = new Date();
+        const diffTime = examDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let bgColor = 'yellow';
+        let icon = 'edit-3';
+        
+        if (diffDays <= 3) {
+            bgColor = 'red';
+            icon = 'alert-triangle';
+        } else if (diffDays <= 7) {
+            bgColor = 'orange';
+            icon = 'clock';
         }
+        
+        const examElement = document.createElement('div');
+        examElement.className = `flex items-center justify-between p-3 bg-${bgColor}-50 rounded-lg`;
+        examElement.innerHTML = `
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-${bgColor}-100 flex items-center justify-center mr-3">
+                    <i data-feather="${icon}" class="text-${bgColor}-600"></i>
+                </div>
+                <div>
+                    <div class="font-medium">${exam.name}</div>
+                    <div class="text-sm text-gray-600">${formatDate(exam.date)} • ${exam.time}</div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <div class="text-sm font-medium text-${bgColor}-600">${diffDays > 0 ? `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}` : 'Aujourd\'hui'}</div>
+                <button class="delete-exam p-1 rounded-full hover:bg-gray-200" data-id="${exam.id}">
+                    <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                </button> 
+            </div>
+        `;
+        examsList.appendChild(examElement);
+    });
+    
+    feather.replace();
+    
+    // Ajouter event listeners pour delete
+    document.querySelectorAll('.delete-exam').forEach(button => {
+        button.addEventListener('click', function() {
+            const examId = this.getAttribute('data-id');
+            deleteExam(examId);
+        });
+    });
+}
         
         // Render reminders list
         function renderRemindersList() {
