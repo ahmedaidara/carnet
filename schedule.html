@@ -25,6 +25,26 @@
             background-color: #F5F3FF;
             border-radius: 4px;
         }
+        .subject-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .subject-popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -67,7 +87,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Couleur</label>
                         <div class="flex space-x-2">
-                            <button data-color="purple" class="color-option w-8 h-8 rounded-full bg-purple-500 border-2 border-white"></button>
+                            <button data-color="purple" class="color-option w-8 h-8 rounded-full bg-purple-500 border-2 border-white ring-2 ring-offset-2 ring-purple-500"></button>
                             <button data-color="blue" class="color-option w-8 h-8 rounded-full bg-blue-500 border-2 border-white"></button>
                             <button data-color="green" class="color-option w-8 h-8 rounded-full bg-green-500 border-2 border-white"></button>
                             <button data-color="red" class="color-option w-8 h-8 rounded-full bg-red-500 border-2 border-white"></button>
@@ -77,6 +97,80 @@
                     <div class="flex justify-end space-x-3 pt-2">
                         <button id="cancelAddSchedule" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
                         <button id="confirmAddSchedule" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Créer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configure Schedule Modal -->
+        <div id="configureScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Configurer l'emploi du temps</h2>
+                    <button id="closeConfigureModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jours à afficher</label>
+                            <div class="flex flex-wrap gap-2">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Lundi" checked>
+                                    <span class="ml-2">Lundi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Mardi" checked>
+                                    <span class="ml-2">Mardi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Mercredi" checked>
+                                    <span class="ml-2">Mercredi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Jeudi" checked>
+                                    <span class="ml-2">Jeudi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Vendredi" checked>
+                                    <span class="ml-2">Vendredi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Samedi">
+                                    <span class="ml-2">Samedi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Dimanche">
+                                    <span class="ml-2">Dimanche</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Heures</label>
+                            <div id="timeSlotsContainer" class="space-y-2">
+                                <div class="flex items-center space-x-2">
+                                    <input type="time" class="time-start px-2 py-1 rounded border border-gray-300" value="08:00">
+                                    <span>-</span>
+                                    <input type="time" class="time-end px-2 py-1 rounded border border-gray-300" value="10:00">
+                                    <button class="remove-time-slot text-red-500">
+                                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button id="addTimeSlot" class="mt-2 text-sm text-purple-600 flex items-center">
+                                <i data-feather="plus" class="mr-1 w-4 h-4"></i> Ajouter un créneau horaire
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="scheduleTablePreview" class="mt-4">
+                        <!-- Le tableau d'emploi du temps sera généré ici -->
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelConfigureSchedule" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmConfigureSchedule" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Enregistrer</button>
                     </div>
                 </div>
             </div>
@@ -112,168 +206,56 @@
             </div>
         </div>
 
-        <!-- Schedules List -->
-        <div class="mb-8">
-            <h2 class="text-lg font-semibold mb-3">Mes emplois du temps</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="schedule-card bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-500 hover:shadow-md">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-medium">Scolaire</h3>
-                        <div class="flex space-x-1">
-                            <button class="p-1 rounded-full hover:bg-gray-100">
-                                <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
-                            </button>
-                            <button class="p-1 rounded-full hover:bg-gray-100">
-                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="text-sm text-gray-500 mt-1">Lundi - Vendredi • 8h-18h</div>
-                    <div class="mt-3">
-                        <a href="#" class="text-purple-600 text-sm flex items-center">
-                            Voir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-                        </a>
-                    </div>
+        <!-- Add Reminder Modal -->
+        <div id="addReminderModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Nouveau rappel</h2>
+                    <button id="closeReminderModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
                 </div>
-                <div class="schedule-card bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-medium">Personnel</h3>
-                        <div class="flex space-x-1">
-                            <button class="p-1 rounded-full hover:bg-gray-100">
-                                <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
-                            </button>
-                            <button class="p-1 rounded-full hover:bg-gray-100">
-                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
-                            </button>
-                        </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                        <input type="text" id="reminderTitle" placeholder="Titre du rappel" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
                     </div>
-                    <div class="text-sm text-gray-500 mt-1">Tous les jours • Flexible</div>
-                    <div class="mt-3">
-                        <a href="#" class="text-blue-600 text-sm flex items-center">
-                            Voir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-                        </a>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Détails</label>
+                        <textarea id="reminderDetails" placeholder="Détails du rappel" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400" rows="3"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddReminder" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddReminder" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Subject Popup -->
+        
+
+        <!-- Schedules List -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold mb-3">Mes emplois du temps</h2>
+            <div id="schedulesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Les emplois du temps seront générés ici dynamiquement -->
+            </div>
+        </div>
+
         <!-- Current Week Schedule -->
-        <div>
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="text-lg font-semibold">Semaine actuelle</h2>
-                <div class="flex items-center space-x-2">
-                    <button class="p-1 rounded-full hover:bg-gray-100">
-                        <i data-feather="chevron-left" class="w-5 h-5 text-gray-600"></i>
-                    </button>
-                    <span class="text-sm font-medium">12 - 18 juin 2023</span>
-                    <button class="p-1 rounded-full hover:bg-gray-100">
-                        <i data-feather="chevron-right" class="w-5 h-5 text-gray-600"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="grid grid-cols-7 gap-px bg-gray-200">
-                    <!-- Header row -->
-                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Lundi</div>
-                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Mardi</div>
-                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Mercredi</div>
-                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Jeudi</div>
-                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Vendredi</div>
-                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Samedi</div>
-                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Dimanche</div>
-                    
-                    <!-- Time slots -->
-                    <div class="col-span-7 grid grid-cols-7 gap-px bg-gray-200">
-                        <!-- 8h-10h -->
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
-                            <div class="text-sm bg-purple-50 text-purple-800 rounded px-1 py-0.5 truncate">Mathématiques</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
-                            <div class="text-sm bg-purple-50 text-purple-800 rounded px-1 py-0.5 truncate">Mathématiques</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
-                            <div class="text-sm bg-blue-50 text-blue-800 rounded px-1 py-0.5 truncate">Physique</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
-                        </div>
-                        
-                        <!-- 10h15-12h15 -->
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
-                            <div class="text-sm bg-green-50 text-green-800 rounded px-1 py-0.5 truncate">Philosophie</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
-                            <div class="text-sm bg-purple-50 text-purple-800 rounded px-1 py-0.5 truncate">Mathématiques</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
-                            <div class="text-sm bg-yellow-50 text-yellow-800 rounded px-1 py-0.5 truncate">Anglais</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
-                        </div>
-                        <div class="time-slot bg-white p-2 h-24">
-                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
-                        </div>
-                        
-                        <!-- Add more time slots as needed -->
-                    </div>
-                </div>
-            </div>
+        <div id="currentScheduleSection">
+            <!-- Le planning de la semaine actuelle sera généré ici dynamiquement -->
         </div>
 
         <!-- Upcoming Exams -->
         <div class="mt-8">
             <h2 class="text-lg font-semibold mb-3">Examens à venir</h2>
             <div class="bg-white rounded-xl shadow-sm p-4">
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
-                                <i data-feather="alert-triangle" class="text-red-600"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium">BAC Blanc - Mathématiques</div>
-                                <div class="text-sm text-gray-600">20 juin 2023 • 8h00-12h00</div>
-                            </div>
-                        </div>
-                        <div class="text-sm font-medium text-red-600">Dans 8 jours</div>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
-                                <i data-feather="edit-3" class="text-yellow-600"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium">DS Physique</div>
-                                <div class="text-sm text-gray-600">23 juin 2023 • 10h00-12h00</div>
-                            </div>
-                        </div>
-                        <div class="text-sm font-medium text-yellow-600">Dans 11 jours</div>
-                    </div>
+                <div id="examsList" class="space-y-3">
+                    <!-- Les examens seront générés ici dynamiquement -->
                 </div>
-                <button class="mt-4 w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center">
+                <button id="addExamBtn2" class="mt-4 w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center">
                     <i data-feather="plus" class="mr-2 w-4 h-4"></i> Ajouter un examen
                 </button>
             </div>
@@ -288,31 +270,8 @@
                 </button>
             </div>
             <div class="bg-white rounded-xl shadow-sm p-4">
-                <div class="space-y-3">
-                    <div class="flex items-start p-3 bg-gray-50 rounded-lg">
-                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
-                            <i data-feather="bell" class="text-gray-600"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="font-medium">Révision formules</div>
-                            <div class="text-sm text-gray-600">Réviser toutes les formules de trigonométrie pour le DS de jeudi</div>
-                        </div>
-                        <button class="p-1 rounded-full hover:bg-gray-200 ml-2">
-                            <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
-                        </button>
-                    </div>
-                    <div class="flex items-start p-3 bg-gray-50 rounded-lg">
-                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
-                            <i data-feather="bell" class="text-gray-600"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <div class="font-medium">Préparer exposé</div>
-                            <div class="text-sm text-gray-600">Terminer la présentation pour l'exposé d'histoire</div>
-                        </div>
-                        <button class="p-1 rounded-full hover:bg-gray-200 ml-2">
-                            <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
-                        </button>
-                    </div>
+                <div id="remindersList" class="space-y-3">
+                    <!-- Les rappels seront générés ici dynamiquement -->
                 </div>
             </div>
         </div>
@@ -355,13 +314,318 @@
         const cancelAddSchedule = document.getElementById('cancelAddSchedule');
         const confirmAddSchedule = document.getElementById('confirmAddSchedule');
         
+        const configureScheduleModal = document.getElementById('configureScheduleModal');
+        const closeConfigureModal = document.getElementById('closeConfigureModal');
+        const cancelConfigureSchedule = document.getElementById('cancelConfigureSchedule');
+        const confirmConfigureSchedule = document.getElementById('confirmConfigureSchedule');
+        const addTimeSlot = document.getElementById('addTimeSlot');
+        const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+        const scheduleTablePreview = document.getElementById('scheduleTablePreview');
+        
         const addExamModal = document.getElementById('addExamModal');
         const addExamBtn = document.getElementById('addExamBtn');
+        const addExamBtn2 = document.getElementById('addExamBtn2');
         const closeExamModal = document.getElementById('closeExamModal');
         const cancelAddExam = document.getElementById('cancelAddExam');
         const confirmAddExam = document.getElementById('confirmAddExam');
         
+        const addReminderModal = document.getElementById('addReminderModal');
         const addReminderBtn = document.getElementById('addReminderBtn');
+        const closeReminderModal = document.getElementById('closeReminderModal');
+        const cancelAddReminder = document.getElementById('cancelAddReminder');
+        const confirmAddReminder = document.getElementById('confirmAddReminder');
+        
+        const subjectPopup = document.getElementById('subjectPopup');
+        const closeSubjectPopup = document.getElementById('closeSubjectPopup');
+        
+        const schedulesList = document.getElementById('schedulesList');
+        const currentScheduleSection = document.getElementById('currentScheduleSection');
+        const examsList = document.getElementById('examsList');
+        const remindersList = document.getElementById('remindersList');
+        
+        // Data Storage
+        let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+        let exams = JSON.parse(localStorage.getItem('exams')) || [];
+        let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+        let currentScheduleId = localStorage.getItem('currentScheduleId');
+        
+        // Initialize the page
+        function initPage() {
+            renderSchedulesList();
+            renderCurrentSchedule();
+            renderExamsList();
+            renderRemindersList();
+        }
+        
+        // Render schedules list
+        function renderSchedulesList() {
+            schedulesList.innerHTML = '';
+            
+            if (schedules.length === 0) {
+                schedulesList.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-gray-500">
+                        <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                        <p>Aucun emploi du temps créé</p>
+                    </div>
+                `;
+                feather.replace();
+                return;
+            }
+            
+            schedules.forEach(schedule => {
+                const scheduleElement = document.createElement('div');
+                scheduleElement.className = `schedule-card bg-white rounded-xl shadow-sm p-4 border-l-4 border-${schedule.color}-500 hover:shadow-md`;
+                scheduleElement.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-medium">${schedule.name}</h3>
+                        <div class="flex space-x-1">
+                            <button class="edit-schedule p-1 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
+                                <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                            <button class="delete-schedule p-1 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">${schedule.days ? schedule.days.join(' • ') : ''}</div>
+                    <div class="mt-3">
+                        <a href="#" class="view-schedule text-${schedule.color}-600 text-sm flex items-center" data-id="${schedule.id}">
+                            Voir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                        </a>
+                    </div>
+                `;
+                schedulesList.appendChild(scheduleElement);
+            });
+            
+            feather.replace();
+            
+            // Add event listeners
+            document.querySelectorAll('.view-schedule').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const scheduleId = this.getAttribute('data-id');
+                    setCurrentSchedule(scheduleId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-schedule').forEach(button => {
+                button.addEventListener('click', function() {
+                    const scheduleId = this.getAttribute('data-id');
+                    openConfigureScheduleModal(scheduleId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-schedule').forEach(button => {
+                button.addEventListener('click', function() {
+                    const scheduleId = this.getAttribute('data-id');
+                    deleteSchedule(scheduleId);
+                });
+            });
+        }
+        
+        // Render current schedule
+        function renderCurrentSchedule() {
+            if (!currentScheduleId) {
+                currentScheduleSection.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                        <p>Aucun emploi du temps sélectionné</p>
+                        <p class="text-sm">Créez ou sélectionnez un emploi du temps pour commencer</p>
+                    </div>
+                `;
+                feather.replace();
+                return;
+            }
+            
+            const schedule = schedules.find(s => s.id === currentScheduleId);
+            if (!schedule) {
+                currentScheduleId = null;
+                localStorage.removeItem('currentScheduleId');
+                renderCurrentSchedule();
+                return;
+            }
+            
+            currentScheduleSection.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-lg font-semibold">${schedule.name}</h2>
+                    <div class="flex items-center space-x-2">
+                        <button class="p-1 rounded-full hover:bg-gray-100">
+                            <i data-feather="chevron-left" class="w-5 h-5 text-gray-600"></i>
+                        </button>
+                        <span class="text-sm font-medium">${getCurrentWeekRange()}</span>
+                        <button class="p-1 rounded-full hover:bg-gray-100">
+                            <i data-feather="chevron-right" class="w-5 h-5 text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                        ${schedule.days.map(day => `
+                            <div class="bg-gray-100 p-2 text-center font-medium text-sm">${day}</div>
+                        `).join('')}
+                        
+                        ${schedule.timeSlots.map(timeSlot => `
+                            <div class="col-span-${schedule.days.length} grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                                ${schedule.days.map(day => {
+                                    const subject = schedule.data && schedule.data[day] && schedule.data[day][timeSlot.id] ? schedule.data[day][timeSlot.id] : '';
+                                    return `
+                                        <div class="time-slot bg-white p-2 h-24">
+                                            <div class="text-xs text-gray-500 mb-1">${timeSlot.start} - ${timeSlot.end}</div>
+                                            ${subject ? `
+                                                <div class="subject text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-1 py-0.5 truncate" 
+                                                      data-day="${day}" data-time="${timeSlot.id}" data-subject="${subject}">
+                                                    ${subject}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            feather.replace();
+            
+            // Add event listeners for subjects
+            document.querySelectorAll('.subject').forEach(subject => {
+                subject.addEventListener('click', function() {
+                    const day = this.getAttribute('data-day');
+                    const timeId = this.getAttribute('data-time');
+                    const subjectText = this.getAttribute('data-subject');
+                    const timeSlot = schedule.timeSlots.find(ts => ts.id === timeId);
+                    
+                    showSubjectPopup(subjectText, day, timeSlot);
+                });
+                
+                // Make subjects editable
+                subject.setAttribute('contenteditable', 'true');
+                subject.addEventListener('blur', function() {
+                    const day = this.getAttribute('data-day');
+                    const timeId = this.getAttribute('data-time');
+                    const newSubject = this.textContent.trim();
+                    
+                    if (!schedule.data) schedule.data = {};
+                    if (!schedule.data[day]) schedule.data[day] = {};
+                    
+                    if (newSubject) {
+                        schedule.data[day][timeId] = newSubject;
+                    } else {
+                        delete schedule.data[day][timeId];
+                    }
+                    
+                    saveSchedules();
+                });
+            });
+        }
+        
+        // Render exams list
+        function renderExamsList() {
+            examsList.innerHTML = '';
+            
+            if (exams.length === 0) {
+                examsList.innerHTML = `
+                    <div class="text-center py-4 text-gray-500">
+                        <p>Aucun examen à venir</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort exams by date
+            exams.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+            
+            exams.forEach(exam => {
+                const examDate = new Date(exam.date + 'T' + exam.time);
+                const now = new Date();
+                const diffTime = examDate - now;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                let bgColor = 'yellow';
+                let icon = 'edit-3';
+                
+                if (diffDays <= 3) {
+                    bgColor = 'red';
+                    icon = 'alert-triangle';
+                } else if (diffDays <= 7) {
+                    bgColor = 'orange';
+                    icon = 'clock';
+                }
+                
+                const examElement = document.createElement('div');
+                examElement.className = `flex items-center justify-between p-3 bg-${bgColor}-50 rounded-lg`;
+                examElement.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-${bgColor}-100 flex items-center justify-center mr-3">
+                            <i data-feather="${icon}" class="text-${bgColor}-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium">${exam.name}</div>
+                            <div class="text-sm text-gray-600">${formatDate(exam.date)} • ${exam.time}</div>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium text-${bgColor}-600">${diffDays > 0 ? `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}` : 'Aujourd\'hui'}</div>
+                `;
+                examsList.appendChild(examElement);
+            });
+            
+            feather.replace();
+        }
+        
+        // Render reminders list
+        function renderRemindersList() {
+            remindersList.innerHTML = '';
+            
+            if (reminders.length === 0) {
+                remindersList.innerHTML = `
+                    <div class="text-center py-4 text-gray-500">
+                        <p>Aucun rappel</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            reminders.forEach(reminder => {
+                const reminderElement = document.createElement('div');
+                reminderElement.className = 'flex items-start p-3 bg-gray-50 rounded-lg';
+                reminderElement.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
+                        <i data-feather="bell" class="text-gray-600"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="font-medium">${reminder.title}</div>
+                        <div class="text-sm text-gray-600">${reminder.details}</div>
+                    </div>
+                    <button class="delete-reminder p-1 rounded-full hover:bg-gray-200 ml-2" data-id="${reminder.id}">
+                        <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                    </button>
+                `;
+                remindersList.appendChild(reminderElement);
+            });
+            
+            feather.replace();
+            
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-reminder').forEach(button => {
+                button.addEventListener('click', function() {
+                    const reminderId = this.getAttribute('data-id');
+                    deleteReminder(reminderId);
+                });
+            });
+        }
+        
+        // Show subject popup
+        function showSubjectPopup(subject, day, timeSlot) {
+            document.getElementById('subjectTitle').textContent = subject;
+            document.getElementById('subjectDetails').innerHTML = `
+                <p><strong>Jour:</strong> ${day}</p>
+                <p><strong>Horaire:</strong> ${timeSlot.start} - ${timeSlot.end}</p>
+                <p><strong>Matière:</strong> ${subject}</p>
+            `;
+            subjectPopup.classList.remove('hidden');
+        }
         
         // Toggle modals
         function toggleScheduleModal(show) {
@@ -370,6 +634,16 @@
                 document.body.style.overflow = 'hidden';
             } else {
                 addScheduleModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        function toggleConfigureScheduleModal(show) {
+            if (show) {
+                configureScheduleModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                configureScheduleModal.classList.add('hidden');
                 document.body.style.overflow = '';
             }
         }
@@ -384,32 +658,328 @@
             }
         }
         
+        function toggleReminderModal(show) {
+            if (show) {
+                addReminderModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addReminderModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Open configure schedule modal
+        function openConfigureScheduleModal(scheduleId = null) {
+            const schedule = scheduleId ? schedules.find(s => s.id === scheduleId) : null;
+            
+            // Reset form
+            document.querySelectorAll('.day-checkbox').forEach(checkbox => {
+                checkbox.checked = schedule ? schedule.days.includes(checkbox.value) : ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'].includes(checkbox.value);
+            });
+            
+            timeSlotsContainer.innerHTML = '';
+            if (schedule && schedule.timeSlots) {
+                schedule.timeSlots.forEach(timeSlot => {
+                    addTimeSlotElement(timeSlot.start, timeSlot.end, timeSlot.id);
+                });
+            } else {
+                addTimeSlotElement('08:00', '10:00');
+                addTimeSlotElement('10:15', '12:15');
+            }
+            
+            // Generate preview
+            generateSchedulePreview(schedule);
+            
+            // Store the current schedule ID for saving
+            configureScheduleModal.setAttribute('data-schedule-id', scheduleId);
+            
+            toggleConfigureScheduleModal(true);
+        }
+        
+        // Add time slot element
+        function addTimeSlotElement(start = '', end = '', id = null) {
+            const timeSlotId = id || generateId();
+            const timeSlotElement = document.createElement('div');
+            timeSlotElement.className = 'flex items-center space-x-2';
+            timeSlotElement.innerHTML = `
+                <input type="time" class="time-start px-2 py-1 rounded border border-gray-300" value="${start}">
+                <span>-</span>
+                <input type="time" class="time-end px-2 py-1 rounded border border-gray-300" value="${end}">
+                <button class="remove-time-slot text-red-500">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                </button>
+            `;
+            timeSlotElement.querySelector('.remove-time-slot').addEventListener('click', function() {
+                timeSlotElement.remove();
+                generateSchedulePreview();
+            });
+            
+            // Add change listeners to update preview
+            timeSlotElement.querySelectorAll('input').forEach(input => {
+                input.addEventListener('change', generateSchedulePreview);
+            });
+            
+            timeSlotsContainer.appendChild(timeSlotElement);
+            feather.replace();
+        }
+        
+        // Generate schedule preview
+        function generateSchedulePreview(schedule = null) {
+            const selectedDays = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
+            const timeSlots = Array.from(timeSlotsContainer.children).map(el => {
+                return {
+                    id: generateId(),
+                    start: el.querySelector('.time-start').value,
+                    end: el.querySelector('.time-end').value
+                };
+            });
+            
+            scheduleTablePreview.innerHTML = `
+                <h3 class="text-md font-medium mb-2">Aperçu</h3>
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="grid grid-cols-${selectedDays.length} gap-px bg-gray-200">
+                        ${selectedDays.map(day => `
+                            <div class="bg-gray-100 p-2 text-center font-medium text-sm">${day}</div>
+                        `).join('')}
+                        
+                        ${timeSlots.map(timeSlot => `
+                            <div class="col-span-${selectedDays.length} grid grid-cols-${selectedDays.length} gap-px bg-gray-200">
+                                ${selectedDays.map(day => {
+                                    const subject = schedule && schedule.data && schedule.data[day] && schedule.data[day][timeSlot.id] ? schedule.data[day][timeSlot.id] : '';
+                                    return `
+                                        <div class="time-slot bg-white p-2 h-24">
+                                            <div class="text-xs text-gray-500 mb-1">${timeSlot.start} - ${timeSlot.end}</div>
+                                            <div class="subject-preview text-sm bg-purple-50 text-purple-800 rounded px-1 py-0.5 truncate" contenteditable="true">${subject}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Create new schedule
+        function createSchedule(name, color) {
+            const newSchedule = {
+                id: generateId(),
+                name: name,
+                color: color,
+                days: Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value),
+                timeSlots: Array.from(timeSlotsContainer.children).map(el => {
+                    return {
+                        id: generateId(),
+                        start: el.querySelector('.time-start').value,
+                        end: el.querySelector('.time-end').value
+                    };
+                }),
+                data: {}
+            };
+            
+            schedules.push(newSchedule);
+            saveSchedules();
+            setCurrentSchedule(newSchedule.id);
+            renderSchedulesList();
+            toggleScheduleModal(false);
+        }
+        
+        // Update schedule
+        function updateSchedule(scheduleId) {
+            const schedule = schedules.find(s => s.id === scheduleId);
+            if (!schedule) return;
+            
+            schedule.days = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
+            schedule.timeSlots = Array.from(timeSlotsContainer.children).map(el => {
+                return {
+                    id: generateId(),
+                    start: el.querySelector('.time-start').value,
+                    end: el.querySelector('.time-end').value
+                };
+            });
+            
+            // Preserve existing data
+            const newData = {};
+            const previewSubjects = document.querySelectorAll('.subject-preview');
+            let i = 0;
+            
+            schedule.days.forEach(day => {
+                schedule.timeSlots.forEach(timeSlot => {
+                    if (previewSubjects[i]) {
+                        const subject = previewSubjects[i].textContent.trim();
+                        if (subject) {
+                            if (!newData[day]) newData[day] = {};
+                            newData[day][timeSlot.id] = subject;
+                        }
+                        i++;
+                    }
+                });
+            });
+            
+            schedule.data = newData;
+            
+            saveSchedules();
+            renderSchedulesList();
+            renderCurrentSchedule();
+            toggleConfigureScheduleModal(false);
+        }
+        
+        // Delete schedule
+        function deleteSchedule(scheduleId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet emploi du temps ?')) {
+                schedules = schedules.filter(s => s.id !== scheduleId);
+                if (currentScheduleId === scheduleId) {
+                    currentScheduleId = null;
+                    localStorage.removeItem('currentScheduleId');
+                }
+                saveSchedules();
+                renderSchedulesList();
+                renderCurrentSchedule();
+            }
+        }
+        
+        // Set current schedule
+        function setCurrentSchedule(scheduleId) {
+            currentScheduleId = scheduleId;
+            localStorage.setItem('currentScheduleId', scheduleId);
+            renderCurrentSchedule();
+        }
+        
+        // Add exam
+        function addExam(name, date, time) {
+            const newExam = {
+                id: generateId(),
+                name: name,
+                date: date,
+                time: time
+            };
+            
+            exams.push(newExam);
+            saveExams();
+            renderExamsList();
+            toggleExamModal(false);
+        }
+        
+        // Add reminder
+        function addReminder(title, details) {
+            const newReminder = {
+                id: generateId(),
+                title: title,
+                details: details
+            };
+            
+            reminders.push(newReminder);
+            saveReminders();
+            renderRemindersList();
+            toggleReminderModal(false);
+        }
+        
+        // Delete reminder
+        function deleteReminder(reminderId) {
+            reminders = reminders.filter(r => r.id !== reminderId);
+            saveReminders();
+            renderRemindersList();
+        }
+        
+        // Save data to localStorage
+        function saveSchedules() {
+            localStorage.setItem('schedules', JSON.stringify(schedules));
+        }
+        
+        function saveExams() {
+            localStorage.setItem('exams', JSON.stringify(exams));
+        }
+        
+        function saveReminders() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+        }
+        
+        // Utility functions
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+        
+        function getCurrentWeekRange() {
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Start from Monday
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            
+            return `${formatDate(startOfWeek.toISOString().split('T')[0])} - ${formatDate(endOfWeek.toISOString().split('T')[0])}`;
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+        }
+        
         // Event Listeners
         addScheduleBtn.addEventListener('click', () => toggleScheduleModal(true));
         closeScheduleModal.addEventListener('click', () => toggleScheduleModal(false));
         cancelAddSchedule.addEventListener('click', () => toggleScheduleModal(false));
         confirmAddSchedule.addEventListener('click', () => {
-            // In a real app, save the new schedule
+            const name = document.getElementById('scheduleName').value.trim();
+            const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+            
+            if (!name) {
+                alert('Veuillez donner un nom à votre emploi du temps');
+                return;
+            }
+            
+            openConfigureScheduleModal();
             toggleScheduleModal(false);
         });
         
+        addTimeSlot.addEventListener('click', () => addTimeSlotElement());
+        
+        closeConfigureModal.addEventListener('click', () => toggleConfigureScheduleModal(false));
+        cancelConfigureSchedule.addEventListener('click', () => toggleConfigureScheduleModal(false));
+        confirmConfigureSchedule.addEventListener('click', () => {
+            const scheduleId = configureScheduleModal.getAttribute('data-schedule-id');
+            if (scheduleId) {
+                updateSchedule(scheduleId);
+            } else {
+                const name = document.getElementById('scheduleName').value.trim();
+                const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+                createSchedule(name, color);
+            }
+        });
+        
         addExamBtn.addEventListener('click', () => toggleExamModal(true));
+        addExamBtn2.addEventListener('click', () => toggleExamModal(true));
         closeExamModal.addEventListener('click', () => toggleExamModal(false));
         cancelAddExam.addEventListener('click', () => toggleExamModal(false));
         confirmAddExam.addEventListener('click', () => {
-            // In a real app, save the new exam
-            toggleExamModal(false);
+            const name = document.getElementById('examName').value.trim();
+            const date = document.getElementById('examDate').value;
+            const time = document.getElementById('examTime').value;
+            
+            if (!name || !date || !time) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            addExam(name, date, time);
         });
         
-        addReminderBtn.addEventListener('click', () => {
-            const title = prompt("Titre du rappel:");
-            if (title) {
-                const description = prompt("Description du rappel:");
-                if (description) {
-                    // In a real app, save the reminder and update the UI
-                    alert("Rappel ajouté avec succès!");
-                }
+        addReminderBtn.addEventListener('click', () => toggleReminderModal(true));
+        closeReminderModal.addEventListener('click', () => toggleReminderModal(false));
+        cancelAddReminder.addEventListener('click', () => toggleReminderModal(false));
+        confirmAddReminder.addEventListener('click', () => {
+            const title = document.getElementById('reminderTitle').value.trim();
+            const details = document.getElementById('reminderDetails').value.trim();
+            
+            if (!title) {
+                alert('Veuillez donner un titre à votre rappel');
+                return;
             }
+            
+            addReminder(title, details);
+        });
+        
+        closeSubjectPopup.addEventListener('click', () => {
+            subjectPopup.classList.add('hidden');
         });
         
         // Color selection for schedule
@@ -421,6 +991,14 @@
                 this.classList.add('ring-2', 'ring-offset-2', 'ring-purple-500');
             });
         });
+        
+        // Day checkbox change listener
+        document.querySelectorAll('.day-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', generateSchedulePreview);
+        });
+        
+        // Initialize the page
+        initPage();
         
         // Prevent blue highlight on mobile taps
         document.addEventListener('touchstart', function() {}, true);
