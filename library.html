@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Bibliothèque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .book-card {
+            transition: all 0.3s ease;
+        }
+        .book-card:hover {
+            transform: translateY(-3px);
+        }
+        .book-actions {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .book-card:hover .book-actions {
+            opacity: 1;
+        }
+        [contenteditable]:focus {
+            outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="text-gray-600">
+                    <i data-feather="arrow-left"></i>
+                </a>
+                <h1 class="text-xl font-bold text-gray-800">Bibliothèque</h1>
+            </div>
+            <button id="addBookBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                <i data-feather="plus"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6 pb-20">
+        <!-- Add Book Modal -->
+        <div id="addBookModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Ajouter un livre</h2>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Titre du livre</label>
+                        <input type="text" id="bookTitle" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Auteur (optionnel)</label>
+                        <input type="text" id="bookAuthor" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fichier PDF/Images</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-gray-600">
+                                    <label class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none">
+                                        <span>Téléverser un fichier</span>
+                                        <input id="bookFile" type="file" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">ou glisser-déposer</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PDF, JPG, PNG jusqu'à 10MB</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddBook" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddBook" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Books List -->
+        <div id="booksList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Books will be loaded here dynamically -->
+        </div>
+
+        <!-- No Books Placeholder -->
+        <div id="noBooks" class="text-center py-12">
+            <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <i data-feather="book" class="text-gray-400 w-12 h-12"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-700 mb-1">Aucun livre ajouté</h3>
+            <p class="text-gray-500 mb-4">Commencez par ajouter vos livres pour construire votre bibliothèque</p>
+            <button id="addFirstBook" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                <i data-feather="plus" class="mr-2 inline"></i> Ajouter un livre
+            </button>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
+        <div class="container mx-auto flex justify-around">
+            <a href="index.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Accueil</span>
+            </a>
+            <a href="subjects.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="book" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Matières</span>
+            </a>
+            <a href="library.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
+                <i data-feather="bookmark" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Bibliothèque</span>
+            </a>
+            <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="calendar" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Emploi du temps</span>
+            </a>
+            <a href="settings.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="settings" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Paramètres</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Sample books data
+        let books = [
+            { id: 1, title: "Physique Chimie Tle", author: "Dupont et Martin", cover: "http://static.photos/education/320x240/1" },
+            { id: 2, title: "Mathématiques Terminale", author: "Leblanc", cover: "http://static.photos/education/320x240/2" },
+            { id: 3, title: "Histoire-Géographie", author: "", cover: "http://static.photos/education/320x240/3" }
+        ];
+        
+        // Load from localStorage if available
+        if (localStorage.getItem('books')) {
+            books = JSON.parse(localStorage.getItem('books'));
+        }
+        
+        // DOM Elements
+        const booksList = document.getElementById('booksList');
+        const noBooks = document.getElementById('noBooks');
+        const addBookModal = document.getElementById('addBookModal');
+        const addBookBtn = document.getElementById('addBookBtn');
+        const addFirstBookBtn = document.getElementById('addFirstBook');
+        const closeModalBtn = document.getElementById('closeModal');
+        const cancelAddBookBtn = document.getElementById('cancelAddBook');
+        const confirmAddBookBtn = document.getElementById('confirmAddBook');
+        const bookTitleInput = document.getElementById('bookTitle');
+        const bookAuthorInput = document.getElementById('bookAuthor');
+        const bookFileInput = document.getElementById('bookFile');
+        
+        // Render books
+        function renderBooks() {
+            if (books.length === 0) {
+                noBooks.classList.remove('hidden');
+                booksList.classList.add('hidden');
+            } else {
+                noBooks.classList.add('hidden');
+                booksList.classList.remove('hidden');
+                
+                booksList.innerHTML = '';
+                books.forEach(book => {
+                    const bookCard = document.createElement('div');
+                    bookCard.className = 'book-card bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md';
+                    bookCard.innerHTML = `
+                        <div class="relative">
+                            <img src="${book.cover}" alt="${book.title}" class="w-full h-48 object-cover">
+                            <div class="absolute top-2 right-2 book-actions flex space-x-1">
+                                <button class="edit-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
+                                    <i data-feather="edit-2" class="w-4 h-4 text-gray-600"></i>
+                                </button>
+                                <button class="delete-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
+                                    <i data-feather="trash-2" class="w-4 h-4 text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-medium text-gray-800 mb-1">${book.title}</h3>
+                            <div class="text-sm text-gray-500">${book.author || 'Auteur non spécifié'}</div>
+                            <div class="mt-3 flex justify-between items-center">
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">PDF</span>
+                                <button class="text-purple-600 text-sm flex items-center">
+                                    Ouvrir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    booksList.appendChild(bookCard);
+                });
+                feather.replace();
+            }
+        }
+        
+        // Toggle modal
+        function toggleModal(show) {
+            if (show) {
+                addBookModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addBookModal.classList.add('hidden');
+                document.body.style.overflow = '';
+                bookTitleInput.value = '';
+                bookAuthorInput.value = '';
+                bookFileInput.value = '';
+            }
+        }
+        
+        // Add new book
+        function addBook() {
+            const title = bookTitleInput.value.trim();
+            const author = bookAuthorInput.value.trim();
+            
+            if (title) {
+                const newBook = {
+                    id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
+                    title,
+                    author: author || '',
+                    cover: `http://static.photos/education/320x240/${Math.floor(Math.random() * 100)}`
+                };
+                
+                books.unshift(newBook);
+                localStorage.setItem('books', JSON.stringify(books));
+                renderBooks();
+                toggleModal(false);
+            }
+        }
+        
+        // Delete book
+        function deleteBook(id) {
+            // Show confirmation dialog
+            const confirmDelete = confirm("Voulez-vous vraiment supprimer ce livre?");
+            if (confirmDelete) {
+                books = books.filter(book => book.id !== id);
+                localStorage.setItem('books', JSON.stringify(books));
+                renderBooks();
+            }
+        }
+        
+        // Event Listeners
+        addBookBtn.addEventListener('click', () => toggleModal(true));
+        addFirstBookBtn.addEventListener('click', () => toggleModal(true));
+        closeModalBtn.addEventListener('click', () => toggleModal(false));
+        cancelAddBookBtn.addEventListener('click', () => toggleModal(false));
+        confirmAddBookBtn.addEventListener('click', addBook);
+        
+        // Handle delete and edit buttons (delegated events)
+        booksList.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-book')) {
+                const id = parseInt(e.target.closest('.delete-book').dataset.id);
+                deleteBook(id);
+            }
+            
+            if (e.target.closest('.edit-book')) {
+                alert('Fonctionnalité d\'édition à implémenter');
+            }
+        });
+        
+        // Initial render
+        renderBooks();
+        
+        // Prevent blue highlight on mobile taps
+        document.addEventListener('touchstart', function() {}, true);
+    </script>
+</body>
+</html>
