@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Bulletin de notes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .grade-table input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+        }
+        .grade-table input:focus {
+            outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
+        }
+        [contenteditable]:focus {
+            outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
+        }
+        .report-card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="text-gray-600">
+                    <i data-feather="arrow-left"></i>
+                </a>
+                <h1 class="text-xl font-bold text-gray-800">Bulletin de notes</h1>
+            </div>
+            <button id="newReportBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                <i data-feather="plus"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6 pb-20">
+        <!-- New Report Form -->
+        <div id="newReportForm" class="bg-white rounded-xl shadow-sm p-6 mb-8 hidden">
+            <h2 class="text-lg font-semibold mb-4">Nouveau bulletin</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Titre du bulletin</label>
+                    <input type="text" id="reportTitle" placeholder="Ex: 1er Trimestre 2023-2024" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" id="reportDate" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button id="cancelNewReport" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                    <button id="createNewReport" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Créer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Report -->
+        <section class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Bulletin actuel</h2>
+                <div class="flex items-center space-x-2">
+                    <button id="calculateAverage" class="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700">
+                        Calculer la moyenne
+                    </button>
+                    <button id="saveReport" class="px-3 py-1.5 bg-white border border-purple-600 text-purple-600 rounded-lg text-sm hover:bg-purple-50">
+                        Enregistrer
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 report-card">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 id="currentReportTitle" class="font-bold text-xl text-gray-800" contenteditable="true">Bulletin du 1er Semestre</h3>
+                        <div class="text-sm text-gray-500 mt-1">
+                            <span id="studentName">Jean Dupont</span> - 
+                            <span id="studentClass" contenteditable="true">Terminale S</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-500">Moyenne Générale</div>
+                        <div id="generalAverage" class="text-3xl font-bold text-purple-600">14.5</div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full grade-table">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="pb-2 text-left font-medium text-gray-700">Matière</th>
+                                <th class="pb-2 text-center font-medium text-gray-700">Coeff</th>
+                                <th class="pb-2 text-center font-medium text-gray-700">Note</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradesTableBody">
+                            <!-- Grades will be added here dynamically -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="border-t border-gray-200 font-medium">
+                                <td class="pt-3 text-left">Total</td>
+                                <td id="totalCoeff" class="pt-3 text-center">12</td>
+                                <td id="totalPoints" class="pt-3 text-center">174</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <div class="mt-6">
+                    <button id="addSubjectToReport" class="text-purple-600 text-sm flex items-center">
+                        <i data-feather="plus" class="mr-1 w-4 h-4"></i> Ajouter une matière
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Evolution Section -->
+        <section id="evolution">
+            <h2 class="text-lg font-semibold mb-4">Évolution</h2>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <h3 class="font-medium mb-3">Moyenne générale</h3>
+                <div class="h-48">
+                    <canvas id="averageChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h3 class="font-medium mb-3">Par matière</h3>
+                <div class="h-48">
+                    <canvas id="subjectChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Saved Reports -->
+        <section class="mt-8">
+            <h2 class="text-lg font-semibold mb-4">Bulletins enregistrés</h2>
+            <div id="savedReportsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Saved reports will be added here -->
+                <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-500">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-medium">1er Trimestre</h3>
+                        <div class="flex space-x-1">
+                            <button class="p-1 rounded-full hover:bg-gray-100">
+                                <i data-feather="download" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                            <button class="p-1 rounded-full hover:bg-gray-100">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">15/12/2023</div>
+                    <div class="mt-3 flex justify-between items-center">
+                        <div>
+                            <div class="text-xs text-gray-500">Moyenne</div>
+                            <div class="font-medium">14.2/20</div>
+                        </div>
+                        <a href="#" class="text-purple-600 text-sm flex items-center">
+                            Voir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-medium">2ème Trimestre</h3>
+                        <div class="flex space-x-1">
+                            <button class="p-1 rounded-full hover:bg-gray-100">
+                                <i data-feather="download" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                            <button class="p-1 rounded-full hover:bg-gray-100">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">15/03/2024</div>
+                    <div class="mt-3 flex justify-between items-center">
+                        <div>
+                            <div class="text-xs text-gray-500">Moyenne</div>
+                            <div class="font-medium">15.7/20</div>
+                        </div>
+                        <a href="#" class="text-blue-600 text-sm flex items-center">
+                            Voir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
+        <div class="container mx-auto flex justify-around">
+            <a href="index.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Accueil</span>
+            </a>
+            <a href="subjects.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="book" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Matières</span>
+            </a>
+            <a href="library.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="bookmark" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Bibliothèque</span>
+            </a>
+            <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="calendar" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Emploi du temps</span>
+            </a>
+            <a href="settings.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="settings" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Paramètres</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Load user data from localStorage if available
+        if (localStorage.getItem('userProfile')) {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+            document.getElementById('studentName').textContent = userProfile.name || 'Jean Dupont';
+            document.getElementById('studentClass').textContent = userProfile.class || 'Terminale S';
+        }
+        
+        // Sample subjects data
+        let subjects = [
+            { name: "Mathématiques", coefficient: 5, grade: 14 },
+            { name: "Physique", coefficient: 4, grade: 16 },
+            { name: "Informatique", coefficient: 3, grade: 15 },
+            { name: "Philosophie", coefficient: 2, grade: 12 },
+            { name: "Anglais", coefficient: 2, grade: 13 }
+        ];
+        
+        // Load from localStorage if available
+        if (localStorage.getItem('gradesSubjects')) {
+            subjects = JSON.parse(localStorage.getItem('gradesSubjects'));
+        }
+        
+        // DOM Elements
+        const newReportForm = document.getElementById('newReportForm');
+        const newReportBtn = document.getElementById('newReportBtn');
+        const cancelNewReport = document.getElementById('cancelNewReport');
+        const createNewReport = document.getElementById('createNewReport');
+        const gradesTableBody = document.getElementById('gradesTableBody');
+        const addSubjectToReport = document.getElementById('addSubjectToReport');
+        const calculateAverage = document.getElementById('calculateAverage');
+        const saveReport = document.getElementById('saveReport');
+        const generalAverage = document.getElementById('generalAverage');
+        const totalCoeff = document.getElementById('totalCoeff');
+        const totalPoints = document.getElementById('totalPoints');
+        
+        // Toggle new report form
+        function toggleNewReportForm(show) {
+            if (show) {
+                newReportForm.classList.remove('hidden');
+            } else {
+                newReportForm.classList.add('hidden');
+            }
+        }
+        
+        // Render grades table
+        function renderGradesTable() {
+            gradesTableBody.innerHTML = '';
+            
+            let totalCoeffValue = 0;
+            let totalPointsValue = 0;
+            let hasGrades = false;
+            
+            subjects.forEach((subject, index) => {
+                if (subject.grade !== '' && !isNaN(parseFloat(subject.grade))) {
+                    totalCoeffValue += parseFloat(subject.coefficient);
+                    totalPointsValue += parseFloat(subject.grade) * parseFloat(subject.coefficient);
+                    hasGrades = true;
+                }
+                
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-100';
+                row.innerHTML = `
+                    <td class="py-3 text-left">
+                        <span class="subject-name" contenteditable="true">${subject.name}</span>
+                    </td>
+                    <td class="py-3 text-center">
+                        <input type="number" class="subject-coeff" value="${subject.coefficient}" min="1" data-index="${index}">
+                    </td>
+                    <td class="py-3 text-center">
+                        <input type="number" class="subject-grade" value="${subject.grade || ''}" min="0" max="20" step="0.25" data-index="${index}" placeholder="--">
+                    </td>
+                `;
+                
+                gradesTableBody.appendChild(row);
+            });
+            
+            // Update totals
+            totalCoeff.textContent = totalCoeffValue;
+            totalPoints.textContent = totalPointsValue;
+            
+            // Calculate average if there are grades
+            if (hasGrades) {
+                const average = totalPointsValue / totalCoeffValue;
+                generalAverage.textContent = average.toFixed(2);
+            } else {
+                generalAverage.textContent = '--';
+            }
+        }
+        
+        // Add new subject to report
+        function addSubjectToGrades() {
+            subjects.push({ name: "Nouvelle matière", coefficient: 1, grade: "" });
+            localStorage.setItem('gradesSubjects', JSON.stringify(subjects));
+            renderGradesTable();
+            
+            // Scroll to bottom
+            setTimeout(() => {
+                gradesTableBody.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Focus on the new subject name
+                const newSubjectNames = document.querySelectorAll('.subject-name');
+                newSubjectNames[newSubjectNames.length - 1].focus();
+            }, 100);
+        }
+        
+        // Calculate average
+        function calculateGradesAverage() {
+            let totalCoeffValue = 0;
+            let totalPointsValue = 0;
+            let hasGrades = false;
+            
+            subjects.forEach(subject => {
+                if (subject.grade !== '' && !isNaN(parseFloat(subject.grade))) {
+                    totalCoeffValue += parseFloat(subject.coefficient);
+                    totalPointsValue += parseFloat(subject.grade) * parseFloat(subject.coefficient);
+                    hasGrades = true;
+                }
+            });
+            
+            // Update totals
+            totalCoeff.textContent = totalCoeffValue;
+            totalPoints.textContent = totalPointsValue;
+            
+            // Calculate average if there are grades
+            if (hasGrades) {
+                const average = totalPointsValue / totalCoeffValue;
+                generalAverage.textContent = average.toFixed(2);
+                alert(`Moyenne calculée: ${average.toFixed(2)}/20`);
+            } else {
+                generalAverage.textContent = '--';
+                alert('Aucune note valide à calculer');
+            }
+        }
+        
+        // Save report
+        function saveCurrentReport() {
+            // Update subjects data from inputs
+            document.querySelectorAll('.subject-name').forEach((nameEl, index) => {
+                subjects[index].name = nameEl.textContent;
+            });
+            
+            document.querySelectorAll('.subject-coeff').forEach((coeffEl, index) => {
+                subjects[index].coefficient = coeffEl.value;
+            });
+            
+            document.querySelectorAll('.subject-grade').forEach((gradeEl, index) => {
+                subjects[index].grade = gradeEl.value;
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('gradesSubjects', JSON.stringify(subjects));
+            
+            // Also save student class if edited
+            if (localStorage.getItem('userProfile')) {
+                const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+                userProfile.class = document.getElementById('studentClass').textContent;
+                localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            }
+            
+            alert('Bulletin enregistré avec succès!');
+        }
+        
+        // Initialize charts
+        function initCharts() {
+            // Average chart
+            const averageCtx = document.getElementById('averageChart').getContext('2d');
+            const averageChart = new Chart(averageCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Trim 1', 'Trim 2', 'Trim 3', 'Sem 1', 'Sem 2'],
+                    datasets: [{
+                        label: 'Moyenne générale',
+                        data: [12.5, 13.2, 14.0, 14.5, 15.2],
+                        borderColor: '#6C63FF',
+                        backgroundColor: 'rgba(108, 99, 255, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 10,
+                            max: 20
+                        }
+                    }
+                }
+            });
+            
+            // Subject chart
+            const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+            const subjectChart = new Chart(subjectCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Maths', 'Physique', 'Info', 'Philo', 'Anglais'],
+                    datasets: [{
+                        label: 'Notes',
+                        data: [14, 16, 15, 12, 13],
+                        backgroundColor: [
+                            'rgba(108, 99, 255, 0.7)',
+                            'rgba(76, 68, 219, 0.7)',
+                            'rgba(108, 99, 255, 0.7)',
+                            'rgba(76, 68, 219, 0.7)',
+                            'rgba(108, 99, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(108,
+</body>
+</html>
