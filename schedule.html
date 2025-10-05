@@ -45,6 +45,12 @@
             max-height: 90%;
             overflow-y: auto;
         }
+      
+      .time-cell:focus {
+    outline: none;
+    background-color: #F5F3FF;
+    border-color: #8B5CF6;
+}
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -984,28 +990,32 @@ function generateOtherScheduleTable() {
     }
     
     scheduleTable.innerHTML = `
-        <div class="grid grid-cols-${selectedDays.length + 1} gap-px bg-gray-200">
-            <!-- En-tête -->
-            <div class="bg-gray-100 p-3 font-medium"></div>
+        <div class="grid grid-cols-${selectedDays.length + 1} gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+            <!-- En-tête du tableau -->
+            <div class="bg-gray-100 p-3 font-medium border-r border-gray-200"></div>
             ${selectedDays.map(day => `
-                <div class="bg-gray-100 p-3 text-center font-medium">${day}</div>
+                <div class="bg-gray-100 p-3 text-center font-medium border-r border-gray-200 last:border-r-0">${day}</div>
             `).join('')}
             
             <!-- Lignes de créneaux horaires -->
             ${timeSlots.map((timeSlot, index) => `
-                <div class="grid grid-cols-${selectedDays.length + 1} gap-px bg-gray-200">
-                    <div class="bg-gray-50 p-2 flex items-center justify-between">
-                        <span class="text-sm font-medium">${timeSlot.start} - ${timeSlot.end}</span>
-                        <button class="remove-time-row text-red-500" data-index="${index}">
+                <div class="contents">
+                    <!-- Colonne des horaires (gauche) -->
+                    <div class="bg-gray-50 p-3 flex items-center justify-between border-r border-gray-200 border-t border-gray-200">
+                        <span class="text-sm font-medium whitespace-nowrap">${timeSlot.start} - ${timeSlot.end}</span>
+                        <button class="remove-time-row text-red-500 hover:text-red-700 ml-2" data-index="${index}">
                             <i data-feather="trash-2" class="w-4 h-4"></i>
                         </button>
                     </div>
+                    
+                    <!-- Colonnes des jours (cases à remplir) -->
                     ${selectedDays.map(day => `
-                        <div class="bg-white p-2">
-                            <div class="time-cell h-12 border border-gray-200 rounded hover:bg-gray-50 cursor-text" 
+                        <div class="bg-white p-2 border-r border-gray-200 border-t border-gray-200 last:border-r-0">
+                            <div class="time-cell w-full h-16 p-2 rounded border border-gray-300 hover:border-purple-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 cursor-text transition-colors" 
                                  contenteditable="true"
                                  data-day="${day}"
-                                 data-time="${timeSlot.start}-${timeSlot.end}"></div>
+                                 data-time="${timeSlot.start}-${timeSlot.end}"
+                                 placeholder="Matière..."></div>
                         </div>
                     `).join('')}
                 </div>
@@ -1020,6 +1030,27 @@ function generateOtherScheduleTable() {
         button.addEventListener('click', function() {
             const index = this.getAttribute('data-index');
             removeOtherTimeSlot(index);
+        });
+    });
+    
+    // Ajouter le placeholder aux cellules
+    document.querySelectorAll('.time-cell').forEach(cell => {
+        if (!cell.textContent.trim()) {
+            cell.innerHTML = '<span class="text-gray-400">Matière...</span>';
+        }
+        
+        cell.addEventListener('focus', function() {
+            if (this.innerHTML.includes('text-gray-400')) {
+                this.innerHTML = '';
+                this.classList.remove('text-gray-400');
+            }
+        });
+        
+        cell.addEventListener('blur', function() {
+            if (!this.textContent.trim()) {
+                this.innerHTML = '<span class="text-gray-400">Matière...</span>';
+                this.classList.add('text-gray-400');
+            }
         });
     });
 }
@@ -1127,26 +1158,29 @@ function renderOtherSchedules() {
                     <i data-feather="trash-2" class="w-4 h-4 text-red-600"></i>
                 </button>
             </div>
-            <div class="bg-gray-50 rounded-lg overflow-hidden">
+            <div class="bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
                 <div class="grid grid-cols-${schedule.days.length + 1} gap-px bg-gray-200">
                     <!-- En-tête -->
-                    <div class="bg-gray-100 p-2 font-medium"></div>
+                    <div class="bg-gray-100 p-3 font-medium border-r border-gray-200"></div>
                     ${schedule.days.map(day => `
-                        <div class="bg-gray-100 p-2 text-center font-medium text-sm">${day}</div>
+                        <div class="bg-gray-100 p-3 text-center font-medium text-sm border-r border-gray-200 last:border-r-0">${day}</div>
                     `).join('')}
                     
                     <!-- Lignes -->
                     ${schedule.timeSlots.map(timeSlot => `
-                        <div class="grid grid-cols-${schedule.days.length + 1} gap-px bg-gray-200">
-                            <div class="bg-gray-50 p-2">
-                                <div class="text-xs text-gray-500">${timeSlot.start} - ${timeSlot.end}</div>
+                        <div class="contents">
+                            <!-- Colonne horaire -->
+                            <div class="bg-gray-50 p-3 border-r border-gray-200 border-t border-gray-200">
+                                <div class="text-xs text-gray-500 whitespace-nowrap">${timeSlot.start} - ${timeSlot.end}</div>
                             </div>
+                            
+                            <!-- Colonnes des matières -->
                             ${schedule.days.map(day => {
                                 const subject = schedule.data && schedule.data[day] && schedule.data[day][`${timeSlot.start}-${timeSlot.end}`] ? schedule.data[day][`${timeSlot.start}-${timeSlot.end}`] : '';
                                 return `
-                                    <div class="bg-white p-2">
+                                    <div class="bg-white p-3 border-r border-gray-200 border-t border-gray-200 last:border-r-0">
                                         ${subject ? `
-                                            <div class="text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-2 py-1">
+                                            <div class="text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-2 py-1 text-center">
                                                 ${subject}
                                             </div>
                                         ` : ''}
