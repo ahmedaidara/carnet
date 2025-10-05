@@ -148,6 +148,38 @@
         line-height: 1.1;
     }
 }
+      
+      #scheduleDisplay table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: center;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#scheduleDisplay th {
+  background: linear-gradient(to right, #7e22ce, #9333ea);
+  color: white;
+  padding: 6px;
+}
+
+#scheduleDisplay td {
+  border: 1px solid #eee;
+  padding: 4px;
+  background: #fff;
+}
+
+#scheduleDisplay tbody tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+#scheduleDisplay h2 {
+  font-size: 1rem;
+  color: #4b0082;
+  margin-bottom: 0.5rem;
+}
+
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -1515,6 +1547,121 @@ function createOtherSchedule() {
     }
 }
 
+      
+      // Charger les examens depuis le localStorage
+function loadExams() {
+    const examsList = document.getElementById('examsList');
+    const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    
+    examsList.innerHTML = '';
+    
+    if (exams.length === 0) {
+        examsList.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+                <p>Aucun examen à venir</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Trier les examens par date
+    exams.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+    
+    exams.forEach(exam => {
+        const examDate = new Date(exam.date + 'T' + exam.time);
+        const now = new Date();
+        const diffTime = examDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let bgColor = 'yellow';
+        let icon = 'edit-3';
+        
+        if (diffDays <= 3) {
+            bgColor = 'red';
+            icon = 'alert-triangle';
+        } else if (diffDays <= 7) {
+            bgColor = 'orange';
+            icon = 'clock';
+        }
+        
+        const examElement = document.createElement('div');
+        examElement.className = `flex items-center justify-between p-3 bg-${bgColor}-50 rounded-lg`;
+        examElement.innerHTML = `
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-${bgColor}-100 flex items-center justify-center mr-3">
+                    <i data-feather="${icon}" class="text-${bgColor}-600"></i>
+                </div>
+                <div>
+                    <div class="font-medium">${exam.name}</div>
+                    <div class="text-sm text-gray-600">${formatDate(exam.date)} • ${exam.time}</div>
+                </div>
+            </div>
+            <div class="text-sm font-medium text-${bgColor}-600">${diffDays > 0 ? `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}` : 'Aujourd\'hui'}</div>
+        `;
+        examsList.appendChild(examElement);
+    });
+    
+    feather.replace();
+}
+
+// Charger les rappels depuis le localStorage
+function loadReminders() {
+    const remindersList = document.getElementById('remindersList');
+    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    
+    remindersList.innerHTML = '';
+    
+    if (reminders.length === 0) {
+        remindersList.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+                <p>Aucun rappel</p>
+            </div>
+        `;
+        return;
+    }
+    
+    reminders.forEach(reminder => {
+        const reminderElement = document.createElement('div');
+        reminderElement.className = 'flex items-start p-3 bg-gray-50 rounded-lg';
+        reminderElement.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
+                <i data-feather="bell" class="text-gray-600"></i>
+            </div>
+            <div class="flex-grow">
+                <div class="font-medium">${reminder.title}</div>
+                <div class="text-sm text-gray-600">${reminder.details}</div>
+            </div>
+            <button class="delete-reminder p-1 rounded-full hover:bg-gray-200 ml-2" data-id="${reminder.id}">
+                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+            </button>
+        `;
+        remindersList.appendChild(reminderElement);
+    });
+    
+    feather.replace();
+    
+    // Ajouter les événements de suppression
+    document.querySelectorAll('.delete-reminder').forEach(button => {
+        button.addEventListener('click', function() {
+            const reminderId = this.getAttribute('data-id');
+            deleteReminder(reminderId);
+        });
+    });
+}
+
+// Fonction pour supprimer un rappel
+function deleteReminder(reminderId) {
+    let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    reminders = reminders.filter(r => r.id !== reminderId);
+    localStorage.setItem('reminders', JSON.stringify(reminders));
+    loadReminders(); // Recharger l'affichage
+}
+
+// Fonction utilitaire pour formater la date
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+}
 // Fonction pour mettre à jour un emploi du temps
 function updateOtherSchedule(scheduleId) {
     const scheduleIndex = otherSchedules.findIndex(s => s.id === scheduleId);
@@ -1593,8 +1740,10 @@ document.getElementById('addOtherTimeSlot').addEventListener('click', addOtherTi
 // Initialisation au chargement
 document.addEventListener('DOMContentLoaded', function() {
     renderOtherSchedules();
+  loadExams(); // ← AJOUTE CETTE LIGNE
+    loadReminders(); 
 });
-      // Corriger updateSchedule pour ordre correct (ts puis day)
+      // Corriger updateSchedule pour ordre   (ts pus day)
 function updateSchedule(scheduleId) {
     const schedule = schedules.find(s => s.id === scheduleId);
     if (!schedule) return;
