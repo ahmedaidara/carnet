@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Matière</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            color: #6C63FF;
+            border-bottom: 2px solid #6C63FF;
+        }
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #6C63FF #F3F4F6;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #6C63FF;
+            border-radius: 3px;
+        }
+        [contenteditable]:focus {
+            outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
+        }
+        .document-card:hover .document-actions {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="subjects.html" class="text-gray-600">
+                    <i data-feather="arrow-left"></i>
+                </a>
+                <h1 id="subjectTitle" class="text-xl font-bold text-gray-800">Matière</h1>
+            </div>
+            <button id="addContentBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                <i data-feather="plus"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="container mx-auto px-4">
+        <div class="flex overflow-x-auto custom-scrollbar pb-1">
+            <div class="flex space-x-6">
+                <button data-tab="documents" class="tab-button active px-1 py-3 font-medium whitespace-nowrap">
+                    Documents
+                </button>
+                <button data-tab="photos" class="tab-button px-1 py-3 font-medium whitespace-nowrap">
+                    Photos
+                </button>
+                <button data-tab="videos" class="tab-button px-1 py-3 font-medium whitespace-nowrap">
+                    Vidéos
+                </button>
+                <button data-tab="notes" class="tab-button px-1 py-3 font-medium whitespace-nowrap">
+                    Notes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-4 pb-20">
+        <!-- Add Content Modal -->
+        <div id="addContentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="modalTitle" class="text-lg font-semibold">Ajouter un document</h2>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                        <input type="text" id="contentTitle" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div id="categoryField">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie (optionnel)</label>
+                        <input type="text" id="contentCategory" placeholder="Ex: Leçon 1, Chapitre 3" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div id="contentField">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contenu</label>
+                        <textarea id="contentText" rows="4" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400"></textarea>
+                    </div>
+                    <div id="fileUploadField" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fichier</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-gray-600">
+                                    <label class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none">
+                                        <span>Téléverser un fichier</span>
+                                        <input id="fileUpload" type="file" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">ou glisser-déposer</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PDF, DOCX, PNG, JPG, MP4 jusqu'à 10MB</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddContent" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddContent" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Tabs -->
+        <div id="documents" class="tab-content active">
+            <div id="documentsList" class="grid grid-cols-1 gap-3">
+                <!-- Documents will be loaded here -->
+            </div>
+            <div id="noDocuments" class="text-center py-12">
+                <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <i data-feather="file-text" class="text-gray-400 w-12 h-12"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-700 mb-1">Aucun document</h3>
+                <p class="text-gray-500 mb-4">Ajoutez vos premiers documents pour cette matière</p>
+                <button class="add-document-btn px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    <i data-feather="plus" class="mr-2 inline"></i> Ajouter un document
+                </button>
+            </div>
+        </div>
+
+        <div id="photos" class="tab-content">
+            <div id="photosList" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <!-- Photos will be loaded here -->
+            </div>
+            <div id="noPhotos" class="text-center py-12">
+                <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <i data-feather="image" class="text-gray-400 w-12 h-12"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-700 mb-1">Aucune photo</h3>
+                <p class="text-gray-500 mb-4">Ajoutez vos premières photos pour cette matière</p>
+                <button class="add-photo-btn px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    <i data-feather="plus" class="mr-2 inline"></i> Ajouter une photo
+                </button>
+            </div>
+        </div>
+
+        <div id="videos" class="tab-content">
+            <div id="videosList" class="grid grid-cols-1 gap-3">
+                <!-- Videos will be loaded here -->
+            </div>
+            <div id="noVideos" class="text-center py-12">
+                <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <i data-feather="video" class="text-gray-400 w-12 h-12"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-700 mb-1">Aucune vidéo</h3>
+                <p class="text-gray-500 mb-4">Ajoutez vos premières vidéos pour cette matière</p>
+                <button class="add-video-btn px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    <i data-feather="plus" class="mr-2 inline"></i> Ajouter une vidéo
+                </button>
+            </div>
+        </div>
+
+        <div id="notes" class="tab-content">
+            <div id="notesList" class="grid grid-cols-1 gap-3">
+                <!-- Notes will be loaded here -->
+            </div>
+            <div id="noNotes" class="text-center py-12">
+                <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <i data-feather="edit-3" class="text-gray-400 w-12 h-12"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-700 mb-1">Aucune note</h3>
+                <p class="text-gray-500 mb-4">Ajoutez vos premières notes pour cette matière</p>
+                <button class="add-note-btn px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    <i data-feather="plus" class="mr-2 inline"></i> Ajouter une note
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
+        <div class="container mx-auto flex justify-around">
+            <a href="index.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Accueil</span>
+            </a>
+            <a href="subjects.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="book" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Matières</span>
+            </a>
+            <a href="library.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="bookmark" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Bibliothèque</span>
+            </a>
+            <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="calendar" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Emploi du temps</span>
+            </a>
+            <a href="settings.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="settings" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Paramètres</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Get subject ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const subjectId = parseInt(urlParams.get('id'));
+        
+        // Sample data for subjects and their contents
+        let subjects = [
+            { 
+                id: 1, 
+                name: "Mathématiques", 
+                coefficient: 5, 
+                color: "purple",
+                documents: [
+                    { id: 1, title: "Cours Algèbre", category: "Chapitre 1", content: "Contenu du document...", date: "2023-06-10" },
+                    { id: 2, title: "Exercices Géométrie", category: "Chapitre 2", content: "Contenu du document...", date: "2023-06-05" }
+                ],
+                photos: [
+                    { id: 1, title: "Tableau trigonométrie", category: "Formules", content: "photo1.jpg", date: "2023-05-28" }
+                ],
+                videos: [
+                    { id: 1, title: "Vidéo démonstration", category: "Théorème", content: "video1.mp4", date: "2023-05-20" }
+                ],
+                notes: [
+                    { id: 1, title: "Révisions examens", category: "Important", content: "Ne pas oublier de revoir les intégrales", date: "2023-06-12" }
+                ]
+            },
+            { 
+                id: 2, 
+                name: "Physique", 
+                coefficient: 4, 
+                color: "red",
+                documents: [],
+                photos: [],
+                videos: [],
+                notes: []
+            }
+        ];
+        
+        // Load from localStorage if available
+        if (localStorage.getItem('subjects')) {
+            subjects = JSON.parse(localStorage.getItem('subjects'));
+        }
+        
+        // Find current subject
+        let currentSubject = subjects.find(subject => subject.id === subjectId);
+        
+        // If subject not found, redirect to subjects list
+        if (!currentSubject) {
+            window.location.href = 'subjects.html';
+        }
+        
+        // Set subject title
+        document.getElementById('subjectTitle').textContent = currentSubject.name;
+        
+        // DOM Elements
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const addContentModal = document.getElementById('addContentModal');
+        const addContentBtn = document.getElementById('addContentBtn');
+        const closeModalBtn = document.getElementById('closeModal');
+        const cancelAddContentBtn = document.getElementById('cancelAddContent');
+        const confirmAddContentBtn = document.getElementById('confirmAddContent');
+        const modalTitle = document.getElementById('modalTitle');
+        const contentTitleInput = document.getElementById('contentTitle');
+        const contentCategoryInput = document.getElementById('contentCategory');
+        const contentTextInput = document.getElementById('contentText');
+        const contentField = document.getElementById('contentField');
+        const fileUploadField = document.getElementById('fileUploadField');
+        const fileUploadInput = document.getElementById('fileUpload');
+        
+        // Current active tab
+        let activeTab = 'documents';
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            // Update UI
+            tabButtons.forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            tabContents.forEach(content => {
+                if (content.id === tabName) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            
+            activeTab = tabName;
+        }
+        
+        // Toggle modal
+        function toggleModal(show, type = 'document') {
+            if (show) {
+                // Configure modal based on content type
+                switch(type) {
+                    case 'document':
+                        modalTitle.textContent = 'Ajouter un document';
+                        contentField.classList.remove('hidden');
+                        fileUploadField.classList.remove('hidden');
+                        break;
+                    case 'photo':
+                        modalTitle.textContent = 'Ajouter une photo';
+                        contentField.classList.add('hidden');
+                        fileUploadField.classList.remove('hidden');
+                        break;
+                    case 'video':
+                        modalTitle.textContent = 'Ajouter une vidéo';
+                        contentField.classList.add('hidden');
+                        fileUploadField.classList.remove('hidden');
+                        break;
+                    case 'note':
+                        modalTitle.textContent = 'Ajouter une note';
+                        contentField.classList.remove('hidden');
+                        fileUploadField.classList.add('hidden');
+                        break;
+                }
+                
+                addContentModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addContentModal.classList.add('hidden');
+                document.body.style.overflow = '';
+                contentTitleInput.value = '';
+                contentCategoryInput.value = '';
+                contentTextInput.value = '';
+                fileUploadInput.value = '';
+            }
+        }
+        
+        // Add new content
+        function addContent() {
+            const title = contentTitleInput.value.trim();
+            const category = contentCategoryInput.value.trim();
+            const content = activeTab === 'note' ? contentTextInput.value.trim() : 'file'; // In a real app, handle file upload
+            
+            if (title) {
+                const newContent = {
+                    id: Date.now(), // Simple ID generation
+                    title,
+                    category: category || 'Non classé',
+                    content,
+                    date: new Date().toISOString().split('T')[0]
+                };
+                
+                // Add to current subject's content array
+                if (!currentSubject[`${activeTab}s`]) {
+                    currentSubject[`${activeTab}s`] = [];
+                }
+                
+                currentSubject[`${activeTab}s`].unshift(newContent);
+                
+                // Update in subjects array
+                const subjectIndex = subjects.findIndex(s => s.id === currentSubject.id);
+                subjects[subjectIndex] = currentSubject;
+                
+                // Save to localStorage
+                localStorage.setItem('subjects', JSON.stringify(subjects));
+                
+                // Render updated content
+                renderContent(activeTab);
+                toggleModal(false);
+            }
+        }
+        
+        // Delete content
+        function deleteContent(type, id) {
+            // Show confirmation dialog
+            const confirmDelete = confirm(`Voulez-vous vraiment supprimer ce ${type}?`);
+            if (confirmDelete) {
+                // Filter out the content to delete
+                currentSubject[`${type}s`] = currentSubject[`${type}s`].filter(item => item.id !== id);
+                
+                // Update in subjects array
+                const subjectIndex = subjects.findIndex(s => s.id === currentSubject.id);
+                subjects[subjectIndex] = currentSubject;
+                
+                // Save to localStorage
+                localStorage.setItem('subjects', JSON.stringify(subjects));
+                
+                // Render updated content
+                renderContent(type);
+            }
+        }
+        
+        // Render content for a specific tab
+        function renderContent(type) {
+            const listElement = document.getElementById(`${type}List`);
+            const noContentElement = document.getElementById(`no${type.charAt(0).toUpperCase() + type.slice(1)}s`);
+            
+            if (currentSubject[`${type}s`] && currentSubject[`${type}s`].length > 0) {
+                listElement.innerHTML = '';
+                noContentElement.classList.add('hidden');
+                
+                currentSubject[`${type}s`].forEach(item => {
+                    let contentHtml = '';
+                    
+                    if (type === 'document') {
+                        contentHtml = `
+                            <div class="document-card bg-white rounded-lg shadow-sm p-4 border border-gray-100 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center">
+                                        <i data-feather="file-text" class="text-purple-600 mr-2"></i>
+                                        <h3 class="font-medium">${item.title}</h3>
+                                    </div>
+                                    <div class="document-actions opacity-0 flex space-x-1 transition">
+                                        <button class="edit-content p-1 rounded-full hover:bg-gray-100" data-type="${type}" data-id="${item.id}">
+                                            <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
+                                        </button>
+                                        <button class="delete-content p-1 rounded-full hover:bg-gray-100" data-type="${type}" data-id="${item.id}">
+                                            <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-500 mb-1">${item.category}</div>
+                                <div class="text-xs text-gray-400">Ajouté le ${item.date}</div>
+                            </div>
+                        `;
+                    } else if (type === 'photo') {
+                        contentHtml = `
+                            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
+                                <img src="http://static.photos/education/320x240/${Math.floor(Math.random() * 100)}" alt="${item.title}" class="w-full h-40 object-cover">
+                                <div class="p-3">
+                                    <div class="flex justify-between items-start">
+                                        <h3 class="font-medium text-sm">${item.title}</h3>
+                                        <div class="flex space-x-1">
+                                            <button class="edit-content p-1 rounded-full hover:bg-gray-100" data-type="${type}" data-id="${item.id}">
+                                                <i data-feather="edit-2" class="w-3 h-3 text-gray-500"></i>
+                                            </button>
+                                            <button class="delete-content p-1 rounded-full hover:bg-gray-100" data-type="${type}" data-id="${item.id}">
+                                                <i data-feather="trash-2" class="w-3 h-3 text-gray-500"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">${item.category}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (type === 'video') {
+                        contentHtml = `
+                            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
+                                <div class="relative">
+                                    <img src="http://static.photos/technology/320x240/${Math.floor(Math.random() * 100)}" alt="${item.title}" class="w-full h-40 object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="w-12 h-12 rounded-full bg-black bg-opacity-50 flex items-center justify-center">
+                                            <i data-feather="play" class="text-white"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-3">
+                                    <div class="flex justify-between items-start">
+                                        <h3 class="font-medium text-sm">${item.title}</h3>
+                                        <div class="flex space-x-1">
+                                            <button class="edit-content p-1 rounded-full hover:bg-gray-100" data-type="${type}" data-id="${item.id}">
+                                                <i data-feather="edit-2" class="w-3 h-3 text-gray-500"></i>
+                                            </button>
+                                            <button class="delete-content p-1 rounded-full hover:bg-gray-100" data-type="${type}" data-id="${item.id}">
+                                                <i data-feather="trash-2" class="w-3 h-3 text-gray-500"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">${item.category}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (type === 'note') {
+                        contentHtml = `
+                            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-medium">${item.title}</h3>
+                                    <div class="flex space-x-1">
+                                        <button class="edit-content p-1 rounded-full hover:bg-gray-100" data-type="${type}" data-id="${item.id}">
+                                            <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
+                                        </button>
+                                        <button class="delete-content p-1 rounded-full hover:bg-gray-100" data-type="${type}" data-id="${item.id}">
+                                            <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-500 mb-1">${item.category}</div>
+                                <p class="text-gray-700 text-sm mb-2">${item.content}</p>
+                                <div class="text-xs text-gray-400">Ajouté le ${item.date}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    listElement.innerHTML += contentHtml;
+                });
+            } else {
+                noContentElement.classList.remove('hidden');
+            }
+            
+            feather.replace();
+        }
+        
+        // Event Listeners
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        
+        addContentBtn.addEventListener('click', () => toggleModal(true, activeTab));
+        
+        document.querySelectorAll('.add-document-btn, .add-photo-btn, .add-video-btn, .add-note-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const type = e.target.classList.contains('add-document-btn') ? 'document' :
+                             e.target.classList.contains('add-photo-btn') ? 'photo' :
+                             e.target.classList.contains('add-video-btn') ? 'video' : 'note';
+                toggleModal(true, type);
+            });
+        });
+        
+        closeModalBtn.addEventListener('click', () => toggleModal(false));
+        cancelAddContentBtn.addEventListener('click', () => toggleModal(false));
+        confirmAddContentBtn.addEventListener('click', addContent);
+        
+        // Handle delete and edit buttons (delegated events)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-content')) {
+                const type = e.target.closest('.delete-content').dataset.type;
+                const id = parseInt(e.target.closest('.delete-content').dataset.id);
+                deleteContent(type, id);
+            }
+            
+            // In a real app, you would implement edit functionality
+            if (e.target.closest('.edit-content')) {
+                alert('Fonctionnalité d\'édition à implémenter');
+            }
+        });
+        
+        // Initial render for active tab
+        renderContent(activeTab);
+        
+        // Prevent blue highlight on mobile taps
+        document.addEventListener('touchstart', function() {}, true);
+    </script>
+</body>
+</html>
