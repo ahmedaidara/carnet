@@ -23,7 +23,7 @@
         }
         [contenteditable]:focus {
             outline: none;
-            background-color: #F5F3FF;
+            background-color: #F5F3FF; 
             border-radius: 4px;
         }
     </style>
@@ -173,29 +173,36 @@
                 books.forEach(book => {
                     const bookCard = document.createElement('div');
                     bookCard.className = 'book-card bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md';
-                    bookCard.innerHTML = `
-                        <div class="relative">
-                            <img src="${book.cover}" alt="${book.title}" class="w-full h-48 object-cover">
-                            <div class="absolute top-2 right-2 book-actions flex space-x-1">
-                                <button class="edit-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
-                                    <i data-feather="edit-2" class="w-4 h-4 text-gray-600"></i>
-                                </button>
-                                <button class="delete-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
-                                    <i data-feather="trash-2" class="w-4 h-4 text-gray-600"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-medium text-gray-800 mb-1">${book.title}</h3>
-                            <div class="text-sm text-gray-500">${book.author || 'Auteur non spécifié'}</div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">PDF</span>
-                                <button class="text-purple-600 text-sm flex items-center">
-                                    Ouvrir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                   bookCard.innerHTML = `
+    <div class="relative">
+        ${book.fileType.startsWith('image/') 
+            ? `<img src="${book.fileUrl}" alt="${book.title}" class="w-full h-48 object-cover">`
+            : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center">
+                   <i data-feather="file-text" class="w-16 h-16 text-gray-400"></i>
+               </div>`
+        }
+        <div class="absolute top-2 right-2 book-actions flex space-x-1">
+            <button class="edit-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
+                <i data-feather="edit-2" class="w-4 h-4 text-gray-600"></i>
+            </button>
+            <button class="delete-book p-2 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 shadow" data-id="${book.id}">
+                <i data-feather="trash-2" class="w-4 h-4 text-gray-600"></i>
+            </button>
+        </div>
+    </div>
+    <div class="p-4">
+        <h3 class="font-medium text-gray-800 mb-1">${book.title}</h3>
+        <div class="text-sm text-gray-500">${book.author || 'Auteur non spécifié'}</div>
+        <div class="mt-3 flex justify-between items-center">
+            <span class="text-xs ${book.fileType === 'application/pdf' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'} px-2 py-1 rounded">
+                ${book.fileType.startsWith('image/') ? 'IMAGE' : 'PDF'}
+            </span>
+            <button class="open-file text-purple-600 text-sm flex items-center" data-id="${book.id}">
+                Ouvrir <i data-feather="${book.fileType === 'application/pdf' ? 'eye' : 'image'}" class="ml-1 w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+`;
                     
                     booksList.appendChild(bookCard);
                 });
@@ -217,26 +224,62 @@
             }
         }
         
-        // Add new book
-        function addBook() {
-            const title = bookTitleInput.value.trim();
-            const author = bookAuthorInput.value.trim();
-            
-            if (title) {
-                const newBook = {
-                    id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
-                    title,
-                    author: author || '',
-                    cover: `http://static.photos/education/320x240/${Math.floor(Math.random() * 100)}`
-                };
-                
-                books.unshift(newBook);
-                localStorage.setItem('books', JSON.stringify(books));
-                renderBooks();
-                toggleModal(false);
-            }
-        }
+       // Open file in viewer
+function openFile(id) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    
+    if (book.fileType === 'application/pdf') {
+        // Ouvrir le PDF dans un nouvel onglet ou dans un modal
+        window.open(book.fileUrl, '_blank');
+    } else if (book.fileType.startsWith('image/')) {
+        // Afficher l'image en plein écran
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center';
+        modal.innerHTML = `
+            <div class="max-w-4xl max-h-full p-4">
+                <img src="${book.fileUrl}" alt="${book.title}" class="max-w-full max-h-full object-contain">
+                <button class="absolute top-4 right-4 text-white text-2xl">×</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
         
+        modal.querySelector('button').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+    }
+}
+      // Add new book
+function addBook() {
+    const title = bookTitleInput.value.trim();
+    const author = bookAuthorInput.value.trim();
+    const file = bookFileInput.files[0];
+    
+    if (title && file) {
+        // Create object URL for the uploaded file
+        const fileUrl = URL.createObjectURL(file);
+        const fileType = file.type;
+        
+        const newBook = {
+            id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
+            title,
+            author: author || '',
+            cover: fileType.startsWith('image/') ? fileUrl : 'pdf-icon.png', // Tu devras créer une icône PDF
+            fileUrl: fileUrl,
+            fileType: fileType,
+            fileName: file.name
+        };
+        
+        books.unshift(newBook);
+        localStorage.setItem('books', JSON.stringify(books));
+        renderBooks();
+        toggleModal(false);
+    } else {
+        alert('Veuillez remplir le titre et sélectionner un fichier');
+    }
+}
+        
+      
         // Delete book
         function deleteBook(id) {
             // Show confirmation dialog
@@ -262,6 +305,11 @@
                 deleteBook(id);
             }
             
+          if (e.target.closest('.open-file')) {
+        const id = parseInt(e.target.closest('.open-file').dataset.id);
+        openFile(id);
+    }
+          
             if (e.target.closest('.edit-book')) {
                 alert('Fonctionnalité d\'édition à implémenter');
             }
