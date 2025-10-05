@@ -235,13 +235,19 @@
         <!-- Subject Popup -->
         
 
-        <!-- Schedules List -->
-        <div class="mb-8">
-            <h2 class="text-lg font-semibold mb-3">Mes emplois du temps</h2>
-            <div id="schedulesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Les emplois du temps seront générés ici dynamiquement -->
-            </div>
-        </div>
+   <!-- Autre emploi du temps -->
+<div class="mt-8">
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="text-lg font-semibold">Autre emploi du temps</h2>
+        <button id="addOtherScheduleBtn" class="text-purple-600 text-sm flex items-center">
+            <i data-feather="plus" class="mr-1 w-4 h-4"></i> Ajouter
+        </button>
+    </div>
+    <div id="otherSchedulesList" class="space-y-6">
+        <!-- Les autres emplois du temps s'afficheront ici -->
+    </div>
+</div>
+
 
         <!-- Current Week Schedule -->
         <div id="currentScheduleSection">
@@ -261,6 +267,93 @@
             </div>
         </div>
 
+<!-- Add Other Schedule Modal -->
+<div id="addOtherScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-6xl p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">Nouvel emploi du temps</h2>
+            <button id="closeOtherScheduleModal" class="text-gray-500 hover:text-gray-700">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <!-- En-tête avec titre et couleur -->
+            <div class="flex items-center space-x-4 mb-4">
+                <input type="text" id="otherScheduleName" placeholder="Nom de l'emploi du temps" class="text-xl font-bold border-none focus:ring-0 flex-grow">
+                <div class="flex space-x-2">
+                    <button data-color="purple" class="color-option w-6 h-6 rounded-full bg-purple-500 border-2 border-white ring-2 ring-offset-2 ring-purple-500"></button>
+                    <button data-color="blue" class="color-option w-6 h-6 rounded-full bg-blue-500 border-2 border-white"></button>
+                    <button data-color="green" class="color-option w-6 h-6 rounded-full bg-green-500 border-2 border-white"></button>
+                    <button data-color="red" class="color-option w-6 h-6 rounded-full bg-red-500 border-2 border-white"></button>
+                    <button data-color="yellow" class="color-option w-6 h-6 rounded-full bg-yellow-400 border-2 border-white"></button>
+                </div>
+            </div>
+
+            <!-- Jours à afficher -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Jours à afficher</label>
+                <div class="flex flex-wrap gap-3">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Lundi" checked>
+                        <span class="ml-2">Lundi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Mardi" checked>
+                        <span class="ml-2">Mardi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Mercredi" checked>
+                        <span class="ml-2">Mercredi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Jeudi" checked>
+                        <span class="ml-2">Jeudi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Vendredi" checked>
+                        <span class="ml-2">Vendredi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Samedi">
+                        <span class="ml-2">Samedi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Dimanche">
+                        <span class="ml-2">Dimanche</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Créneaux horaires -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Créneaux horaires</label>
+                <div id="otherTimeSlotsContainer" class="space-y-2 mb-3">
+                    <div class="flex items-center space-x-2">
+                        <input type="time" class="other-time-start px-2 py-1 rounded border border-gray-300" value="08:00">
+                        <span>-</span>
+                        <input type="time" class="other-time-end px-2 py-1 rounded border border-gray-300" value="09:00">
+                        <button class="remove-other-time-slot text-red-500">
+                            <i data-feather="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <button id="addOtherTimeSlot" class="text-sm text-purple-600 flex items-center">
+                    <i data-feather="plus" class="mr-1 w-4 h-4"></i> Ajouter un créneau horaire
+                </button>
+            </div>
+
+            <!-- Tableau emploi du temps -->
+            <div id="otherScheduleTable" class="bg-gray-50 rounded-lg overflow-hidden">
+                <!-- Le tableau sera généré ici dynamiquement -->
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4">
+                <button id="cancelAddOtherSchedule" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                <button id="confirmAddOtherSchedule" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
         <!-- Reminders Section -->
         <div class="mt-8">
             <div class="flex justify-between items-center mb-3">
@@ -348,7 +441,8 @@
         let exams = JSON.parse(localStorage.getItem('exams')) || [];
         let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
         let currentScheduleId = localStorage.getItem('currentScheduleId');
-        
+        let otherSchedules = JSON.parse(localStorage.getItem('otherSchedules')) || [];
+
         // Initialize the page
         function initPage() {
             renderSchedulesList();
@@ -358,71 +452,142 @@
         }
         
         // Render schedules list
-        function renderSchedulesList() {
-            schedulesList.innerHTML = '';
-            
-            if (schedules.length === 0) {
-                schedulesList.innerHTML = `
-                    <div class="col-span-full text-center py-8 text-gray-500">
-                        <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
-                        <p>Aucun emploi du temps créé</p>
-                    </div>
-                `;
-                feather.replace();
-                return;
-            }
-            
-            schedules.forEach(schedule => {
-                const scheduleElement = document.createElement('div');
-                scheduleElement.className = `schedule-card bg-white rounded-xl shadow-sm p-4 border-l-4 border-${schedule.color}-500 hover:shadow-md`;
-                scheduleElement.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-medium">${schedule.name}</h3>
-                        <div class="flex space-x-1">
-                            <button class="edit-schedule p-1 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
-                                <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
-                            </button>
-                            <button class="delete-schedule p-1 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
-                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
-                            </button>
+   function renderSchedulesList() {
+    schedulesList.innerHTML = '';
+    
+    if (schedules.length === 0) {
+        schedulesList.innerHTML = `
+            <div class="col-span-full text-center py-8 text-gray-500">
+                <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                <p>Aucun emploi du temps créé</p>
+            </div>
+        `;
+        feather.replace();
+        return;
+    }
+    
+    schedulesList.className = 'grid grid-cols-1 gap-6'; // Une colonne pour les tableaux complets
+    
+    schedules.forEach(schedule => {
+        const scheduleElement = document.createElement('div');
+        scheduleElement.className = 'bg-white rounded-xl shadow-sm p-4';
+        scheduleElement.innerHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">${schedule.name}</h3>
+                <div class="flex space-x-2">
+                    <button class="edit-schedule p-2 rounded-full hover:bg-gray-100 bg-purple-100" data-id="${schedule.id}">
+                        <i data-feather="edit-2" class="w-4 h-4 text-purple-600"></i>
+                    </button>
+                    <button class="delete-schedule p-2 rounded-full hover:bg-gray-100 bg-red-100" data-id="${schedule.id}">
+                        <i data-feather="trash-2" class="w-4 h-4 text-red-600"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-gray-50 rounded-lg overflow-hidden">
+                <div class="grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                    ${schedule.days.map(day => `
+                        <div class="bg-gray-100 p-2 text-center font-medium">${day}</div>
+                    `).join('')}
+                    
+                    ${schedule.timeSlots.map(timeSlot => `
+                        <div class="col-span-${schedule.days.length} grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                            ${schedule.days.map(day => {
+                                const subject = schedule.data && schedule.data[day] && schedule.data[day][timeSlot.id] ? schedule.data[day][timeSlot.id] : '';
+                                return `
+                                    <div class="time-slot bg-white p-2">
+                                        <div class="text-xs text-gray-500 mb-1">${timeSlot.start} - ${timeSlot.end}</div>
+                                        ${subject ? `
+                                            <div class="subject text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-2 py-1 truncate">
+                                                ${subject}
+                                            </div>
+                                        ` : '<div class="h-8"></div>'}
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
-                    </div>
-                    <div class="text-sm text-gray-500 mt-1">${schedule.days ? schedule.days.join(' • ') : ''}</div>
-                    <div class="mt-3">
-                        <a href="#" class="view-schedule text-${schedule.color}-600 text-sm flex items-center" data-id="${schedule.id}">
-                            Voir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-                        </a>
-                    </div>
-                `;
-                schedulesList.appendChild(scheduleElement);
-            });
-            
-            feather.replace();
-            
-            // Add event listeners
-            document.querySelectorAll('.view-schedule').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const scheduleId = this.getAttribute('data-id');
-                    setCurrentSchedule(scheduleId);
-                });
-            });
-            
-            document.querySelectorAll('.edit-schedule').forEach(button => {
-                button.addEventListener('click', function() {
-                    const scheduleId = this.getAttribute('data-id');
-                    openConfigureScheduleModal(scheduleId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-schedule').forEach(button => {
-                button.addEventListener('click', function() {
-                    const scheduleId = this.getAttribute('data-id');
-                    deleteSchedule(scheduleId);
-                });
-            });
-        }
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        schedulesList.appendChild(scheduleElement);
+    });
+    
+    feather.replace();
+    
+    document.querySelectorAll('.edit-schedule').forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-id');
+            openConfigureScheduleModal(scheduleId);
+        });
+    });
+    
+    document.querySelectorAll('.delete-schedule').forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-id');
+            deleteSchedule(scheduleId);
+        });
+    });
+}
         
+      // Charger les emplois du temps complets sur la page d'accueil
+function loadHomeSchedules() {
+    const homeSchedulesList = document.getElementById('homeSchedulesList');
+    const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    
+    homeSchedulesList.innerHTML = '';
+    
+    if (schedules.length === 0) {
+        homeSchedulesList.innerHTML = `
+            <div class="text-center py-8 text-gray-500 bg-white rounded-xl shadow-sm">
+                <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                <p>Aucun emploi du temps créé</p>
+                <a href="schedule.html" class="text-purple-600 text-sm mt-2 inline-block">Créer le premier</a>
+            </div>
+        `;
+        feather.replace();
+        return;
+    }
+    
+    // Afficher tous les emplois du temps avec leurs tableaux complets
+    schedules.forEach(schedule => {
+        const scheduleElement = document.createElement('div');
+        scheduleElement.className = 'bg-white rounded-xl shadow-sm p-4';
+        scheduleElement.innerHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">${schedule.name}</h3>
+                <span class="w-4 h-4 rounded-full bg-${schedule.color}-500"></span>
+            </div>
+            <div class="bg-gray-50 rounded-lg overflow-hidden">
+                <div class="grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                    ${schedule.days.map(day => `
+                        <div class="bg-gray-100 p-2 text-center font-medium text-sm">${day}</div>
+                    `).join('')}
+                    
+                    ${schedule.timeSlots.map(timeSlot => `
+                        <div class="col-span-${schedule.days.length} grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                            ${schedule.days.map(day => {
+                                const subject = schedule.data && schedule.data[day] && schedule.data[day][timeSlot.id] ? schedule.data[day][timeSlot.id] : '';
+                                return `
+                                    <div class="time-slot bg-white p-2">
+                                        <div class="text-xs text-gray-500 mb-1">${timeSlot.start} - ${timeSlot.end}</div>
+                                        ${subject ? `
+                                            <div class="subject text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-2 py-1 truncate">
+                                                ${subject}
+                                            </div>
+                                        ` : '<div class="h-8"></div>'}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        homeSchedulesList.appendChild(scheduleElement);
+    });
+    
+    feather.replace();
+}
         // Render current schedule
         function renderCurrentSchedule() {
             if (!currentScheduleId) {
@@ -761,70 +926,449 @@
         }
         
         // Create new schedule
-        function createSchedule(name, color) {
-            const newSchedule = {
+       function createSchedule(name, color) {
+    const newSchedule = {
+        id: generateId(),
+        name: name,
+        color: color,
+        days: Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value),
+        timeSlots: Array.from(timeSlotsContainer.children).map(el => {
+            return {
                 id: generateId(),
-                name: name,
-                color: color,
-                days: Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value),
-                timeSlots: Array.from(timeSlotsContainer.children).map(el => {
-                    return {
-                        id: generateId(),
-                        start: el.querySelector('.time-start').value,
-                        end: el.querySelector('.time-end').value
-                    };
-                }),
-                data: {}
+                start: el.querySelector('.time-start').value,
+                end: el.querySelector('.time-end').value
             };
-            
-            schedules.push(newSchedule);
-            saveSchedules();
-            setCurrentSchedule(newSchedule.id);
-            renderSchedulesList();
-            toggleConfigureScheduleModal(false);
-        }
+        }),
+        data: {}
+    };
+    
+    schedules.push(newSchedule);
+    saveSchedules();
+    setCurrentSchedule(newSchedule.id);
+    renderSchedulesList();
+    renderCurrentSchedule(); // Ajout pour afficher le tableau immédiatement
+    toggleConfigureScheduleModal(false);
+}
         
         // Update schedule
-        function updateSchedule(scheduleId) {
-            const schedule = schedules.find(s => s.id === scheduleId);
-            if (!schedule) return;
+      // Fonctions pour autres emplois du temps
+function initOtherScheduleModal() {
+    generateOtherScheduleTable();
+    
+    // Écouter les changements de jours
+    document.querySelectorAll('.other-day-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', generateOtherScheduleTable);
+    });
+    
+    // Écouter les changements d'heures
+    document.querySelectorAll('.other-time-start, .other-time-end').forEach(input => {
+        input.addEventListener('change', generateOtherScheduleTable);
+    });
+}
+
+function generateOtherScheduleTable() {
+    const selectedDays = Array.from(document.querySelectorAll('.other-day-checkbox:checked')).map(cb => cb.value);
+    const timeSlots = Array.from(document.querySelectorAll('#otherTimeSlotsContainer > div')).map(el => ({
+        start: el.querySelector('.other-time-start').value,
+        end: el.querySelector('.other-time-end').value
+    }));
+    
+    // Trier les créneaux horaires
+    timeSlots.sort((a, b) => a.start.localeCompare(b.start));
+    
+    const scheduleTable = document.getElementById('otherScheduleTable');
+    
+    if (selectedDays.length === 0 || timeSlots.length === 0) {
+        scheduleTable.innerHTML = '<div class="p-4 text-center text-gray-500">Sélectionnez des jours et des créneaux horaires</div>';
+        return;
+    }
+    
+    scheduleTable.innerHTML = `
+        <div class="grid grid-cols-${selectedDays.length + 1} gap-px bg-gray-200">
+            <!-- En-tête -->
+            <div class="bg-gray-100 p-3 font-medium"></div>
+            ${selectedDays.map(day => `
+                <div class="bg-gray-100 p-3 text-center font-medium">${day}</div>
+            `).join('')}
             
-            schedule.days = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
-            schedule.timeSlots = Array.from(timeSlotsContainer.children).map(el => {
-                return {
-                    id: generateId(),
-                    start: el.querySelector('.time-start').value,
-                    end: el.querySelector('.time-end').value
-                };
-            });
-            
-            // Preserve existing data
-            const newData = {};
-            const previewSubjects = document.querySelectorAll('.subject-preview');
-            let i = 0;
-            
-            schedule.days.forEach(day => {
-                schedule.timeSlots.forEach(timeSlot => {
-                    if (previewSubjects[i]) {
-                        const subject = previewSubjects[i].textContent.trim();
-                        if (subject) {
-                            if (!newData[day]) newData[day] = {};
-                            newData[day][timeSlot.id] = subject;
-                        }
-                        i++;
-                    }
-                });
-            });
-            
-            schedule.data = newData;
-            
-            saveSchedules();
-            renderSchedulesList();
-            renderCurrentSchedule();
-            toggleConfigureScheduleModal(false);
-        }
+            <!-- Lignes de créneaux horaires -->
+            ${timeSlots.map((timeSlot, index) => `
+                <div class="grid grid-cols-${selectedDays.length + 1} gap-px bg-gray-200">
+                    <div class="bg-gray-50 p-2 flex items-center justify-between">
+                        <span class="text-sm font-medium">${timeSlot.start} - ${timeSlot.end}</span>
+                        <button class="remove-time-row text-red-500" data-index="${index}">
+                            <i data-feather="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    ${selectedDays.map(day => `
+                        <div class="bg-white p-2">
+                            <div class="time-cell h-12 border border-gray-200 rounded hover:bg-gray-50 cursor-text" 
+                                 contenteditable="true"
+                                 data-day="${day}"
+                                 data-time="${timeSlot.start}-${timeSlot.end}"></div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    feather.replace();
+    
+    // Ajouter les événements pour supprimer les lignes
+    document.querySelectorAll('.remove-time-row').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = this.getAttribute('data-index');
+            removeOtherTimeSlot(index);
+        });
+    });
+}
+
+function addOtherTimeSlot() {
+    const container = document.getElementById('otherTimeSlotsContainer');
+    const timeSlotElement = document.createElement('div');
+    timeSlotElement.className = 'flex items-center space-x-2';
+    timeSlotElement.innerHTML = `
+        <input type="time" class="other-time-start px-2 py-1 rounded border border-gray-300" value="09:00">
+        <span>-</span>
+        <input type="time" class="other-time-end px-2 py-1 rounded border border-gray-300" value="10:00">
+        <button class="remove-other-time-slot text-red-500">
+            <i data-feather="trash-2" class="w-4 h-4"></i>
+        </button>
+    `;
+    
+    container.appendChild(timeSlotElement);
+    feather.replace();
+    
+    // Ajouter les événements
+    timeSlotElement.querySelector('.remove-other-time-slot').addEventListener('click', function() {
+        timeSlotElement.remove();
+        generateOtherScheduleTable();
+    });
+    
+    timeSlotElement.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', generateOtherScheduleTable);
+    });
+    
+    generateOtherScheduleTable();
+}
+
+function removeOtherTimeSlot(index) {
+    const timeSlots = document.querySelectorAll('#otherTimeSlotsContainer > div');
+    if (timeSlots[index]) {
+        timeSlots[index].remove();
+        generateOtherScheduleTable();
+    }
+}
+
+function createOtherSchedule() {
+    const name = document.getElementById('otherScheduleName').value.trim() || 'Nouvel emploi du temps';
+    const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+    const selectedDays = Array.from(document.querySelectorAll('.other-day-checkbox:checked')).map(cb => cb.value);
+    
+    const timeSlots = Array.from(document.querySelectorAll('#otherTimeSlotsContainer > div')).map(el => ({
+        start: el.querySelector('.other-time-start').value,
+        end: el.querySelector('.other-time-end').value
+    })).sort((a, b) => a.start.localeCompare(b.start));
+    
+    // Récupérer les données du tableau
+    const data = {};
+    document.querySelectorAll('.time-cell').forEach(cell => {
+        const day = cell.getAttribute('data-day');
+        const time = cell.getAttribute('data-time');
+        const subject = cell.textContent.trim();
         
-        // Delete schedule
+        if (subject) {
+            if (!data[day]) data[day] = {};
+            data[day][time] = subject;
+        }
+    });
+    
+    const newSchedule = {
+        id: Date.now().toString(),
+        name: name,
+        color: color,
+        days: selectedDays,
+        timeSlots: timeSlots,
+        data: data
+    };
+    
+    otherSchedules.push(newSchedule);
+    saveOtherSchedules();
+    renderOtherSchedules();
+    toggleOtherScheduleModal(false);
+}
+
+function renderOtherSchedules() {
+    const container = document.getElementById('otherSchedulesList');
+    container.innerHTML = '';
+    
+    if (otherSchedules.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500 bg-white rounded-xl shadow-sm">
+                <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                <p>Aucun emploi du temps supplémentaire</p>
+            </div>
+        `;
+        feather.replace();
+        return;
+    }
+    
+    otherSchedules.forEach(schedule => {
+        const scheduleElement = document.createElement('div');
+        scheduleElement.className = 'bg-white rounded-xl shadow-sm p-4';
+        scheduleElement.innerHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-3">
+                    <h3 class="text-lg font-semibold">${schedule.name}</h3>
+                    <span class="w-4 h-4 rounded-full bg-${schedule.color}-500"></span>
+                </div>
+                <button class="delete-other-schedule p-2 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
+                    <i data-feather="trash-2" class="w-4 h-4 text-red-600"></i>
+                </button>
+            </div>
+            <div class="bg-gray-50 rounded-lg overflow-hidden">
+                <div class="grid grid-cols-${schedule.days.length + 1} gap-px bg-gray-200">
+                    <!-- En-tête -->
+                    <div class="bg-gray-100 p-2 font-medium"></div>
+                    ${schedule.days.map(day => `
+                        <div class="bg-gray-100 p-2 text-center font-medium text-sm">${day}</div>
+                    `).join('')}
+                    
+                    <!-- Lignes -->
+                    ${schedule.timeSlots.map(timeSlot => `
+                        <div class="grid grid-cols-${schedule.days.length + 1} gap-px bg-gray-200">
+                            <div class="bg-gray-50 p-2">
+                                <div class="text-xs text-gray-500">${timeSlot.start} - ${timeSlot.end}</div>
+                            </div>
+                            ${schedule.days.map(day => {
+                                const subject = schedule.data && schedule.data[day] && schedule.data[day][`${timeSlot.start}-${timeSlot.end}`] ? schedule.data[day][`${timeSlot.start}-${timeSlot.end}`] : '';
+                                return `
+                                    <div class="bg-white p-2">
+                                        ${subject ? `
+                                            <div class="text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-2 py-1">
+                                                ${subject}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        container.appendChild(scheduleElement);
+    });
+    
+    feather.replace();
+    
+    // Ajouter les événements de suppression
+    document.querySelectorAll('.delete-other-schedule').forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-id');
+            deleteOtherSchedule(scheduleId);
+        });
+    });
+}
+
+function deleteOtherSchedule(scheduleId) {
+    otherSchedules = otherSchedules.filter(s => s.id !== scheduleId);
+    saveOtherSchedules();
+    renderOtherSchedules();
+}
+
+function saveOtherSchedules() {
+    localStorage.setItem('otherSchedules', JSON.stringify(otherSchedules));
+}
+
+function toggleOtherScheduleModal(show) {
+    const modal = document.getElementById('addOtherScheduleModal');
+    if (show) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        initOtherScheduleModal();
+    } else {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+// Événements
+document.getElementById('addOtherScheduleBtn').addEventListener('click', () => toggleOtherScheduleModal(true));
+document.getElementById('closeOtherScheduleModal').addEventListener('click', () => toggleOtherScheduleModal(false));
+document.getElementById('cancelAddOtherSchedule').addEventListener('click', () => toggleOtherScheduleModal(false));
+document.getElementById('confirmAddOtherSchedule').addEventListener('click', createOtherSchedule);
+document.getElementById('addOtherTimeSlot').addEventListener('click', addOtherTimeSlot);
+
+// Initialisation au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    renderOtherSchedules();
+});
+      // Corriger updateSchedule pour ordre correct (ts puis day)
+function updateSchedule(scheduleId) {
+    const schedule = schedules.find(s => s.id === scheduleId);
+    if (!schedule) return;
+    
+    schedule.days = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
+    schedule.timeSlots = Array.from(timeSlotsContainer.children).map(el => {
+        return {
+            id: generateId(),
+            start: el.querySelector('.time-start').value,
+            end: el.querySelector('.time-end').value
+        };
+    });
+    
+    // Preserve existing data + new from preview (ordre ts puis day pour matcher DOM)
+    const newData = schedule.data || {};
+    const previewSubjects = document.querySelectorAll('.subject-preview');
+    let i = 0;
+    
+    schedule.timeSlots.forEach(timeSlot => {
+        schedule.days.forEach(day => {
+            if (previewSubjects[i]) {
+                const subject = previewSubjects[i].textContent.trim();
+                if (subject) {
+                    if (!newData[day]) newData[day] = {};
+                    newData[day][timeSlot.id] = subject;
+                }
+                i++;
+            }
+        });
+    });
+    
+    schedule.data = newData;
+    
+    saveSchedules();
+    renderSchedulesList();
+    renderCurrentSchedule();
+    toggleConfigureScheduleModal(false);
+}
+
+// Ajouter lecture preview dans createSchedule
+function createSchedule(name, color) {
+    const newSchedule = {
+        id: generateId(),
+        name: name,
+        color: color,
+        days: Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value),
+        timeSlots: Array.from(timeSlotsContainer.children).map(el => {
+            return {
+                id: generateId(),
+                start: el.querySelector('.time-start').value,
+                end: el.querySelector('.time-end').value
+            };
+        }),
+        data: {}
+    };
+    
+    // Lire preview pour data (ordre ts puis day)
+    const previewSubjects = document.querySelectorAll('.subject-preview');
+    let i = 0;
+    
+    newSchedule.timeSlots.forEach(timeSlot => {
+        newSchedule.days.forEach(day => {
+            if (previewSubjects[i]) {
+                const subject = previewSubjects[i].textContent.trim();
+                if (subject) {
+                    if (!newSchedule.data[day]) newSchedule.data[day] = {};
+                    newSchedule.data[day][timeSlot.id] = subject;
+                }
+                i++;
+            }
+        });
+    });
+    
+    schedules.push(newSchedule);
+    saveSchedules();
+    setCurrentSchedule(newSchedule.id);
+    renderSchedulesList();
+    renderCurrentSchedule();
+    toggleConfigureScheduleModal(false);
+}
+        
+      // === CONFIGURATION EMPLOI DU TEMPS ===
+
+// Génération du tableau d'emploi du temps
+function generateScheduleTable(days, timeSlots) {
+  let table = `<table class="w-full border-collapse text-sm text-center">
+    <thead class="bg-purple-100">
+      <tr>
+        <th class="border p-2">Heures</th>`;
+  days.forEach(day => {
+    table += `<th class="border p-2">${day}</th>`;
+  });
+  table += `</tr></thead><tbody>`;
+
+  timeSlots.forEach(slot => {
+    table += `<tr>
+      <td class="border p-2">${slot.start} - ${slot.end}</td>`;
+    days.forEach(() => {
+      table += `<td class="border p-2 text-gray-500 italic">Libre</td>`;
+    });
+    table += `</tr>`;
+  });
+
+  table += `</tbody></table>`;
+  return table;
+}
+
+// Sauvegarde et affichage du tableau
+document.getElementById("confirmConfigureSchedule").addEventListener("click", () => {
+  const selectedDays = [...document.querySelectorAll(".day-checkbox:checked")].map(cb => cb.value);
+  const timeSlots = [...document.querySelectorAll("#timeSlotsContainer .flex")].map(el => ({
+    start: el.querySelector(".time-start").value,
+    end: el.querySelector(".time-end").value
+  }));
+
+  const tableHTML = generateScheduleTable(selectedDays, timeSlots);
+
+  // Afficher dans la page d’accueil
+  const display = document.getElementById("scheduleDisplay");
+  const container = document.getElementById("scheduleTableContainer");
+  container.innerHTML = tableHTML;
+  display.classList.remove("hidden");
+
+  // Sauvegarder localement
+  localStorage.setItem("emploiDuTemps", JSON.stringify({ days: selectedDays, timeSlots }));
+
+  // Fermer le modal
+  document.getElementById("configureScheduleModal").classList.add("hidden");
+});
+
+// Charger depuis localStorage au démarrage
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("emploiDuTemps");
+  if (saved) {
+    const { days, timeSlots } = JSON.parse(saved);
+    const tableHTML = generateScheduleTable(days, timeSlots);
+    document.getElementById("scheduleTableContainer").innerHTML = tableHTML;
+    document.getElementById("scheduleDisplay").classList.remove("hidden");
+  }
+});
+
+// Ajouter un créneau
+document.getElementById("addTimeSlot").addEventListener("click", () => {
+  const container = document.getElementById("timeSlotsContainer");
+  const div = document.createElement("div");
+  div.className = "flex items-center space-x-2";
+  div.innerHTML = `
+    <input type="time" class="time-start px-2 py-1 rounded border border-gray-300" value="08:00">
+    <span>-</span>
+    <input type="time" class="time-end px-2 py-1 rounded border border-gray-300" value="10:00">
+    <button class="remove-time-slot text-red-500"><i data-feather="trash-2" class="w-4 h-4"></i></button>`;
+  container.appendChild(div);
+  feather.replace();
+});
+
+// Supprimer un créneau
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".remove-time-slot")) {
+    e.target.closest(".flex").remove();
+  }
+});
+
+        // Delete sChedule
         function deleteSchedule(scheduleId) {
             if (confirm('Êtes-vous sûr de vouloir supprimer cet emploi du temps ?')) {
                 schedules = schedules.filter(s => s.id !== scheduleId);
@@ -882,9 +1426,12 @@
         }
         
         // Save data to localStorage
-        function saveSchedules() {
-            localStorage.setItem('schedules', JSON.stringify(schedules));
-        }
+      function saveSchedules() {
+    localStorage.setItem('schedules', JSON.stringify(schedules));
+    
+    // Déclencher un événement pour notifier le changement
+    window.dispatchEvent(new Event('schedulesUpdated'));
+}
         
         function saveExams() {
             localStorage.setItem('exams', JSON.stringify(exams));
