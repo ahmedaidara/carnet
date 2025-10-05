@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Emploi du temps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .schedule-card {
+            transition: all 0.3s ease;
+        }
+        .schedule-card:hover {
+            transform: translateY(-3px);
+        }
+        .time-slot {
+            transition: background-color 0.2s ease;
+        }
+        .time-slot:hover {
+            background-color: #F5F3FF;
+        }
+        [contenteditable]:focus {
+            outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="text-gray-600">
+                    <i data-feather="arrow-left"></i>
+                </a>
+                <h1 class="text-xl font-bold text-gray-800">Emploi du temps</h1>
+            </div>
+            <div class="flex space-x-2">
+                <button id="addScheduleBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                    <i data-feather="plus"></i>
+                </button>
+                <button id="addExamBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                    <i data-feather="edit-3"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6 pb-32">
+        <!-- Add Schedule Modal -->
+        <div id="addScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Nouvel emploi du temps</h2>
+                    <button id="closeScheduleModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                        <input type="text" id="scheduleName" placeholder="Ex: Scolaire, Personnel, Vacances" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Couleur</label>
+                        <div class="flex space-x-2">
+                            <button data-color="purple" class="color-option w-8 h-8 rounded-full bg-purple-500 border-2 border-white"></button>
+                            <button data-color="blue" class="color-option w-8 h-8 rounded-full bg-blue-500 border-2 border-white"></button>
+                            <button data-color="green" class="color-option w-8 h-8 rounded-full bg-green-500 border-2 border-white"></button>
+                            <button data-color="red" class="color-option w-8 h-8 rounded-full bg-red-500 border-2 border-white"></button>
+                            <button data-color="yellow" class="color-option w-8 h-8 rounded-full bg-yellow-400 border-2 border-white"></button>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddSchedule" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddSchedule" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Créer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Exam Modal -->
+        <div id="addExamModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Nouvel examen</h2>
+                    <button id="closeExamModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                        <input type="text" id="examName" placeholder="Ex: BAC Blanc, DS Math" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input type="date" id="examDate" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Heure</label>
+                        <input type="time" id="examTime" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddExam" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddExam" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedules List -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold mb-3">Mes emplois du temps</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="schedule-card bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-500 hover:shadow-md">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-medium">Scolaire</h3>
+                        <div class="flex space-x-1">
+                            <button class="p-1 rounded-full hover:bg-gray-100">
+                                <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                            <button class="p-1 rounded-full hover:bg-gray-100">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">Lundi - Vendredi • 8h-18h</div>
+                    <div class="mt-3">
+                        <a href="#" class="text-purple-600 text-sm flex items-center">
+                            Voir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="schedule-card bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500 hover:shadow-md">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-medium">Personnel</h3>
+                        <div class="flex space-x-1">
+                            <button class="p-1 rounded-full hover:bg-gray-100">
+                                <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                            <button class="p-1 rounded-full hover:bg-gray-100">
+                                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">Tous les jours • Flexible</div>
+                    <div class="mt-3">
+                        <a href="#" class="text-blue-600 text-sm flex items-center">
+                            Voir <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Week Schedule -->
+        <div>
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold">Semaine actuelle</h2>
+                <div class="flex items-center space-x-2">
+                    <button class="p-1 rounded-full hover:bg-gray-100">
+                        <i data-feather="chevron-left" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                    <span class="text-sm font-medium">12 - 18 juin 2023</span>
+                    <button class="p-1 rounded-full hover:bg-gray-100">
+                        <i data-feather="chevron-right" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="grid grid-cols-7 gap-px bg-gray-200">
+                    <!-- Header row -->
+                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Lundi</div>
+                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Mardi</div>
+                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Mercredi</div>
+                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Jeudi</div>
+                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Vendredi</div>
+                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Samedi</div>
+                    <div class="bg-gray-100 p-2 text-center font-medium text-sm">Dimanche</div>
+                    
+                    <!-- Time slots -->
+                    <div class="col-span-7 grid grid-cols-7 gap-px bg-gray-200">
+                        <!-- 8h-10h -->
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
+                            <div class="text-sm bg-purple-50 text-purple-800 rounded px-1 py-0.5 truncate">Mathématiques</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
+                            <div class="text-sm bg-purple-50 text-purple-800 rounded px-1 py-0.5 truncate">Mathématiques</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
+                            <div class="text-sm bg-blue-50 text-blue-800 rounded px-1 py-0.5 truncate">Physique</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">8h-10h</div>
+                        </div>
+                        
+                        <!-- 10h15-12h15 -->
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
+                            <div class="text-sm bg-green-50 text-green-800 rounded px-1 py-0.5 truncate">Philosophie</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
+                            <div class="text-sm bg-purple-50 text-purple-800 rounded px-1 py-0.5 truncate">Mathématiques</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
+                            <div class="text-sm bg-yellow-50 text-yellow-800 rounded px-1 py-0.5 truncate">Anglais</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
+                        </div>
+                        <div class="time-slot bg-white p-2 h-24">
+                            <div class="text-xs text-gray-500 mb-1">10h15-12h15</div>
+                        </div>
+                        
+                        <!-- Add more time slots as needed -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Exams -->
+        <div class="mt-8">
+            <h2 class="text-lg font-semibold mb-3">Examens à venir</h2>
+            <div class="bg-white rounded-xl shadow-sm p-4">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                <i data-feather="alert-triangle" class="text-red-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium">BAC Blanc - Mathématiques</div>
+                                <div class="text-sm text-gray-600">20 juin 2023 • 8h00-12h00</div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-medium text-red-600">Dans 8 jours</div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                <i data-feather="edit-3" class="text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium">DS Physique</div>
+                                <div class="text-sm text-gray-600">23 juin 2023 • 10h00-12h00</div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-medium text-yellow-600">Dans 11 jours</div>
+                    </div>
+                </div>
+                <button class="mt-4 w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center">
+                    <i data-feather="plus" class="mr-2 w-4 h-4"></i> Ajouter un examen
+                </button>
+            </div>
+        </div>
+
+        <!-- Reminders Section -->
+        <div class="mt-8">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold">Rappels</h2>
+                <button id="addReminderBtn" class="text-purple-600 text-sm flex items-center">
+                    <i data-feather="plus" class="mr-1 w-4 h-4"></i> Nouveau rappel
+                </button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-4">
+                <div class="space-y-3">
+                    <div class="flex items-start p-3 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
+                            <i data-feather="bell" class="text-gray-600"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="font-medium">Révision formules</div>
+                            <div class="text-sm text-gray-600">Réviser toutes les formules de trigonométrie pour le DS de jeudi</div>
+                        </div>
+                        <button class="p-1 rounded-full hover:bg-gray-200 ml-2">
+                            <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-start p-3 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
+                            <i data-feather="bell" class="text-gray-600"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="font-medium">Préparer exposé</div>
+                            <div class="text-sm text-gray-600">Terminer la présentation pour l'exposé d'histoire</div>
+                        </div>
+                        <button class="p-1 rounded-full hover:bg-gray-200 ml-2">
+                            <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
+        <div class="container mx-auto flex justify-around">
+            <a href="index.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Accueil</span>
+            </a>
+            <a href="subjects.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="book" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Matières</span>
+            </a>
+            <a href="library.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="bookmark" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Bibliothèque</span>
+            </a>
+            <a href="schedule.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
+                <i data-feather="calendar" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Emploi du temps</span>
+            </a>
+            <a href="settings.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="settings" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Paramètres</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // DOM Elements
+        const addScheduleModal = document.getElementById('addScheduleModal');
+        const addScheduleBtn = document.getElementById('addScheduleBtn');
+        const closeScheduleModal = document.getElementById('closeScheduleModal');
+        const cancelAddSchedule = document.getElementById('cancelAddSchedule');
+        const confirmAddSchedule = document.getElementById('confirmAddSchedule');
+        
+        const addExamModal = document.getElementById('addExamModal');
+        const addExamBtn = document.getElementById('addExamBtn');
+        const closeExamModal = document.getElementById('closeExamModal');
+        const cancelAddExam = document.getElementById('cancelAddExam');
+        const confirmAddExam = document.getElementById('confirmAddExam');
+        
+        const addReminderBtn = document.getElementById('addReminderBtn');
+        
+        // Toggle modals
+        function toggleScheduleModal(show) {
+            if (show) {
+                addScheduleModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addScheduleModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        function toggleExamModal(show) {
+            if (show) {
+                addExamModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addExamModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Event Listeners
+        addScheduleBtn.addEventListener('click', () => toggleScheduleModal(true));
+        closeScheduleModal.addEventListener('click', () => toggleScheduleModal(false));
+        cancelAddSchedule.addEventListener('click', () => toggleScheduleModal(false));
+        confirmAddSchedule.addEventListener('click', () => {
+            // In a real app, save the new schedule
+            toggleScheduleModal(false);
+        });
+        
+        addExamBtn.addEventListener('click', () => toggleExamModal(true));
+        closeExamModal.addEventListener('click', () => toggleExamModal(false));
+        cancelAddExam.addEventListener('click', () => toggleExamModal(false));
+        confirmAddExam.addEventListener('click', () => {
+            // In a real app, save the new exam
+            toggleExamModal(false);
+        });
+        
+        addReminderBtn.addEventListener('click', () => {
+            const title = prompt("Titre du rappel:");
+            if (title) {
+                const description = prompt("Description du rappel:");
+                if (description) {
+                    // In a real app, save the reminder and update the UI
+                    alert("Rappel ajouté avec succès!");
+                }
+            }
+        });
+        
+        // Color selection for schedule
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.color-option').forEach(opt => {
+                    opt.classList.remove('ring-2', 'ring-offset-2', 'ring-purple-500');
+                });
+                this.classList.add('ring-2', 'ring-offset-2', 'ring-purple-500');
+            });
+        });
+        
+        // Prevent blue highlight on mobile taps
+        document.addEventListener('touchstart', function() {}, true);
+    </script>
+</body>
+</html>
