@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Matières</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .subject-card {
+            transition: all 0.3s ease;
+        }
+        .subject-card:hover {
+            transform: translateY(-3px);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            color: #6C63FF;
+            border-bottom: 2px solid #6C63FF;
+        }
+        [contenteditable]:focus {
+            outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="text-gray-600">
+                    <i data-feather="arrow-left"></i>
+                </a>
+                <h1 class="text-xl font-bold text-gray-800">Matières</h1>
+            </div>
+            <button id="addSubjectBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                <i data-feather="plus"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6 pb-20">
+        <!-- Add Subject Modal -->
+        <div id="addSubjectModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Ajouter une matière</h2>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la matière</label>
+                        <input type="text" id="subjectName" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Coefficient</label>
+                        <input type="number" id="subjectCoeff" min="1" value="1" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddSubject" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddSubject" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subjects List -->
+        <div id="subjectsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Subjects will be added here dynamically -->
+        </div>
+
+        <!-- No Subjects Placeholder -->
+        <div id="noSubjects" class="text-center py-12">
+            <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <i data-feather="book-open" class="text-gray-400 w-12 h-12"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-700 mb-1">Aucune matière ajoutée</h3>
+            <p class="text-gray-500 mb-4">Commencez par ajouter vos matières pour organiser vos cours</p>
+            <button id="addFirstSubject" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                <i data-feather="plus" class="mr-2 inline"></i> Ajouter une matière
+            </button>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
+        <div class="container mx-auto flex justify-around">
+            <a href="index.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="home" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Accueil</span>
+            </a>
+            <a href="subjects.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
+                <i data-feather="book" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Matières</span>
+            </a>
+            <a href="library.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="bookmark" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Bibliothèque</span>
+            </a>
+            <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="calendar" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Emploi du temps</span>
+            </a>
+            <a href="settings.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+                <i data-feather="settings" class="w-6 h-6"></i>
+                <span class="text-xs mt-1">Paramètres</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Sample subjects data
+        let subjects = [
+            { id: 1, name: "Mathématiques", coefficient: 5, color: "purple" },
+            { id: 2, name: "Physique", coefficient: 4, color: "red" },
+            { id: 3, name: "Informatique", coefficient: 3, color: "blue" },
+            { id: 4, name: "Histoire-Géo", coefficient: 2, color: "yellow" },
+            { id: 5, name: "Philosophie", coefficient: 2, color: "green" },
+            { id: 6, name: "Anglais", coefficient: 2, color: "indigo" }
+        ];
+        
+        // DOM Elements
+        const subjectsList = document.getElementById('subjectsList');
+        const noSubjects = document.getElementById('noSubjects');
+        const addSubjectModal = document.getElementById('addSubjectModal');
+        const addSubjectBtn = document.getElementById('addSubjectBtn');
+        const addFirstSubjectBtn = document.getElementById('addFirstSubject');
+        const closeModalBtn = document.getElementById('closeModal');
+        const cancelAddSubjectBtn = document.getElementById('cancelAddSubject');
+        const confirmAddSubjectBtn = document.getElementById('confirmAddSubject');
+        const subjectNameInput = document.getElementById('subjectName');
+        const subjectCoeffInput = document.getElementById('subjectCoeff');
+        
+        // Colors for subject cards
+        const cardColors = {
+            purple: { bg: 'purple-100', text: 'purple-600', hover: 'purple-200' },
+            red: { bg: 'red-100', text: 'red-600', hover: 'red-200' },
+            blue: { bg: 'blue-100', text: 'blue-600', hover: 'blue-200' },
+            yellow: { bg: 'yellow-100', text: 'yellow-600', hover: 'yellow-200' },
+            green: { bg: 'green-100', text: 'green-600', hover: 'green-200' },
+            indigo: { bg: 'indigo-100', text: 'indigo-600', hover: 'indigo-200' }
+        };
+        
+        // Icons for subjects
+        const subjectIcons = {
+            "Mathématiques": "divide",
+            "Physique": "atom",
+            "Informatique": "code",
+            "Histoire-Géo": "globe",
+            "Philosophie": "feather",
+            "Anglais": "message-square",
+            "default": "book"
+        };
+        
+        // Render subjects
+        function renderSubjects() {
+            if (subjects.length === 0) {
+                noSubjects.classList.remove('hidden');
+                subjectsList.classList.add('hidden');
+            } else {
+                noSubjects.classList.add('hidden');
+                subjectsList.classList.remove('hidden');
+                
+                subjectsList.innerHTML = '';
+                subjects.forEach(subject => {
+                    const color = cardColors[subject.color] || cardColors.purple;
+                    const icon = subjectIcons[subject.name] || subjectIcons.default;
+                    
+                    const subjectCard = document.createElement('a');
+                    subjectCard.href = `subject.html?id=${subject.id}`;
+                    subjectCard.className = `subject-card bg-white rounded-xl shadow-sm p-4 hover:shadow-md border border-gray-100`;
+                    subjectCard.innerHTML = `
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="w-10 h-10 rounded-full bg-${color.bg} flex items-center justify-center">
+                                <i data-feather="${icon}" class="text-${color.text}"></i>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="edit-subject p-1 rounded-full hover:bg-gray-100" data-id="${subject.id}">
+                                    <i data-feather="edit-2" class="w-4 h-4 text-gray-500"></i>
+                                </button>
+                                <button class="delete-subject p-1 rounded-full hover:bg-gray-100" data-id="${subject.id}">
+                                    <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="font-medium text-gray-800 mb-1">${subject.name}</h3>
+                        <div class="text-sm text-gray-500">Coeff: ${subject.coefficient}</div>
+                    `;
+                    
+                    subjectsList.appendChild(subjectCard);
+                });
+                feather.replace();
+            }
+        }
+        
+        // Toggle modal
+        function toggleModal(show) {
+            if (show) {
+                addSubjectModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addSubjectModal.classList.add('hidden');
+                document.body.style.overflow = '';
+                subjectNameInput.value = '';
+                subjectCoeffInput.value = '1';
+            }
+        }
+        
+        // Add new subject
+        function addSubject() {
+            const name = subjectNameInput.value.trim();
+            const coeff = parseInt(subjectCoeffInput.value);
+            
+            if (name && coeff > 0) {
+                const colors = Object.keys(cardColors);
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const newSubject = {
+                    id: subjects.length > 0 ? Math.max(...subjects.map(s => s.id)) + 1 : 1,
+                    name,
+                    coefficient: coeff,
+                    color: randomColor
+                };
+                
+                subjects.push(newSubject);
+                localStorage.setItem('subjects', JSON.stringify(subjects));
+                renderSubjects();
+                toggleModal(false);
+            }
+        }
+        
+        // Delete subject
+        function deleteSubject(id) {
+            // Show confirmation dialog
+            const confirmDelete = confirm("Voulez-vous vraiment supprimer cette matière?");
+            if (confirmDelete) {
+                subjects = subjects.filter(subject => subject.id !== id);
+                localStorage.setItem('subjects', JSON.stringify(subjects));
+                renderSubjects();
+            }
+        }
+        
+        // Load subjects from localStorage if available
+        if (localStorage.getItem('subjects')) {
+            subjects = JSON.parse(localStorage.getItem('subjects'));
+        }
+        
+        // Event Listeners
+        addSubjectBtn.addEventListener('click', () => toggleModal(true));
+        addFirstSubjectBtn.addEventListener('click', () => toggleModal(true));
+        closeModalBtn.addEventListener('click', () => toggleModal(false));
+        cancelAddSubjectBtn.addEventListener('click', () => toggleModal(false));
+        confirmAddSubjectBtn.addEventListener('click', addSubject);
+        
+        // Handle delete buttons (delegated event)
+        subjectsList.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-subject')) {
+                const id = parseInt(e.target.closest('.delete-subject').dataset.id);
+                deleteSubject(id);
+            }
+        });
+        
+        // Initial render
+        renderSubjects();
+        
+        // Prevent blue highlight on mobile taps
+        document.addEventListener('touchstart', function() {}, true);
+    </script>
+</body>
+</html>
