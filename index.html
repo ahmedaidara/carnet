@@ -82,77 +82,45 @@
                         <i data-feather="calendar" class="text-purple-600"></i>
                     </div>
                     <div>
-                        <div class="text-gray-500">Aujourd'hui</div>
-                        <div id="current-date" class="font-semibold text-lg">Lundi 12 juin 2023</div>
-                    </div>
+    <div class="text-gray-500">Aujourd'hui</div>
+    <div id="current-date" class="font-semibold text-lg">Lundi 10 janvier 2005</div>
+    <div id="current-time" class="text-sm text-gray-600">00:00:00</div>
+</div>
                 </div>
                 
-                <div id="reminder-display" class="flex-grow max-w-md px-4"></div>
+                <div id="reminder-display" class="flex-grow max-w-md px-4">
+    <!-- Les rappels seront affichés ici dynamiquement, sauf "Révision des formules des alcanes" -->
+</div>
                 
                 <div class="flex items-center space-x-4">
-                    <div class="text-right">
-                        <div class="text-gray-500">Prochain devoir</div>
-                        <div id="countdown" class="font-bold text-purple-600 countdown">BAC 2026: 256j 21h 03m 27s</div>
-                    </div>
+                   <div class="text-right">
+    <div class="text-gray-500">Prochain examen</div>
+    <div id="next-exam" class="font-bold text-purple-600">Chargement...</div>
+</div>
                 </div>
             </div>
         </section>
 
         <!-- Tomorrow's Schedule -->
-        <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4 flex items-center">
-                <i data-feather="clock" class="mr-2"></i> Emploi du temps de demain
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white rounded-xl shadow-sm p-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="font-medium">Emploi du temps scolaire</h3>
-                        <a href="schedule.html" class="text-sm text-purple-600 flex items-center">
-                            Voir plus <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-                        </a>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center p-2 bg-purple-50 rounded-lg">
-                            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                                <i data-feather="book" class="text-purple-600"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium">Mathématiques</div>
-                                <div class="text-sm text-gray-500">08:00 - 10:00 • Salle A12</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center p-2 bg-blue-50 rounded-lg">
-                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                                <i data-feather="globe" class="text-blue-600"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium">Histoire-Géo</div>
-                                <div class="text-sm text-gray-500">10:15 - 12:15 • Salle B07</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm p-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="font-medium">Emploi du temps personnel</h3>
-                        <a href="schedule.html" class="text-sm text-purple-600 flex items-center">
-                            Voir plus <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-                        </a>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center p-2 bg-green-50 rounded-lg">
-                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                                <i data-feather="home" class="text-green-600"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium">Révision Chimie</div>
-                                <div class="text-sm text-gray-500">16:00 - 18:00 • Maison</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+       <section class="mb-8">
+    <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <i data-feather="clock" class="mr-2"></i> À suivre
+    </h2>
+    <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-medium">Prochaines matières</h3>
+            <a href="schedule.html" class="text-sm text-purple-600 flex items-center">
+                Voir plus <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+            </a>
+        </div>
+        <div id="next-subjects" class="space-y-3">
+            <!-- Les 2 prochaines matières seront affichées ici dynamiquement -->
+            <div class="text-center py-4 text-gray-500">
+                Chargement des prochaines matières...
             </div>
-        </section>
+        </div>
+    </div>
+</section>
 
         <!-- Bulletin & Evolution -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -255,31 +223,171 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Initialize Feather Icons
-        feather.replace();
+      // Initialize the page
+function initPage() {
+    feather.replace();
+    
+    // Set current date and time
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
+    
+    // Start real-time clock
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+    
+    // Dynamic greeting
+    const hour = now.getHours();
+    let greeting;
+    
+    if (hour < 12) {
+        greeting = "Bonjour";
+    } else if (hour < 18) {
+        greeting = "Bonsoir";
+    } else {
+        greeting = "Bonsoir";
+    }
+    
+    document.getElementById('greeting').textContent = greeting;
+    
+    // Load data from schedule page
+    loadNextExam();
+    loadNextSubjects();
+    loadFilteredReminders();
+    
+    // Set up intervals to refresh data
+    setInterval(loadNextExam, 60000); // Refresh every minute
+    setInterval(loadNextSubjects, 60000); // Refresh every minute
+}
         
-        // Set current date
-        const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
+      
+      // Fonction pour mettre à jour l'heure en temps réel
+function updateCurrentTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('fr-FR', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    const timeElement = document.getElementById('current-time');
+    if (timeElement) {
+        timeElement.textContent = timeString;
+    }
+}
+
+// Fonction pour charger le prochain examen
+function loadNextExam() {
+    const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    const now = new Date();
+    
+    // Filtrer les examens futurs et les trier par date
+    const futureExams = exams
+        .filter(exam => {
+            const examDate = new Date(exam.date + 'T' + exam.time);
+            return examDate > now;
+        })
+        .sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+    
+    const nextExamElement = document.getElementById('next-exam');
+    
+    if (futureExams.length > 0) {
+        const nextExam = futureExams[0];
+        const examDate = new Date(nextExam.date + 'T' + nextExam.time);
+        const diffTime = examDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        // Dynamic greeting
-        const greetings = [
-            "Bonjour", "Salut", "Hello", "Hey", "Bonsoir", "Salam", "Hi there", 
-            "Comment ça va?", "How are you?", "Hola", "Ciao"
-        ];
-        const hour = now.getHours();
-        let greeting;
-        
-        if (hour < 12) {
-            greeting = greetings[0]; // Bonjour
-        } else if (hour < 18) {
-            greeting = greetings[4]; // Bonsoir
-        } else {
-            greeting = greetings[Math.floor(Math.random() * greetings.length)];
+        nextExamElement.textContent = `${nextExam.name}: ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+    } else {
+        nextExamElement.textContent = "Aucun examen à venir";
+    }
+}
+
+// Fonction pour charger les 2 prochaines matières
+function loadNextSubjects() {
+    const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    const otherSchedules = JSON.parse(localStorage.getItem('otherSchedules')) || [];
+    const allSchedules = [...schedules, ...otherSchedules];
+    
+    const now = new Date();
+    const currentDay = now.toLocaleDateString('fr-FR', { weekday: 'long' });
+    const currentTime = now.toTimeString().substring(0, 5); // Format HH:MM
+    
+    let allSubjects = [];
+    
+    // Parcourir tous les emplois du temps
+    allSchedules.forEach(schedule => {
+        if (schedule.days && schedule.days.includes(currentDay) && schedule.timeSlots) {
+            schedule.timeSlots.forEach(timeSlot => {
+                if (timeSlot.start > currentTime) {
+                    const subject = schedule.data && schedule.data[currentDay] && schedule.data[currentDay][`${timeSlot.start}-${timeSlot.end}`];
+                    if (subject) {
+                        allSubjects.push({
+                            subject: subject,
+                            start: timeSlot.start,
+                            end: timeSlot.end,
+                            schedule: schedule.name
+                        });
+                    }
+                }
+            });
         }
-        
-        document.getElementById('greeting').textContent = greeting;
-        
+    });
+    
+    // Trier par heure de début et prendre les 2 premiers
+    allSubjects.sort((a, b) => a.start.localeCompare(b.start));
+    const nextSubjects = allSubjects.slice(0, 2);
+    
+    const nextSubjectsElement = document.getElementById('next-subjects');
+    
+    if (nextSubjects.length > 0) {
+        nextSubjectsElement.innerHTML = nextSubjects.map(subject => `
+            <div class="flex items-center p-2 bg-purple-50 rounded-lg">
+                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                    <i data-feather="book" class="text-purple-600"></i>
+                </div>
+                <div class="flex-grow">
+                    <div class="font-medium">${subject.subject}</div>
+                    <div class="text-sm text-gray-500">${subject.start} - ${subject.end}</div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        nextSubjectsElement.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+                Aucune matière à venir aujourd'hui
+            </div>
+        `;
+    }
+    
+    feather.replace();
+}
+
+// Fonction pour filtrer les rappels (exclure "Révision des formules des alcanes")
+function loadFilteredReminders() {
+    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    const filteredReminders = reminders.filter(reminder => 
+        !reminder.title.includes('Révision') || 
+        !reminder.details.includes('formules des alcanes')
+    );
+    
+    const reminderDisplay = document.getElementById('reminder-display');
+    
+    if (filteredReminders.length > 0) {
+        reminderDisplay.innerHTML = filteredReminders.map(reminder => `
+            <div class="flex items-start p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <i data-feather="bell" class="text-yellow-500 mr-2 mt-0.5"></i>
+                <div>
+                    <div class="font-medium">${reminder.title}</div>
+                    <div class="text-sm text-gray-600">${reminder.details}</div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        reminderDisplay.innerHTML = '';
+    }
+    
+    feather.replace();
+}
         // Countdown timer (example for BAC 2026)
         function updateCountdown() {
             const bacDate = new Date('2026-06-15T08:00:00');
