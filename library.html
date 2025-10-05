@@ -211,18 +211,23 @@
         }
         
         // Toggle modal
-        function toggleModal(show) {
-            if (show) {
-                addBookModal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            } else {
-                addBookModal.classList.add('hidden');
-                document.body.style.overflow = '';
-                bookTitleInput.value = '';
-                bookAuthorInput.value = '';
-                bookFileInput.value = '';
-            }
-        }
+      // Toggle modal
+function toggleModal(show) {
+    if (show) {
+        addBookModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    } else {
+        addBookModal.classList.add('hidden');
+        document.body.style.overflow = '';
+        bookTitleInput.value = '';
+        bookAuthorInput.value = '';
+        bookFileInput.value = '';
+        
+        // Réinitialiser le mode édition
+        delete confirmAddBook.dataset.editingId;
+        confirmAddBook.textContent = 'Ajouter';
+    }
+}
         
        // Open file in viewer
 function openFile(id) {
@@ -249,36 +254,111 @@ function openFile(id) {
         });
     }
 }
+      
+      // Edit book function
+function editBook(id) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    
+    // Remplir le modal avec les données existantes
+    bookTitleInput.value = book.title;
+    bookAuthorInput.value = book.author || '';
+    
+    // Stocker l'ID du livre en cours d'édition
+    confirmAddBook.dataset.editingId = id;
+    confirmAddBook.textContent = 'Modifier';
+    
+    // Afficher le modal
+    toggleModal(true);
+}
       // Add new book
+// Add or edit book
 function addBook() {
     const title = bookTitleInput.value.trim();
     const author = bookAuthorInput.value.trim();
     const file = bookFileInput.files[0];
+    const isEditing = confirmAddBook.dataset.editingId;
     
-    if (title && file) {
-        // Create object URL for the uploaded file
-        const fileUrl = URL.createObjectURL(file);
-        const fileType = file.type;
-        
-        const newBook = {
-            id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
-            title,
-            author: author || '',
-            cover: fileType.startsWith('image/') ? fileUrl : 'pdf-icon.png', // Tu devras créer une icône PDF
-            fileUrl: fileUrl,
-            fileType: fileType,
-            fileName: file.name
-        };
-        
-        books.unshift(newBook);
-        localStorage.setItem('books', JSON.stringify(books));
-        renderBooks();
-        toggleModal(false);
+    if (title) {
+        if (isEditing) {
+            // Mode édition
+            const bookId = parseInt(isEditing);
+            const bookIndex = books.findIndex(b => b.id === bookId);
+            
+            if (bookIndex !== -1) {
+                books[bookIndex].title = title;
+                books[bookIndex].author = author || '';
+                
+                // Si un nouveau fichier est sélectionné
+                if (file) {
+                    // Libérer l'ancienne URL
+                    if (books[bookIndex].fileUrl) {
+                        URL.revokeObjectURL(books[bookIndex].fileUrl);
+                    }
+                    
+                    const fileUrl = URL.createObjectURL(file);
+                    const fileType = file.type;
+                    
+                    books[bookIndex].fileUrl = fileUrl;
+                    books[bookIndex].fileType = fileType;
+                    books[bookIndex].fileName = file.name;
+                    
+                    if (fileType.startsWith('image/')) {
+                        books[bookIndex].cover = fileUrl;
+                    }
+                }
+                
+                localStorage.setItem('books', JSON.stringify(books));
+                renderBooks();
+                toggleModal(false);
+                
+                // Réinitialiser le bouton
+                delete confirmAddBook.dataset.editingId;
+                confirmAddBook.textContent = 'Ajouter';
+            }
+        } else {
+            // Mode ajout
+            if (!file) {
+                alert('Veuillez sélectionner un fichier');
+                return;
+            }
+            
+            const fileUrl = URL.createObjectURL(file);
+            const fileType = file.type;
+            
+            const newBook = {
+                id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
+                title,
+                author: author || '',
+                cover: fileType.startsWith('image/') ? fileUrl : 'pdf-icon.png',
+                fileUrl: fileUrl,
+                fileType: fileType,
+                fileName: file.name
+            };
+            
+            books.unshift(newBook);
+            localStorage.setItem('books', JSON.stringify(books));
+            renderBooks();
+            toggleModal(false);
+        }
     } else {
-        alert('Veuillez remplir le titre et sélectionner un fichier');
+        alert('Veuillez remplir le titre');
     }
 }
+        // Delete book (modifie pour libérer la mémoire)
+function deleteBook(id) {
+    const confirmDelete = confirm("Voulez-vous vraiment supprimer ce livre?");
+    if (confirmDelete) {
+        const bookIndex = books.findIndex(book => book.id === id);
+        if (bookIndex !== -1 && books[bookIndex].fileUrl) {
+            URL.revokeObjectURL(books[bookIndex].fileUrl);
+        }
         
+        books = books.filter(book => book.id !== id);
+        localStorage.setItem('books', JSON.stringify(books));
+        renderBooks();
+    }
+}
       
         // Delete book
         function deleteBook(id) {
@@ -299,21 +379,23 @@ function addBook() {
         confirmAddBookBtn.addEventListener('click', addBook);
         
         // Handle delete and edit buttons (delegated events)
-        booksList.addEventListener('click', (e) => {
-            if (e.target.closest('.delete-book')) {
-                const id = parseInt(e.target.closest('.delete-book').dataset.id);
-                deleteBook(id);
-            }
-            
-          if (e.target.closest('.open-file')) {
+       // Handle delete and edit buttons (delegated events)
+booksList.addEventListener('click', (e) => {
+    if (e.target.closest('.delete-book')) {
+        const id = parseInt(e.target.closest('.delete-book').dataset.id);
+        deleteBook(id);
+    }
+    
+    if (e.target.closest('.edit-book')) {
+        const id = parseInt(e.target.closest('.edit-book').dataset.id);
+        editBook(id);
+    }
+    
+    if (e.target.closest('.open-file')) {
         const id = parseInt(e.target.closest('.open-file').dataset.id);
         openFile(id);
     }
-          
-            if (e.target.closest('.edit-book')) {
-                alert('Fonctionnalité d\'édition à implémenter');
-            }
-        });
+});
         
         // Initial render
         renderBooks();
