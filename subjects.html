@@ -16,6 +16,23 @@
         .select-overlay { position:absolute; top:8px; right:8px; }
         .fullscreen-media { max-width: 95vw; max-height: 85vh; }
         .hidden { display:none; }
+        /* Style pour le bouton fermer */
+        .close-btn { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            background: rgba(0,0,0,0.7); 
+            color: white; 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            z-index: 100;
+        }
+        .close-btn:hover { background: rgba(0,0,0,0.9); }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -65,6 +82,30 @@
             </div>
         </div>
 
+        <!-- Edit Subject Modal -->
+        <div id="editSubjectModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Modifier la matière</h2>
+                    <button id="closeEditModal" class="text-gray-500 hover:text-gray-700"><i data-feather="x"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la matière</label>
+                        <input type="text" id="editSubjectName" class="w-full px-4 py-2 rounded-lg border border-gray-300">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Coefficient</label>
+                        <input type="number" id="editSubjectCoeff" min="1" value="1" class="w-full px-4 py-2 rounded-lg border border-gray-300">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelEditSubject" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700">Annuler</button>
+                        <button id="confirmEditSubject" class="px-4 py-2 rounded-lg bg-purple-600 text-white">Modifier</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Subjects List -->
         <div id="subjectsView">
             <div id="subjectsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -91,9 +132,7 @@
                     <p id="subjectDetailCoeff" class="text-sm text-gray-500"></p>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button id="createFolderBtn" class="px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200">
-                        <i data-feather="folder-plus"></i> Créer dossier
-                    </button>
+                    <!-- Supprimé le bouton Créer dossier -->
                     <button id="editSubjectBtn" class="px-3 py-2 bg-gray-100 rounded-lg"><i data-feather="edit-2"></i></button>
                     <button id="deleteSubjectBtn" class="px-3 py-2 bg-red-100 text-red-700 rounded-lg"><i data-feather="trash-2"></i></button>
                 </div>
@@ -138,7 +177,7 @@
     <!-- Fullscreen viewer modal -->
     <div id="viewerModal" class="fixed inset-0 z-50 bg-black bg-opacity-80 hidden flex items-center justify-center p-4">
         <div class="relative max-w-5xl w-full">
-            <button id="closeViewer" class="absolute right-2 top-2 text-white bg-gray-800 rounded-full p-2"><i data-feather="x"></i></button>
+            <button id="closeViewer" class="close-btn"><i data-feather="x"></i></button>
             <div id="viewerContent" class="flex items-center justify-center">
                 <!-- dynamic content -->
             </div>
@@ -237,7 +276,6 @@
         const backToSubjects = document.getElementById('backToSubjects');
         const subjectDetailTitle = document.getElementById('subjectDetailTitle');
         const subjectDetailCoeff = document.getElementById('subjectDetailCoeff');
-        const createFolderBtn = document.getElementById('createFolderBtn');
         const addFilesLabel = document.getElementById('addFilesLabel');
         const addFilesText = document.getElementById('addFilesText');
         const fileInput = document.getElementById('fileInput');
@@ -262,6 +300,12 @@
         const currentFolderLabel = document.getElementById('currentFolderLabel');
         const toggleSelectBtn = document.getElementById('toggleSelectBtn');
         const toggleSelectModeBtn = document.getElementById('toggleSelectModeBtn');
+        const editSubjectModal = document.getElementById('editSubjectModal');
+        const editSubjectName = document.getElementById('editSubjectName');
+        const editSubjectCoeff = document.getElementById('editSubjectCoeff');
+        const closeEditModal = document.getElementById('closeEditModal');
+        const cancelEditSubject = document.getElementById('cancelEditSubject');
+        const confirmEditSubject = document.getElementById('confirmEditSubject');
 
         // State for current subject view
         let currentSubjectId = null;
@@ -329,8 +373,7 @@
                 // edit & delete handlers
                 card.querySelector('.edit-subject').addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const newName = prompt('Nouveau nom de la matière', sub.name);
-                    if (newName) { sub.name = newName; saveSubjects(); renderSubjects(); }
+                    openEditSubjectModal(sub.id);
                 });
                 card.querySelector('.delete-subject').addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -360,6 +403,26 @@
             }
         }
 
+        // Edit Subject Modal
+        function openEditSubjectModal(subjectId) {
+            const subj = subjects.find(s => s.id === subjectId);
+            if (!subj) return;
+            
+            editSubjectName.value = subj.name;
+            editSubjectCoeff.value = subj.coefficient;
+            editSubjectModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // Set current subject for editing
+            currentSubjectId = subjectId;
+        }
+
+        function closeEditSubjectModal() {
+            editSubjectModal.classList.add('hidden');
+            document.body.style.overflow = '';
+            currentSubjectId = null;
+        }
+
         // Add subject
         function addSubject() {
             const name = subjectNameInput.value.trim();
@@ -370,6 +433,30 @@
             saveSubjects();
             renderSubjects();
             toggleModal(false);
+        }
+
+        // Edit subject
+        function editSubject() {
+            const name = editSubjectName.value.trim();
+            const coeff = parseInt(editSubjectCoeff.value);
+            if (!name || coeff <= 0) { alert('Remplis le nom et un coefficient valide'); return; }
+            
+            const subj = subjects.find(s => s.id === currentSubjectId);
+            if (subj) {
+                subj.name = name;
+                subj.coefficient = coeff;
+                saveSubjects();
+                renderSubjects();
+                
+                // Update detail view if it's open
+                if (subjectDetailView.classList.contains('hidden') === false && currentSubjectId === subj.id) {
+                    subjectDetailTitle.textContent = subj.name;
+                    subjectDetailCoeff.textContent = `Coefficient: ${subj.coefficient}`;
+                    headerTitle.textContent = 'Matière — ' + subj.name;
+                }
+            }
+            
+            closeEditSubjectModal();
         }
 
         // Open subject detail
@@ -402,17 +489,6 @@
             headerTitle.textContent = 'Matières';
             currentSubjectId = null;
             currentFolderId = null;
-        });
-
-        // Create folder (ask name)
-        createFolderBtn.addEventListener('click', () => {
-            const defaultName = prompt('Nom du dossier (proposition : titre de la leçon)', 'Nouvelle leçon');
-            if (!defaultName) return;
-            const data = getSubjectData(currentSubjectId);
-            const id = Date.now();
-            data.folders.push({ id, name: defaultName, createdAt: new Date().toISOString(), items: [] });
-            saveSubjectData(currentSubjectId, data);
-            renderCurrentTab();
         });
 
         // set tab
@@ -615,6 +691,17 @@
             viewerContent.innerHTML = '';
             viewerCurrentItem = item;
             viewerZoom = 1;
+            
+            // Add close button
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-btn';
+            closeBtn.innerHTML = '<i data-feather="x"></i>';
+            closeBtn.addEventListener('click', () => {
+                viewerModal.classList.add('hidden');
+                viewerContent.innerHTML = '';
+            });
+            viewerContent.appendChild(closeBtn);
+            
             if (item.type === 'photo') {
                 const img = document.createElement('img');
                 img.src = item.dataURL;
@@ -629,16 +716,19 @@
                 vid.className = 'fullscreen-media';
                 viewerContent.appendChild(vid);
             } else if (item.type === 'document') {
-                // for documents, attempt to embed pdf or show name + download
+                // For PDFs, open in new tab
                 if (item.mime === 'application/pdf') {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = item.dataURL;
-                    iframe.className = 'w-full h-[80vh]';
-                    viewerContent.appendChild(iframe);
+                    const link = document.createElement('a');
+                    link.href = item.dataURL;
+                    link.target = '_blank';
+                    link.click();
+                    viewerModal.classList.add('hidden');
+                    return;
                 } else {
                     viewerContent.innerHTML = `<div class="p-4 bg-white text-black rounded">${item.name}</div>`;
                 }
             }
+            
             downloadMedia.onclick = () => {
                 const link = document.createElement('a');
                 link.href = item.dataURL;
@@ -651,9 +741,22 @@
                     viewerModal.classList.add('hidden');
                 }
             };
+            
+            feather.replace();
         }
 
-        closeViewer.addEventListener('click', () => { viewerModal.classList.add('hidden'); viewerContent.innerHTML = ''; });
+        closeViewer.addEventListener('click', () => { 
+            viewerModal.classList.add('hidden'); 
+            viewerContent.innerHTML = ''; 
+        });
+
+        // Close viewer when clicking outside content
+        viewerModal.addEventListener('click', (e) => {
+            if (e.target === viewerModal) {
+                viewerModal.classList.add('hidden');
+                viewerContent.innerHTML = '';
+            }
+        });
 
         // Zoom controls (works for images only)
         zoomIn.addEventListener('click', () => {
@@ -697,9 +800,13 @@
                 reader.readAsDataURL(f);
                 const dataURL = await p;
                 let item = { id, type: '', name: f.name, dataURL, mime, createdAt: new Date().toISOString() };
-                if (mime.startsWith('image/')) item.type = 'photo';
-                else if (mime.startsWith('video/')) item.type = 'video';
-                else item.type = 'document';
+                
+                // Assign correct type based on current tab
+                if (currentTab === 'photos') item.type = 'photo';
+                else if (currentTab === 'videos') item.type = 'video';
+                else if (currentTab === 'documents') item.type = 'document';
+                else if (currentTab === 'notes') item.type = 'note';
+                
                 if (currentFolderId) {
                     const folder = data.folders.find(ff => ff.id === currentFolderId);
                     if (!folder) continue;
@@ -710,7 +817,7 @@
                 }
             }
             saveSubjectData(currentSubjectId, data);
-            e.target.value = '';
+            e.target.value = ''; // Reset input to allow selecting same file again
             renderCurrentTab();
         });
 
@@ -815,8 +922,7 @@
         // Edit and delete subject buttons in header area
         document.getElementById('editSubjectBtn').addEventListener('click', () => {
             const subj = subjects.find(s => s.id === currentSubjectId);
-            const newName = prompt('Modifier nom de la matière', subj.name);
-            if (newName) { subj.name = newName; saveSubjects(); subjectDetailTitle.textContent = newName; renderSubjects(); }
+            openEditSubjectModal(subj.id);
         });
         document.getElementById('deleteSubjectBtn').addEventListener('click', () => {
             if (confirm('Supprimer cette matière et tout son contenu ?')) {
@@ -855,6 +961,11 @@
         cancelAddSubjectBtn.addEventListener('click', () => toggleModal(false));
         confirmAddSubjectBtn.addEventListener('click', addSubject);
 
+        // Edit subject events
+        closeEditModal.addEventListener('click', closeEditSubjectModal);
+        cancelEditSubject.addEventListener('click', closeEditSubjectModal);
+        confirmEditSubject.addEventListener('click', editSubject);
+
         // Update render when page shown
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) renderSubjects();
@@ -866,6 +977,7 @@
                 addSubjectModal.classList.add('hidden');
                 viewerModal.classList.add('hidden');
                 noteEditorModal.classList.add('hidden');
+                editSubjectModal.classList.add('hidden');
             }
         });
 
@@ -883,7 +995,7 @@
         const notesDiv = document.getElementById('notes');
         notesDiv.addEventListener('dblclick', () => openNoteEditor(null));
 
-        // End of s cri pt
+        // End of script
     </script>
 </body>
 </html>
