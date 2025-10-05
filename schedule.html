@@ -51,6 +51,47 @@
     background-color: #F5F3FF;
     border-color: #8B5CF6;
 }
+      
+      /* Adaptation mobile */
+@media (max-width: 768px) {
+    .schedule-table-mobile {
+        font-size: 0.75rem;
+    }
+    
+    .time-cell-mobile {
+        min-height: 3rem;
+        padding: 0.25rem;
+    }
+    
+    .day-header-mobile {
+        padding: 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    .time-header-mobile {
+        padding: 0.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Empêcher le zoom sur les inputs sur mobile */
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Améliorer l'expérience tactile */
+.time-cell {
+    min-height: 4rem;
+}
+
+@media (max-width: 768px) {
+    .time-cell {
+        min-height: 3rem;
+        font-size: 0.8rem;
+    }
+}
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -1154,9 +1195,14 @@ function renderOtherSchedules() {
                     <h3 class="text-lg font-semibold">${schedule.name}</h3>
                     <span class="w-4 h-4 rounded-full bg-${schedule.color}-500"></span>
                 </div>
-                <button class="delete-other-schedule p-2 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
-                    <i data-feather="trash-2" class="w-4 h-4 text-red-600"></i>
-                </button>
+                <div class="flex space-x-1">
+                    <button class="edit-other-schedule p-2 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
+                        <i data-feather="edit-2" class="w-4 h-4 text-purple-600"></i>
+                    </button>
+                    <button class="delete-other-schedule p-2 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
+                        <i data-feather="trash-2" class="w-4 h-4 text-red-600"></i>
+                    </button>
+                </div>
             </div>
             <div class="bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
                 <div class="grid grid-cols-${schedule.days.length + 1} gap-px bg-gray-200">
@@ -1201,11 +1247,191 @@ function renderOtherSchedules() {
     document.querySelectorAll('.delete-other-schedule').forEach(button => {
         button.addEventListener('click', function() {
             const scheduleId = this.getAttribute('data-id');
-            deleteOtherSchedule(scheduleId);
+            showDeleteConfirmation(scheduleId);
+        });
+    });
+    
+    // Ajouter les événements de modification
+    document.querySelectorAll('.edit-other-schedule').forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-id');
+            editOtherSchedule(scheduleId);
         });
     });
 }
 
+   // Fonction pour modifier un emploi du temps existant
+function editOtherSchedule(scheduleId) {
+    const schedule = otherSchedules.find(s => s.id === scheduleId);
+    if (!schedule) return;
+    
+    // Remplir le formulaire avec les données existantes
+    document.getElementById('otherScheduleName').value = schedule.name;
+    
+    // Sélectionner la couleur
+    document.querySelectorAll('.color-option').forEach(option => {
+        option.classList.remove('ring-2', 'ring-offset-2', 'ring-purple-500');
+        if (option.getAttribute('data-color') === schedule.color) {
+            option.classList.add('ring-2', 'ring-offset-2', 'ring-purple-500');
+        }
+    });
+    
+    // Cocher les jours
+    document.querySelectorAll('.other-day-checkbox').forEach(checkbox => {
+        checkbox.checked = schedule.days.includes(checkbox.value);
+    });
+    
+    // Remplir les créneaux horaires
+    const timeContainer = document.getElementById('otherTimeSlotsContainer');
+    timeContainer.innerHTML = '';
+    
+    schedule.timeSlots.forEach(timeSlot => {
+        const timeSlotElement = document.createElement('div');
+        timeSlotElement.className = 'flex items-center space-x-2';
+        timeSlotElement.innerHTML = `
+            <input type="time" class="other-time-start px-2 py-1 rounded border border-gray-300" value="${timeSlot.start}">
+            <span>-</span>
+            <input type="time" class="other-time-end px-2 py-1 rounded border border-gray-300" value="${timeSlot.end}">
+            <button class="remove-other-time-slot text-red-500">
+                <i data-feather="trash-2" class="w-4 h-4"></i>
+            </button>
+        `;
+        timeContainer.appendChild(timeSlotElement);
+    });
+    
+    feather.replace();
+    
+    // Ajouter les événements aux nouveaux time slots
+    document.querySelectorAll('.remove-other-time-slot').forEach(button => {
+        button.addEventListener('click', function() {
+            this.parentElement.remove();
+            generateOtherScheduleTable();
+        });
+    });
+    
+    document.querySelectorAll('.other-time-start, .other-time-end').forEach(input => {
+        input.addEventListener('change', generateOtherScheduleTable);
+    });
+    
+    // Générer le tableau avec les données existantes
+    generateOtherScheduleTable();
+    
+    // Remplir les matières dans le tableau
+    setTimeout(() => {
+        document.querySelectorAll('.time-cell').forEach(cell => {
+            const day = cell.getAttribute('data-day');
+            const time = cell.getAttribute('data-time');
+            const subject = schedule.data && schedule.data[day] && schedule.data[day][time] ? schedule.data[day][time] : '';
+            
+            if (subject) {
+                cell.textContent = subject;
+                cell.classList.remove('text-gray-400');
+            }
+        });
+    }, 100);
+    
+    // Stocker l'ID pour la mise à jour
+    document.getElementById('addOtherScheduleModal').setAttribute('data-edit-id', scheduleId);
+    
+    // Changer le texte du bouton
+    document.getElementById('confirmAddOtherSchedule').textContent = 'Mettre à jour';
+    
+    toggleOtherScheduleModal(true);
+}
+
+// Modifier la fonction createOtherSchedule pour gérer l'édition
+function createOtherSchedule() {
+    const editId = document.getElementById('addOtherScheduleModal').getAttribute('data-edit-id');
+    
+    if (editId) {
+        // Mode édition
+        updateOtherSchedule(editId);
+    } else {
+        // Mode création
+        const name = document.getElementById('otherScheduleName').value.trim() || 'Nouvel emploi du temps';
+        const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+        const selectedDays = Array.from(document.querySelectorAll('.other-day-checkbox:checked')).map(cb => cb.value);
+        
+        const timeSlots = Array.from(document.querySelectorAll('#otherTimeSlotsContainer > div')).map(el => ({
+            start: el.querySelector('.other-time-start').value,
+            end: el.querySelector('.other-time-end').value
+        })).sort((a, b) => a.start.localeCompare(b.start));
+        
+        // Récupérer les données du tableau
+        const data = {};
+        document.querySelectorAll('.time-cell').forEach(cell => {
+            const day = cell.getAttribute('data-day');
+            const time = cell.getAttribute('data-time');
+            const subject = cell.textContent.trim();
+            
+            if (subject && !cell.innerHTML.includes('text-gray-400')) {
+                if (!data[day]) data[day] = {};
+                data[day][time] = subject;
+            }
+        });
+        
+        const newSchedule = {
+            id: Date.now().toString(),
+            name: name,
+            color: color,
+            days: selectedDays,
+            timeSlots: timeSlots,
+            data: data
+        };
+        
+        otherSchedules.push(newSchedule);
+        saveOtherSchedules();
+        renderOtherSchedules();
+        toggleOtherScheduleModal(false);
+    }
+}
+
+// Fonction pour mettre à jour un emploi du temps
+function updateOtherSchedule(scheduleId) {
+    const scheduleIndex = otherSchedules.findIndex(s => s.id === scheduleId);
+    if (scheduleIndex === -1) return;
+    
+    const name = document.getElementById('otherScheduleName').value.trim() || 'Nouvel emploi du temps';
+    const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+    const selectedDays = Array.from(document.querySelectorAll('.other-day-checkbox:checked')).map(cb => cb.value);
+    
+    const timeSlots = Array.from(document.querySelectorAll('#otherTimeSlotsContainer > div')).map(el => ({
+        start: el.querySelector('.other-time-start').value,
+        end: el.querySelector('.other-time-end').value
+    })).sort((a, b) => a.start.localeCompare(b.start));
+    
+    // Récupérer les données du tableau
+    const data = {};
+    document.querySelectorAll('.time-cell').forEach(cell => {
+        const day = cell.getAttribute('data-day');
+        const time = cell.getAttribute('data-time');
+        const subject = cell.textContent.trim();
+        
+        if (subject && !cell.innerHTML.includes('text-gray-400')) {
+            if (!data[day]) data[day] = {};
+            data[day][time] = subject;
+        }
+    });
+    
+    // Mettre à jour l'emploi du temps
+    otherSchedules[scheduleIndex] = {
+        ...otherSchedules[scheduleIndex],
+        name: name,
+        color: color,
+        days: selectedDays,
+        timeSlots: timeSlots,
+        data: data
+    };
+    
+    saveOtherSchedules();
+    renderOtherSchedules();
+    toggleOtherScheduleModal(false);
+    
+    // Réinitialiser le mode édition
+    document.getElementById('addOtherScheduleModal').removeAttribute('data-edit-id');
+    document.getElementById('confirmAddOtherSchedule').textContent = 'Enregistrer';
+}   
+      
 function deleteOtherSchedule(scheduleId) {
     otherSchedules = otherSchedules.filter(s => s.id !== scheduleId);
     saveOtherSchedules();
