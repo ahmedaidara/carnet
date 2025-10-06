@@ -81,19 +81,19 @@
                     <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
                         <i data-feather="calendar" class="text-purple-600"></i>
                     </div>
-                    <div>
+              <div>
     <div class="text-gray-500">Aujourd'hui</div>
-    <div id="current-date" class="font-semibold text-lg">Lundi 10 janvier 2005</div>
-    <div id="current-time" class="text-sm text-gray-600">00:00:00</div>
+    <div id="current-date" class="font-semibold text-lg">Lundi 12 juin 2023</div>
+    <div id="current-time" class="font-semibold text-purple-600 text-sm"></div>
 </div>
                 </div>
                 
-                <div id="reminder-display" class="flex-grow max-w-md px-4">
-    <!-- Les rappels seront affichés ici dynamiquement, sauf "Révision des formules des alcanes" -->
+               <div id="reminder-display" class="flex-grow max-w-md px-4">
+    <!-- Les rappels seront affichés ici dynamiquement -->
 </div>
                 
                 <div class="flex items-center space-x-4">
-                   <div class="text-right">
+                 <div class="text-right">
     <div class="text-gray-500">Prochain examen</div>
     <div id="next-exam" class="font-bold text-purple-600">Chargement...</div>
 </div>
@@ -102,7 +102,8 @@
         </section>
 
         <!-- Tomorrow's Schedule -->
-       <section class="mb-8">
+     <!-- Prochaines matières -->
+<section class="mb-8">
     <h2 class="text-xl font-semibold mb-4 flex items-center">
         <i data-feather="clock" class="mr-2"></i> À suivre
     </h2>
@@ -115,9 +116,6 @@
         </div>
         <div id="next-subjects" class="space-y-3">
             <!-- Les 2 prochaines matières seront affichées ici dynamiquement -->
-            <div class="text-center py-4 text-gray-500">
-                Chargement des prochaines matières...
-            </div>
         </div>
     </div>
 </section>
@@ -261,7 +259,7 @@ function initPage() {
 }
         
       
-      // Fonction pour mettre à jour l'heure en temps réel
+   // Update current time
 function updateCurrentTime() {
     const now = new Date();
     const timeString = now.toLocaleTimeString('fr-FR', { 
@@ -269,18 +267,17 @@ function updateCurrentTime() {
         minute: '2-digit',
         second: '2-digit'
     });
-    const timeElement = document.getElementById('current-time');
-    if (timeElement) {
-        timeElement.textContent = timeString;
-    }
+    document.getElementById('current-time').textContent = timeString;
 }
+setInterval(updateCurrentTime, 1000);
+updateCurrentTime();
 
-// Fonction pour charger le prochain examen
+// Load next exam from schedule
 function loadNextExam() {
     const exams = JSON.parse(localStorage.getItem('exams')) || [];
     const now = new Date();
     
-    // Filtrer les examens futurs et les trier par date
+    // Filter future exams and sort by date
     const futureExams = exams
         .filter(exam => {
             const examDate = new Date(exam.date + 'T' + exam.time);
@@ -296,65 +293,84 @@ function loadNextExam() {
         const diffTime = examDate - now;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        nextExamElement.textContent = `${nextExam.name}: ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+        if (diffDays === 0) {
+            nextExamElement.textContent = `${nextExam.name} - Aujourd'hui ${nextExam.time}`;
+        } else if (diffDays === 1) {
+            nextExamElement.textContent = `${nextExam.name} - Demain ${nextExam.time}`;
+        } else {
+            nextExamElement.textContent = `${nextExam.name} - Dans ${diffDays} jours`;
+        }
     } else {
-        nextExamElement.textContent = "Aucun examen à venir";
+        nextExamElement.textContent = "Aucun examen prévu";
     }
 }
 
-// Fonction pour charger les 2 prochaines matières
+// Load next subjects
 function loadNextSubjects() {
     const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
-    const otherSchedules = JSON.parse(localStorage.getItem('otherSchedules')) || [];
-    const allSchedules = [...schedules, ...otherSchedules];
-    
     const now = new Date();
     const currentDay = now.toLocaleDateString('fr-FR', { weekday: 'long' });
-    const currentTime = now.toTimeString().substring(0, 5); // Format HH:MM
+    const currentTime = now.toTimeString().substring(0, 5); // HH:MM format
     
     let allSubjects = [];
     
-    // Parcourir tous les emplois du temps
-    allSchedules.forEach(schedule => {
-        if (schedule.days && schedule.days.includes(currentDay) && schedule.timeSlots) {
-            schedule.timeSlots.forEach(timeSlot => {
-                if (timeSlot.start > currentTime) {
-                    const subject = schedule.data && schedule.data[currentDay] && schedule.data[currentDay][`${timeSlot.start}-${timeSlot.end}`];
-                    if (subject) {
-                        allSubjects.push({
-                            subject: subject,
-                            start: timeSlot.start,
-                            end: timeSlot.end,
-                            schedule: schedule.name
-                        });
-                    }
+    // Collect all subjects from all schedules
+    schedules.forEach(schedule => {
+        if (schedule.data && schedule.days) {
+            schedule.days.forEach(day => {
+                if (schedule.data[day]) {
+                    Object.keys(schedule.data[day]).forEach(timeSlotId => {
+                        const subject = schedule.data[day][timeSlotId];
+                        if (subject && subject.trim() !== '') {
+                            const timeSlot = schedule.timeSlots.find(ts => ts.id === timeSlotId);
+                            if (timeSlot) {
+                                allSubjects.push({
+                                    subject: subject,
+                                    day: day,
+                                    startTime: timeSlot.start,
+                                    scheduleName: schedule.name
+                                });
+                            }
+                        }
+                    });
                 }
             });
         }
     });
     
-    // Trier par heure de début et prendre les 2 premiers
-    allSubjects.sort((a, b) => a.start.localeCompare(b.start));
+    // Sort subjects by day and time
+    const dayOrder = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    allSubjects.sort((a, b) => {
+        const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+        if (dayDiff !== 0) return dayDiff;
+        return a.startTime.localeCompare(b.startTime);
+    });
+    
+    // Display next 2 subjects
+    const nextSubjectsContainer = document.getElementById('next-subjects');
+    nextSubjectsContainer.innerHTML = '';
+    
     const nextSubjects = allSubjects.slice(0, 2);
     
-    const nextSubjectsElement = document.getElementById('next-subjects');
-    
     if (nextSubjects.length > 0) {
-        nextSubjectsElement.innerHTML = nextSubjects.map(subject => `
-            <div class="flex items-center p-2 bg-purple-50 rounded-lg">
-                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                    <i data-feather="book" class="text-purple-600"></i>
+        nextSubjects.forEach((item, index) => {
+            const subjectElement = document.createElement('div');
+            subjectElement.className = `flex items-center p-2 ${index % 2 === 0 ? 'bg-purple-50' : 'bg-blue-50'} rounded-lg`;
+            subjectElement.innerHTML = `
+                <div class="w-10 h-10 rounded-full ${index % 2 === 0 ? 'bg-purple-100' : 'bg-blue-100'} flex items-center justify-center mr-3">
+                    <i data-feather="book" class="${index % 2 === 0 ? 'text-purple-600' : 'text-blue-600'}"></i>
                 </div>
-                <div class="flex-grow">
-                    <div class="font-medium">${subject.subject}</div>
-                    <div class="text-sm text-gray-500">${subject.start} - ${subject.end}</div>
+                <div>
+                    <div class="font-medium">${item.subject}</div>
+                    <div class="text-sm text-gray-500">${item.day} • ${item.startTime}</div>
                 </div>
-            </div>
-        `).join('');
+            `;
+            nextSubjectsContainer.appendChild(subjectElement);
+        });
     } else {
-        nextSubjectsElement.innerHTML = `
+        nextSubjectsContainer.innerHTML = `
             <div class="text-center py-4 text-gray-500">
-                Aucune matière à venir aujourd'hui
+                <p>Aucune matière programmée</p>
             </div>
         `;
     }
@@ -362,32 +378,50 @@ function loadNextSubjects() {
     feather.replace();
 }
 
-// Fonction pour filtrer les rappels (exclure "Révision des formules des alcanes")
-function loadFilteredReminders() {
+// Update reminders display
+function updateRemindersDisplay() {
     const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-    const filteredReminders = reminders.filter(reminder => 
-        !reminder.title.includes('Révision') || 
-        !reminder.details.includes('formules des alcanes')
-    );
-    
     const reminderDisplay = document.getElementById('reminder-display');
     
-    if (filteredReminders.length > 0) {
-        reminderDisplay.innerHTML = filteredReminders.map(reminder => `
-            <div class="flex items-start p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <i data-feather="bell" class="text-yellow-500 mr-2 mt-0.5"></i>
-                <div>
-                    <div class="font-medium">${reminder.title}</div>
-                    <div class="text-sm text-gray-600">${reminder.details}</div>
+    if (reminders.length > 0) {
+        // Filter out the "Révision des formules des alcanes" reminder
+        const filteredReminders = reminders.filter(reminder => 
+            !reminder.title.includes('Révision') || 
+            !reminder.details.includes('formules des alcanes')
+        );
+        
+        if (filteredReminders.length > 0) {
+            reminderDisplay.innerHTML = `
+                <div class="flex items-start p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <i data-feather="bell" class="text-yellow-500 mr-2 mt-0.5"></i>
+                    <div>
+                        <div class="font-medium">${filteredReminders[0].title}</div>
+                        <div class="text-sm text-gray-600">${filteredReminders[0].details}</div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+            feather.replace();
+        } else {
+            reminderDisplay.innerHTML = '';
+        }
     } else {
         reminderDisplay.innerHTML = '';
     }
-    
-    feather.replace();
 }
+
+// Initialize the new functions
+document.addEventListener('DOMContentLoaded', function() {
+    loadNextExam();
+    loadNextSubjects();
+    updateRemindersDisplay();
+    
+    // Update when schedules change
+    window.addEventListener('storage', function() {
+        loadNextExam();
+        loadNextSubjects();
+        updateRemindersDisplay();
+    });
+});
         // Countdown timer (example for BAC 2026)
         function updateCountdown() {
             const bacDate = new Date('2026-06-15T08:00:00');
