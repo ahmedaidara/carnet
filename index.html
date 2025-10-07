@@ -425,15 +425,17 @@ function loadNextExam() {
 
  
 // Load next  subjects
+// Load next subjects from schedules
 function loadNextSubjects() {
     const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
     const now = new Date();
     const currentDay = now.toLocaleDateString('fr-FR', { weekday: 'long' });
     const currentTime = now.toTimeString().substring(0, 5); // HH:MM format
     
-    let allSubjects = [];
+    // Tableau pour stocker toutes les matières futures
+    let allFutureSubjects = [];
     
-    // Collect all subjects from all schedules
+    // Parcourir tous les emplois du temps
     schedules.forEach(schedule => {
         if (schedule.data && schedule.days) {
             schedule.days.forEach(day => {
@@ -441,14 +443,24 @@ function loadNextSubjects() {
                     Object.keys(schedule.data[day]).forEach(timeSlotId => {
                         const subject = schedule.data[day][timeSlotId];
                         if (subject && subject.trim() !== '') {
+                            // Trouver le créneau horaire correspondant
                             const timeSlot = schedule.timeSlots.find(ts => ts.id === timeSlotId);
                             if (timeSlot) {
-                                allSubjects.push({
-                                    subject: subject,
-                                    day: day,
-                                    startTime: timeSlot.start,
-                                    scheduleName: schedule.name
-                                });
+                                // Calculer si c'est une matière future
+                                const subjectDateTime = calculateSubjectDateTime(day, timeSlot.start, now);
+                                
+                                // Vérifier si c'est une matière future (aujourd'hui ou après)
+                                if (subjectDateTime >= now) {
+                                    allFutureSubjects.push({
+                                        subject: subject,
+                                        day: day,
+                                        startTime: timeSlot.start,
+                                        endTime: timeSlot.end,
+                                        scheduleName: schedule.name,
+                                        dateTime: subjectDateTime,
+                                        scheduleColor: schedule.color
+                                    });
+                                }
                             }
                         }
                     });
@@ -457,39 +469,44 @@ function loadNextSubjects() {
         }
     });
     
-    // Sort subjects by day and time
-    const dayOrder = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-    allSubjects.sort((a, b) => {
-        const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
-        if (dayDiff !== 0) return dayDiff;
-        return a.startTime.localeCompare(b.startTime);
-    });
+    // Trier les matières par date/heure (les plus proches en premier)
+    allFutureSubjects.sort((a, b) => a.dateTime - b.dateTime);
     
-    // Display next 2 subjects
+    // Prendre seulement les 2 prochaines matières
+    const nextSubjects = allFutureSubjects.slice(0, 2);
+    
+    // Afficher les résultats
     const nextSubjectsContainer = document.getElementById('next-subjects');
     nextSubjectsContainer.innerHTML = '';
     
-    const nextSubjects = allSubjects.slice(0, 2);
-    
     if (nextSubjects.length > 0) {
         nextSubjects.forEach((item, index) => {
+            const timeUntil = calculateTimeUntil(item.dateTime, now);
+            
             const subjectElement = document.createElement('div');
-            subjectElement.className = `flex items-center p-2 ${index % 2 === 0 ? 'bg-purple-50' : 'bg-blue-50'} rounded-lg`;
+            subjectElement.className = `flex items-center p-3 ${index % 2 === 0 ? 'bg-purple-50' : 'bg-blue-50'} rounded-lg border ${index % 2 === 0 ? 'border-purple-100' : 'border-blue-100'}`;
             subjectElement.innerHTML = `
                 <div class="w-10 h-10 rounded-full ${index % 2 === 0 ? 'bg-purple-100' : 'bg-blue-100'} flex items-center justify-center mr-3">
                     <i data-feather="book" class="${index % 2 === 0 ? 'text-purple-600' : 'text-blue-600'}"></i>
                 </div>
-                <div>
+                <div class="flex-1">
                     <div class="font-medium">${item.subject}</div>
-                    <div class="text-sm text-gray-500">${item.day} • ${item.startTime}</div>
+                    <div class="text-sm text-gray-600">
+                        ${item.day} • ${item.startTime} - ${item.endTime}
+                    </div>
+                    <div class="text-xs ${index % 2 === 0 ? 'text-purple-500' : 'text-blue-500'} font-medium mt-1">
+                        ${timeUntil}
+                    </div>
                 </div>
             `;
             nextSubjectsContainer.appendChild(subjectElement);
         });
     } else {
         nextSubjectsContainer.innerHTML = `
-            <div class="text-center py-4 text-gray-500">
-                <p>Aucune matière programmée</p>
+            <div class="text-center py-6 text-gray-500 bg-gray-50 rounded-lg">
+                <i data-feather="book-open" class="w-8 h-8 mx-auto mb-2"></i>
+                <p>Aucune matière à venir</p>
+                <p class="text-sm mt-1">Toutes les matières sont terminées pour aujourd'hui</p>
             </div>
         `;
     }
@@ -497,6 +514,60 @@ function loadNextSubjects() {
     feather.replace();
 }
 
+// Fonction pour calculer la date/heure d'une matière
+function calculateSubjectDateTime(day, startTime, currentDate) {
+    const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const targetDayIndex = daysOfWeek.indexOf(day);
+    const currentDayIndex = currentDate.getDay();
+    
+    // Calculer le nombre de jours jusqu'au jour cible
+    let daysToAdd = targetDayIndex - currentDayIndex;
+    if (daysToAdd < 0) {
+        daysToAdd += 7; // Semaine suivante
+    }
+    
+    // Créer la date cible
+    const targetDate = new Date(currentDate);
+    targetDate.setDate(currentDate.getDate() + daysToAdd);
+    
+    // Ajouter l'heure de début
+    const [hours, minutes] = startTime.split(':');
+    targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    
+    return targetDate;
+}
+
+// Fonction pour calculer le temps restant jusqu'à la matière
+function calculateTimeUntil(targetDate, currentDate) {
+    const diff = targetDate - currentDate;
+    const diffMinutes = Math.floor(diff / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffDays > 0) {
+        return `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+    } else if (diffHours > 0) {
+        const remainingMinutes = diffMinutes % 60;
+        if (remainingMinutes > 0) {
+            return `Dans ${diffHours}h ${remainingMinutes}min`;
+        }
+        return `Dans ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    } else if (diffMinutes > 0) {
+        return `Dans ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+    } else {
+        return 'Maintenant';
+    }
+}
+
+      // Fonction utilitaire pour formater la date
+function formatDate(date) {
+    return date.toLocaleDateString('fr-FR', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long' 
+    });
+}
+      
 // Update reminders display
 function updateRemindersDisplay() {
     const reminderDisplay = document.getElementById('reminder-display');
@@ -627,6 +698,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Mise à jour du compte à rebours toutes les secondes sur l'accueil
     setInterval(loadNextExam, 1000);
+   setInterval(loadNextSubjects, 60000);
     
     // Update when schedules change
     window.addEventListener('storage', function() {
