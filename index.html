@@ -96,36 +96,35 @@
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-6">
         <!-- Date & Countdown -->
-        <section class="mb-8 bg-white rounded-xl shadow-sm p-6">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                        <i data-feather="calendar" class="text-purple-600"></i>
-                    </div>
-              <div>
-    <div class="text-gray-500">Aujourd'hui</div>
-    <div id="current-date" class="font-semibold text-lg">Lundi 12 juin 2023</div>
-    <div id="current-time" class="font-semibold text-purple-600 text-sm"></div>
-</div>
-                </div>
-                
-               <div id="reminder-display" class="flex-grow max-w-md px-4">
-    <!-- Les rappels seront affichés ici dynamiquement -->
-</div>
-                
-                <div class="flex items-center space-x-4">
-               <div class="text-right">
-    <button onclick="openExamPage()" class="text-gray-500 hover:text-purple-600 transition">
-        <div>Prochain examen</div>
-        <div id="next-exam" class="font-bold text-purple-600 underline">Chargement...</div>
-    </button>
-</div>
-
-                </div>
+      <!-- Date & Countdown -->
+<section class="mb-8 bg-white rounded-xl shadow-sm p-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                <i data-feather="calendar" class="text-purple-600"></i>
             </div>
-        </section>
+            <div>
+                <div class="text-gray-500">Aujourd'hui</div>
+                <div id="current-date" class="font-semibold text-lg">Lundi 12 juin 2023</div>
+                <div id="current-time" class="font-semibold text-purple-600 text-sm"></div>
+            </div>
+        </div>
+        
+        <div id="reminder-display" class="flex-grow max-w-md px-4">
+            <!-- Les rappels seront affichés ici dynamiquement -->
+        </div>
+    </div>
+</section>
 <!-- PAGE EXAMENS -->
- 
+ <!-- Prochain Examen -->
+<section class="mb-8 bg-white rounded-xl shadow-sm p-6">
+    <div class="text-right">
+        <button onclick="openExamPage()" class="text-gray-500 hover:text-purple-600 transition">
+            <div>Prochain examen</div>
+            <div id="next-exam" class="font-bold text-purple-600 underline">Chargement...</div>
+        </button>
+    </div>
+</section>
 
         <!-- Tomorrow's Schedule -->
      <!-- Prochaines matières -->
@@ -315,7 +314,9 @@ function initPage() {
     loadFilteredReminders();
     
     // Set up intervals to refresh data
-    setInterval(loadNextExam, 60000); // Refresh every minute
+   setInterval(() => {
+    loadNextExam();
+}, 1000); // Refresh every minute
     setInterval(loadNextSubjects, 60000); // Refresh every minute
 }
         
@@ -338,12 +339,25 @@ function loadNextExam() {
     const exams = JSON.parse(localStorage.getItem('exams')) || [];
     const now = new Date();
     
+    // Examen en cours (+1h)
+    const ongoingExam = exams.find(exam => {
+        const examStart = new Date(`${exam.date}T${exam.time}`);
+        const examEnd = new Date(examStart.getTime() + 60 * 60 * 1000);
+        return now >= examStart && now <= examEnd;
+    });
+    
+    const nextExamElement = document.getElementById('next-exam');
+    
+    if (ongoingExam) {
+        nextExamElement.textContent = `${ongoingExam.name} - En cours`;
+        return;
+    }
+    
+    // Examen futur le plus proche
     const futureExams = exams
         .filter(exam => new Date(`${exam.date}T${exam.time}`) > now)
         .sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
 
-    const nextExamElement = document.getElementById('next-exam');
-    
     if (futureExams.length > 0) {
         const nextExam = futureExams[0];
         const examDate = new Date(`${nextExam.date}T${nextExam.time}`);
@@ -354,7 +368,7 @@ function loadNextExam() {
         const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-        nextExamElement.textContent = `${nextExam.name} dans ${days}J-${hours}H-${mins}MN-${secs}S`;
+        nextExamElement.innerHTML = `${nextExam.name} dans <span id="countdown-home">${days}J-${hours}H-${mins}MN-${secs}S</span>`;
     } else {
         nextExamElement.textContent = "Aucun examen prévu";
     }
@@ -466,10 +480,14 @@ function updateRemindersDisplay() {
 }
 
 // Initialize the new functions
+// Initialize the new functions
 document.addEventListener('DOMContentLoaded', function() {
     loadNextExam();
     loadNextSubjects();
     updateRemindersDisplay();
+    
+    // Mise à jour du compte à rebours toutes les secondes sur l'accueil
+    setInterval(loadNextExam, 1000);
     
     // Update when schedules change
     window.addEventListener('storage', function() {
@@ -562,6 +580,12 @@ function openExamPage() {
     document.querySelector('nav').classList.add('hidden');
     renderExams();
     feather.replace();
+    
+    // Interval local
+    window.examInterval = setInterval(() => {
+        renderExams();
+        loadNextExam();
+    }, 1000);
 }
 
 function openExamForm() {
@@ -646,6 +670,7 @@ function closeExamPage() {
     document.getElementById('exam-page').classList.add('hidden');
     document.querySelector('main').classList.remove('hidden');
     document.querySelector('nav').classList.remove('hidden');
+    if (window.examInterval) clearInterval(window.examInterval);
 }
 
 function deleteExam(index) {
@@ -654,6 +679,41 @@ function deleteExam(index) {
     localStorage.setItem('exams', JSON.stringify(exams));
     renderExams();
     loadNextExam();
+}
+      
+      function startHomeCountdown() {
+    setInterval(() => {
+        const exams = JSON.parse(localStorage.getItem('exams')) || [];
+        const now = new Date();
+        
+        const ongoingExam = exams.find(exam => {
+            const examStart = new Date(`${exam.date}T${exam.time}`);
+            const examEnd = new Date(examStart.getTime() + 60 * 60 * 1000);
+            return now >= examStart && now <= examEnd;
+        });
+        
+        const nextExamElement = document.getElementById('next-exam');
+        if (ongoingExam) {
+            nextExamElement.textContent = `${ongoingExam.name} - En cours`;
+            return;
+        }
+        
+        const futureExams = exams.filter(exam => new Date(`${exam.date}T${exam.time}`) > now)
+            .sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
+        
+        if (futureExams.length > 0) {
+            const nextExam = futureExams[0];
+            const examDate = new Date(`${nextExam.date}T${nextExam.time}`);
+            const diff = examDate - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+            nextExamElement.innerHTML = `${nextExam.name} dans <span class="countdown-home">${days}J-${hours}H-${mins}MN-${secs}S</span>`;
+        } else {
+            nextExamElement.textContent = "Aucun examen prévu";
+        }
+    }, 1000);
 }
     </script>
 </body>
