@@ -93,10 +93,13 @@
 </div>
                 
                 <div class="flex items-center space-x-4">
-                 <div class="text-right">
-    <div class="text-gray-500">Prochain examen</div>
-    <div id="next-exam" class="font-bold text-purple-600">Chargement...</div>
+               <div class="text-right">
+    <button onclick="openExamPage()" class="text-gray-500 hover:text-purple-600 transition">
+        <div>Prochain examen</div>
+        <div id="next-exam" class="font-bold text-purple-600 underline">Chargement...</div>
+    </button>
 </div>
+
                 </div>
             </div>
         </section>
@@ -189,6 +192,37 @@
                 </a>
             </div>
         </section>
+      
+      <!-- Page Examens -->
+<div id="exam-page" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold flex items-center">
+            <i data-feather="calendar" class="mr-2"></i> Mes examens
+        </h2>
+        <button onclick="openExamForm()" class="bg-purple-600 text-white rounded-full p-2 hover:bg-purple-700">
+            <i data-feather="plus"></i>
+        </button>
+    </div>
+
+    <div id="exam-list" class="space-y-3">
+        <!-- Les examens seront affichés ici -->
+    </div>
+
+    <!-- Fenêtre de formulaire -->
+    <div id="exam-form" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-6 w-80">
+            <h3 class="text-lg font-semibold mb-3">Nouvel examen</h3>
+            <input id="exam-name" type="text" placeholder="Nom de l'examen" class="w-full border rounded-lg p-2 mb-2">
+            <input id="exam-date" type="date" class="w-full border rounded-lg p-2 mb-2">
+            <input id="exam-time" type="time" class="w-full border rounded-lg p-2 mb-4">
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeExamForm()" class="px-3 py-1 rounded-lg border">Annuler</button>
+                <button onclick="addExam()" class="px-3 py-1 bg-purple-600 text-white rounded-lg">Ajouter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     </main>
 
     <!-- Bottom Navigation -->
@@ -277,35 +311,30 @@ function loadNextExam() {
     const exams = JSON.parse(localStorage.getItem('exams')) || [];
     const now = new Date();
     
-    // Filter future exams and sort by date
     const futureExams = exams
-        .filter(exam => {
-            const examDate = new Date(exam.date + 'T' + exam.time);
-            return examDate > now;
-        })
-        .sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
-    
+        .filter(exam => new Date(`${exam.date}T${exam.time}`) > now)
+        .sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
+
     const nextExamElement = document.getElementById('next-exam');
     
     if (futureExams.length > 0) {
         const nextExam = futureExams[0];
-        const examDate = new Date(nextExam.date + 'T' + nextExam.time);
-        const diffTime = examDate - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) {
-            nextExamElement.textContent = `${nextExam.name} - Aujourd'hui ${nextExam.time}`;
-        } else if (diffDays === 1) {
-            nextExamElement.textContent = `${nextExam.name} - Demain ${nextExam.time}`;
-        } else {
-            nextExamElement.textContent = `${nextExam.name} - Dans ${diffDays} jours`;
-        }
+        const examDate = new Date(`${nextExam.date}T${nextExam.time}`);
+        const diff = examDate - now;
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+        nextExamElement.textContent = `${nextExam.name} dans ${days}J-${hours}H-${mins}MN-${secs}S`;
     } else {
         nextExamElement.textContent = "Aucun examen prévu";
     }
 }
 
-// Load next subjects
+ 
+// Load next  subjects
 function loadNextSubjects() {
     const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
     const now = new Date();
@@ -498,6 +527,88 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Prevent blue highlight on mobile taps
         document.addEventListener('touchstart', function() {}, true);
+      
+      // --- PAGE D'EXAMENS --- //
+function openExamPage() {
+    document.getElementById('exam-page').classList.remove('hidden');
+    document.querySelector('main').classList.add('hidden');
+    document.querySelector('nav').classList.add('hidden');
+    renderExams();
+    feather.replace();
+}
+
+function openExamForm() {
+    document.getElementById('exam-form').classList.remove('hidden');
+}
+
+function closeExamForm() {
+    document.getElementById('exam-form').classList.add('hidden');
+}
+
+function addExam() {
+    const name = document.getElementById('exam-name').value.trim();
+    const date = document.getElementById('exam-date').value;
+    const time = document.getElementById('exam-time').value;
+    if (!name || !date || !time) return alert("Veuillez remplir tous les champs !");
+    
+    const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    exams.push({ name, date, time });
+    localStorage.setItem('exams', JSON.stringify(exams));
+    
+    document.getElementById('exam-name').value = '';
+    document.getElementById('exam-date').value = '';
+    document.getElementById('exam-time').value = '';
+    
+    closeExamForm();
+    renderExams();
+    loadNextExam(); // actualise aussi l’accueil
+}
+
+function renderExams() {
+    const list = document.getElementById('exam-list');
+    const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    list.innerHTML = '';
+
+    if (exams.length === 0) {
+        list.innerHTML = `<div class="text-center text-gray-500">Aucun examen ajouté</div>`;
+        return;
+    }
+
+    const now = new Date();
+    exams.forEach(exam => {
+        const examDate = new Date(`${exam.date}T${exam.time}`);
+        const diff = examDate - now;
+
+        let countdown = 'Terminé';
+        if (diff > 0) {
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+            countdown = `${days}J-${hours}H-${mins}MN-${secs}S`;
+        }
+
+        const div = document.createElement('div');
+        div.className = "p-4 border rounded-lg flex justify-between items-center";
+        div.innerHTML = `
+            <div>
+                <div class="font-medium">${exam.name}</div>
+                <div class="text-sm text-gray-500">${exam.date} • ${exam.time}</div>
+            </div>
+            <div class="text-purple-600 font-semibold">${countdown}</div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+// --- Mise à jour du compte à rebours en direct --- //
+setInterval(() => {
+    if (!document.getElementById('exam-page').classList.contains('hidden')) {
+        renderExams();
+    }
+    loadNextExam();
+}, 1000);
+
     </script>
 </body>
 </html>
