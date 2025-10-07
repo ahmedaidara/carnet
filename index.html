@@ -180,20 +180,22 @@
 </div>
             
             <!-- Evolution -->
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <h2 class="text-xl font-semibold mb-4 flex items-center">
-                    <i data-feather="trending-up" class="mr-2"></i> Évolution
-                </h2>
-                <div class="h-48">
-                    <canvas id="evolutionChart"></canvas>
-                </div>
-                <div class="mt-4 text-right">
-                    <a href="grades.html#evolution" class="text-purple-600 text-sm flex items-center justify-end">
-                        Voir le détail <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
+       <!-- Evolution -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <i data-feather="trending-up" class="mr-2"></i> Évolution
+        </h2>
+        <div class="h-48">
+            <!-- ASSUREZ-VOUS QUE CE CANVAS EXISTE -->
+            <canvas id="evolutionChart"></canvas>
+        </div>
+        <div class="mt-4 text-right">
+            <a href="javascript:void(0)" onclick="openGradesPage()" class="text-purple-600 text-sm flex items-center justify-end">
+                Voir les bulletins <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+            </a>
+        </div>
+    </div>
+</section>
 
         <!-- Matières récentes -->
         <section>
@@ -777,7 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCurrentTime();
     setInterval(updateCurrentTime, 1000);
     
-    // Dynami c greeting
+    // Dynamic greeting
     const hour = now.getHours();
     let greeting;
     
@@ -791,20 +793,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('greeting').textContent = greeting;
     
-    // Load data
+    // Load data from schedule page
     loadNextExam();
-    loadNextSubjects(); // ← DOIT ÊTRE APPELLÉE
-     
-updateHomePageGrades();
+    loadNextSubjects();
+    updateRemindersDisplay();
+    
+    // === AJOUT IMPORTANT ===
+    updateHomePageGrades(); // Charger les bulletins et graphique
+    // =======================
+    
     // Set up intervals to refresh data
     setInterval(loadNextExam, 1000);
-    setInterval(loadNextSubjects, 30000);  
-    
-    // Update when schedules change
-    window.addEventListener('storage', function() {
-        loadNextExam();
-        loadNextSubjects();
-    });
+    setInterval(loadNextSubjects, 60000);
 });
         // Countdown timer (example for BAC 2026)
         function updateCountdown() {
@@ -1250,7 +1250,10 @@ function loadSavedBulletins() {
 }
 
 // Afficher les détails d'un bulletin
+// Afficher les détails d'un bulletin - VERSION FONCTIONNELLE
 function showBulletinDetails(bulletin) {
+    console.log("📋 Affichage des détails pour:", bulletin.title);
+    
     let detailsHTML = `
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="text-xl font-semibold mb-4">${bulletin.title}</h3>
@@ -1275,8 +1278,19 @@ function showBulletinDetails(bulletin) {
                     <tbody>
     `;
     
-    bulletin.subjects.forEach(subject => {
-        if (subject.grade > 0) {
+    // Afficher seulement les matières avec des notes
+    const subjectsWithGrades = bulletin.subjects.filter(subject => subject.grade > 0);
+    
+    if (subjectsWithGrades.length === 0) {
+        detailsHTML += `
+            <tr>
+                <td colspan="3" class="border p-4 text-center text-gray-500">
+                    Aucune note saisie
+                </td>
+            </tr>
+        `;
+    } else {
+        subjectsWithGrades.forEach(subject => {
             detailsHTML += `
                 <tr>
                     <td class="border p-2">${subject.name}</td>
@@ -1286,8 +1300,8 @@ function showBulletinDetails(bulletin) {
                     </td>
                 </tr>
             `;
-        }
-    });
+        });
+    }
     
     detailsHTML += `
                     </tbody>
@@ -1308,28 +1322,118 @@ function showBulletinDetails(bulletin) {
                     <div class="text-sm text-gray-600">Moyenne</div>
                 </div>
             </div>
-        </div>
     `;
     
-    // Afficher dans une modale
+    // Ajouter les points forts/faibles seulement s'il y a des notes
+    if (subjectsWithGrades.length > 0) {
+        detailsHTML += `
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h5 class="font-semibold text-green-800 mb-2 flex items-center">
+                        <i data-feather="trending-up" class="w-4 h-4 mr-2"></i>
+                        Points forts
+                    </h5>
+                    <div class="text-sm text-green-700">
+                        ${getStrongPoints(bulletin.subjects)}
+                    </div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <h5 class="font-semibold text-red-800 mb-2 flex items-center">
+                        <i data-feather="trending-down" class="w-4 h-4 mr-2"></i>
+                        Points à améliorer
+                    </h5>
+                    <div class="text-sm text-red-700">
+                        ${getWeakPoints(bulletin.subjects)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    detailsHTML += `</div>`;
+    
+    // CRÉATION DE LA MODALE - CORRECTION ICI
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-60 flex items-center justify-center p-4';
+    modal.style.zIndex = '9999'; // Assurer qu'elle soit au-dessus de tout
     modal.innerHTML = `
         <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center p-6 border-b">
-                <h3 class="text-lg font-semibold">Détails du bulletin</h3>
-                <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
-                    <i data-feather="x" class="w-6 h-6"></i>
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white">
+                <h3 class="text-lg font-semibold text-gray-800">Détails du bulletin</h3>
+                <button onclick="closeBulletinModal()" class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                    <i data-feather="x" class="w-5 h-5"></i>
                 </button>
             </div>
             <div class="p-6">
                 ${detailsHTML}
             </div>
+            <div class="flex justify-end p-6 border-t border-gray-200 sticky bottom-0 bg-white">
+                <button onclick="closeBulletinModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                    Fermer
+                </button>
+            </div>
         </div>
     `;
     
+    modal.id = 'bulletin-details-modal';
+    
+    // AJOUTER DIRECTEMENT AU BODY - ÇA DOIT FONCTIONNER
     document.body.appendChild(modal);
+    
+    // Replacer les icônes Feather
     feather.replace();
+    
+    console.log("✅ Fenêtre de détail affichée");
+}
+
+// Fermer la modale de détail - VERSION AMÉLIORÉE
+function closeBulletinModal() {
+    const modal = document.getElementById('bulletin-details-modal');
+    if (modal) {
+        console.log("🔒 Fermeture de la modale de détail");
+        modal.remove();
+    } else {
+        console.log("❌ Modale non trouvée pour fermeture");
+    }
+}
+
+// Fonctions points forts/faibles - VERSION AMÉLIORÉE
+function getStrongPoints(subjects) {
+    const strongSubjects = subjects.filter(subject => 
+        subject.grade >= 14 && subject.grade > 0
+    );
+    
+    if (strongSubjects.length === 0) {
+        return "<span class='text-gray-500'>Aucun point fort identifié</span>";
+    }
+    
+    const points = strongSubjects.map(subject => 
+        `<div class="flex justify-between items-center py-1">
+            <span>${subject.name}</span>
+            <span class="font-semibold ${getGradeColor(subject.grade)}">${subject.grade}/20</span>
+         </div>`
+    ).join('');
+    
+    return points;
+}
+
+function getWeakPoints(subjects) {
+    const weakSubjects = subjects.filter(subject => 
+        subject.grade < 10 && subject.grade > 0
+    );
+    
+    if (weakSubjects.length === 0) {
+        return "<span class='text-gray-500'>Aucun point faible majeur</span>";
+    }
+    
+    const points = weakSubjects.map(subject => 
+        `<div class="flex justify-between items-center py-1">
+            <span>${subject.name}</span>
+            <span class="font-semibold ${getGradeColor(subject.grade)}">${subject.grade}/20</span>
+         </div>`
+    ).join('');
+    
+    return points;
 }
 
 // Couleur selon la note
@@ -1351,8 +1455,12 @@ function resetGradesForm() {
 }
 
 // Mettre à jour l'affichage des notes sur la page d'accueil
+// Mettre à jour l'affichage des notes sur la page d'accueil (VERSION CORRIGÉE)
 function updateHomePageGrades() {
     const bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
+    
+    const lastBulletinTitle = document.getElementById('last-bulletin-title');
+    const lastBulletinAverage = document.getElementById('last-bulletin-average');
     
     if (bulletins.length > 0) {
         // Trier par date et prendre le plus récent
@@ -1361,23 +1469,55 @@ function updateHomePageGrades() {
         )[0];
         
         // Mettre à jour l'affichage sur la page d'accueil
-        const gradesSection = document.querySelector('a[href*="grades.html"]');
-        if (gradesSection) {
-            const averageElement = gradesSection.querySelector('.text-sm.text-gray-500');
-            if (averageElement) {
-                averageElement.textContent = `Moyenne: ${latestBulletin.average}/20`;
-            }
+        if (lastBulletinTitle) {
+            lastBulletinTitle.textContent = latestBulletin.title;
+        }
+        if (lastBulletinAverage) {
+            lastBulletinAverage.textContent = `Moyenne: ${latestBulletin.average}/20`;
+            lastBulletinAverage.className = `text-sm ${getGradeColor(latestBulletin.average)}`;
         }
         
         // Mettre à jour le graphique d'évolution
         updateEvolutionChart();
+    } else {
+        // Aucun bulletin
+        if (lastBulletinTitle) {
+            lastBulletinTitle.textContent = "Aucun bulletin";
+        }
+        if (lastBulletinAverage) {
+            lastBulletinAverage.textContent = "Moyenne: --/20";
+            lastBulletinAverage.className = "text-sm text-gray-500";
+        }
     }
 }
       // Mettre à jour le graphique d'évolution
+// Mettre à jour le graphique d'évolution - VERSION SIMPLIFIÉE ET FONCTIONNELLE
 function updateEvolutionChart() {
     const bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
+    const canvas = document.getElementById('evolutionChart');
+    
+    console.log("🔄 Mise à jour du graphique...");
+    console.log("Bulletins trouvés:", bulletins.length);
+    console.log("Canvas trouvé:", !!canvas);
+    
+    if (!canvas) {
+        console.error("❌ Canvas 'evolutionChart' non trouvé dans le DOM");
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Détruire l'ancien graphique s'il existe
+    if (window.evolutionChartInstance) {
+        window.evolutionChartInstance.destroy();
+    }
     
     if (bulletins.length === 0) {
+        // Afficher un message quand il n'y a pas de données
+        ctx.fillStyle = '#9CA3AF';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Aucune donnée disponible', canvas.width / 2, canvas.height / 2);
         return;
     }
     
@@ -1386,17 +1526,79 @@ function updateEvolutionChart() {
         new Date(a.createdAt) - new Date(b.createdAt)
     );
     
-    // Préparer les données pour le graphique
-    const labels = sortedBulletins.map(b => b.title);
-    const averages = sortedBulletins.map(b => b.average);
+    // Préparer les données
+    const labels = sortedBulletins.map(b => {
+        const date = new Date(b.date || b.createdAt);
+        return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    });
     
-    // Mettre à jour le graphique existant ou en créer un nouveau
-    const ctx = document.getElementById('evolutionChart')?.getContext('2d');
-    if (ctx && window.evolutionChart) {
-        window.evolutionChart.data.labels = labels;
-        window.evolutionChart.data.datasets[0].data = averages;
-        window.evolutionChart.update();
-    }
+    const averages = sortedBulletins.map(b => parseFloat(b.average));
+    
+    console.log("Labels:", labels);
+    console.log("Moyennes:", averages);
+    
+    // Créer le nouveau graphique
+    window.evolutionChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Moyenne générale',
+                data: averages,
+                borderColor: '#6C63FF',
+                backgroundColor: 'rgba(108, 99, 255, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#6C63FF',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    callbacks: {
+                        label: function(context) {
+                            return `Moyenne: ${context.parsed.y}/20`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: Math.floor(Math.min(...averages) - 1),
+                    max: Math.ceil(Math.max(...averages) + 1),
+                    ticks: {
+                        callback: function(value) {
+                            return value + '/20';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+    
+    console.log("✅ Graphique créé avec succès");
 }
     </script>
   
