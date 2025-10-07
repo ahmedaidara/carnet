@@ -425,54 +425,100 @@ function loadNextExam() {
 
  
 // Load next  subjects
-// Load next subjects from schedules
+// Load next subjects from schedules - VERSION CORRIGÉE
 function loadNextSubjects() {
+    console.log("🔍 Chargement des prochaines matières...");
+    
     const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    const otherSchedules = JSON.parse(localStorage.getItem('otherSchedules')) || [];
+    
+    console.log("Emplois du temps trouvés:", schedules.length);
+    console.log("Autres emplois du temps:", otherSchedules.length);
+    
     const now = new Date();
     const currentDay = now.toLocaleDateString('fr-FR', { weekday: 'long' });
-    const currentTime = now.toTimeString().substring(0, 5); // HH:MM format
+    const currentTime = now.toTimeString().substring(0, 5);
+    
+    console.log("📅 Aujourd'hui:", currentDay, "Heure actuelle:", currentTime);
     
     // Tableau pour stocker toutes les matières futures
     let allFutureSubjects = [];
     
-    // Parcourir tous les emplois du temps
-    schedules.forEach(schedule => {
-        if (schedule.data && schedule.days) {
-            schedule.days.forEach(day => {
-                if (schedule.data[day]) {
-                    Object.keys(schedule.data[day]).forEach(timeSlotId => {
-                        const subject = schedule.data[day][timeSlotId];
-                        if (subject && subject.trim() !== '') {
-                            // Trouver le créneau horaire correspondant
-                            const timeSlot = schedule.timeSlots.find(ts => ts.id === timeSlotId);
+    // Fonction pour traiter un emploi du temps
+    function processSchedule(schedule, isOther = false) {
+        if (!schedule.data || !schedule.days || !schedule.timeSlots) {
+            console.log("❌ Emploi du temps invalide:", schedule.name);
+            return;
+        }
+        
+        console.log(`📚 Analyse de l'emploi du temps: ${schedule.name}`);
+        console.log("Jours:", schedule.days);
+        console.log("Créneaux:", schedule.timeSlots);
+        console.log("Données:", schedule.data);
+        
+        schedule.days.forEach(day => {
+            if (schedule.data[day]) {
+                Object.keys(schedule.data[day]).forEach(timeKey => {
+                    const subject = schedule.data[day][timeKey];
+                    
+                    if (subject && subject.trim() !== '') {
+                        console.log(`📖 Matière trouvée: ${subject} le ${day} à ${timeKey}`);
+                        
+                        // Pour les autres emplois du temps, la clé est "start-end"
+                        let startTime, endTime;
+                        
+                        if (isOther) {
+                            // Structure des autres emplois du temps: "HH:MM-HH:MM"
+                            [startTime, endTime] = timeKey.split('-');
+                        } else {
+                            // Structure des emplois du temps principaux: timeSlot ID
+                            const timeSlot = schedule.timeSlots.find(ts => ts.id === timeKey);
                             if (timeSlot) {
-                                // Calculer si c'est une matière future
-                                const subjectDateTime = calculateSubjectDateTime(day, timeSlot.start, now);
-                                
-                                // Vérifier si c'est une matière future (aujourd'hui ou après)
-                                if (subjectDateTime >= now) {
-                                    allFutureSubjects.push({
-                                        subject: subject,
-                                        day: day,
-                                        startTime: timeSlot.start,
-                                        endTime: timeSlot.end,
-                                        scheduleName: schedule.name,
-                                        dateTime: subjectDateTime,
-                                        scheduleColor: schedule.color
-                                    });
-                                }
+                                startTime = timeSlot.start;
+                                endTime = timeSlot.end;
+                            } else {
+                                console.log("❌ Créneau horaire non trouvé pour:", timeKey);
+                                return;
                             }
                         }
-                    });
-                }
-            });
-        }
-    });
+                        
+                        if (startTime && endTime) {
+                            const subjectDateTime = calculateSubjectDateTime(day, startTime, now);
+                            
+                            console.log(`⏰ ${subject} - ${day} ${startTime}-${endTime}`);
+                            console.log("Date/heure calculée:", subjectDateTime);
+                            console.log("Maintenant:", now);
+                            console.log("Est future?", subjectDateTime >= now);
+                            
+                            if (subjectDateTime >= now) {
+                                allFutureSubjects.push({
+                                    subject: subject,
+                                    day: day,
+                                    startTime: startTime,
+                                    endTime: endTime,
+                                    scheduleName: schedule.name,
+                                    dateTime: subjectDateTime,
+                                    scheduleColor: schedule.color || 'purple'
+                                });
+                                console.log("✅ Ajoutée comme matière future");
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
     
-    // Trier les matières par date/heure (les plus proches en premier)
+    // Traiter tous les emplois du temps
+    schedules.forEach(schedule => processSchedule(schedule, false));
+    otherSchedules.forEach(schedule => processSchedule(schedule, true));
+    
+    console.log("📋 Matières futures trouvées:", allFutureSubjects.length);
+    
+    // Trier par date/heure
     allFutureSubjects.sort((a, b) => a.dateTime - b.dateTime);
     
-    // Prendre seulement les 2 prochaines matières
+    // Prendre les 2 prochaines
     const nextSubjects = allFutureSubjects.slice(0, 2);
     
     // Afficher les résultats
@@ -480,6 +526,8 @@ function loadNextSubjects() {
     nextSubjectsContainer.innerHTML = '';
     
     if (nextSubjects.length > 0) {
+        console.log("🎯 Affichage des 2 prochaines matières:", nextSubjects);
+        
         nextSubjects.forEach((item, index) => {
             const timeUntil = calculateTimeUntil(item.dateTime, now);
             
@@ -502,11 +550,15 @@ function loadNextSubjects() {
             nextSubjectsContainer.appendChild(subjectElement);
         });
     } else {
+        console.log("❌ Aucune matière future trouvée");
         nextSubjectsContainer.innerHTML = `
             <div class="text-center py-6 text-gray-500 bg-gray-50 rounded-lg">
                 <i data-feather="book-open" class="w-8 h-8 mx-auto mb-2"></i>
                 <p>Aucune matière à venir</p>
                 <p class="text-sm mt-1">Toutes les matières sont terminées pour aujourd'hui</p>
+                <button onclick="debugSchedules()" class="text-xs text-purple-600 mt-2 underline">
+                    Debug
+                </button>
             </div>
         `;
     }
@@ -514,11 +566,29 @@ function loadNextSubjects() {
     feather.replace();
 }
 
+// Fonction de debug pour voir ce qui est stocké
+function debugSchedules() {
+    console.log("=== DEBUG EMPLOIS DU TEMPS ===");
+    const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    const otherSchedules = JSON.parse(localStorage.getItem('otherSchedules')) || [];
+    
+    console.log("Emplois du temps principaux:", schedules);
+    console.log("Autres emplois du temps:", otherSchedules);
+    
+    alert("Vérifiez la console du navigateur (F12) pour voir les données détaillées");
+}
+      
+// Fonction pour calculer la date/heure d'une matière
 // Fonction pour calculer la date/heure d'une matière
 function calculateSubjectDateTime(day, startTime, currentDate) {
     const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     const targetDayIndex = daysOfWeek.indexOf(day);
     const currentDayIndex = currentDate.getDay();
+    
+    if (targetDayIndex === -1) {
+        console.log("❌ Jour non trouvé:", day);
+        return new Date(0); // Date très ancienne
+    }
     
     // Calculer le nombre de jours jusqu'au jour cible
     let daysToAdd = targetDayIndex - currentDayIndex;
@@ -532,12 +602,16 @@ function calculateSubjectDateTime(day, startTime, currentDate) {
     
     // Ajouter l'heure de début
     const [hours, minutes] = startTime.split(':');
-    targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    if (hours && minutes) {
+        targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    } else {
+        console.log("❌ Heure invalide:", startTime);
+    }
     
     return targetDate;
 }
 
-// Fonction pour calculer le temps restant jusqu'à la matière
+// Fonction pour calculer le temps restant
 function calculateTimeUntil(targetDate, currentDate) {
     const diff = targetDate - currentDate;
     const diffMinutes = Math.floor(diff / (1000 * 60));
@@ -690,21 +764,44 @@ function deleteReminder(index) {
 }
 
 // Initialize the new functions
-// Initialize the new functions
 document.addEventListener('DOMContentLoaded', function() {
-    loadNextExam();
-    loadNextSubjects();
-    updateRemindersDisplay();
+    feather.replace();
     
-    // Mise à jour du compte à rebours toutes les secondes sur l'accueil
+    // Set current date and time
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
+    
+    // Start real-time clock
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+    
+    // Dynamic greeting
+    const hour = now.getHours();
+    let greeting;
+    
+    if (hour < 12) {
+        greeting = "Bonjour";
+    } else if (hour < 18) {
+        greeting = "Bonsoir";
+    } else {
+        greeting = "Bonsoir";
+    }
+    
+    document.getElementById('greeting').textContent = greeting;
+    
+    // Load data
+    loadNextExam();
+    loadNextSubjects(); // ← DOIT ÊTRE APPELLÉE
+    
+    // Set up intervals to refresh data
     setInterval(loadNextExam, 1000);
-   setInterval(loadNextSubjects, 60000);
+    setInterval(loadNextSubjects, 30000); // Rafraîchir toutes les 30 secondes
     
     // Update when schedules change
     window.addEventListener('storage', function() {
         loadNextExam();
         loadNextSubjects();
-        updateRemindersDisplay();
     });
 });
         // Countdown timer (example for BAC 2026)
