@@ -116,10 +116,11 @@
     </div>
 </section>
 <!-- PAGE EXAMENS -->
- <!-- Prochain Examen -->
+<!-- Prochain Examen -->
 <section class="mb-8 bg-white rounded-xl shadow-sm p-6">
-    <div class="text-right">
-        <button onclick="openExamPage()" class="text-gray-500 hover:text-purple-600 transition">
+    <div class="flex justify-center items-center">
+        <button onclick="openExamPage()" class="text-gray-500 hover:text-purple-600 transition flex flex-col items-center text-center">
+            <i data-feather="clock" class="w-6 h-6 mb-2 text-purple-600"></i>
             <div>Prochain examen</div>
             <div id="next-exam" class="font-bold text-purple-600 underline">Chargement...</div>
         </button>
