@@ -66,7 +66,17 @@
   margin-top: 80px;
   padding: 20px;
 }
+.reminder-item {
+    max-height: none !important;
+    overflow: visible !important;
+}
 
+.reminder-details {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -350,7 +360,7 @@ function initPage() {
     // Load data from schedule page
     loadNextExam();
     loadNextSubjects();
-    loadFilteredReminders();
+    updateRemindersDisplay(); // Affiche toujours le bouton "cliquez pour ajouter"
     
     // Set up intervals to refresh data
    setInterval(() => {
@@ -488,34 +498,17 @@ function loadNextSubjects() {
 }
 
 // Update reminders display
-// Update reminders display
 function updateRemindersDisplay() {
-    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
     const reminderDisplay = document.getElementById('reminder-display');
     
-    if (reminders.length > 0) {
-        // Afficher le premier rappel (sans filtre)
-        const firstReminder = reminders[0];
-        reminderDisplay.innerHTML = `
-            <div class="flex items-start p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <i data-feather="bell" class="text-yellow-500 mr-2 mt-0.5"></i>
-                <div>
-                    <div class="font-medium">${firstReminder.title}</div>
-                    <div class="text-sm text-gray-600">${firstReminder.details}</div>
-                </div>
-            </div>
-        `;
-        feather.replace();
-    } else {
-        // Si aucun rappel, afficher un message par défaut
-        reminderDisplay.innerHTML = `
-            <div class="flex items-center justify-center p-3 bg-yellow-50 rounded-lg border border-yellow-200 cursor-pointer" onclick="openReminderPage()">
-                <i data-feather="bell" class="text-yellow-500 mr-2"></i>
-                <span class="font-medium text-gray-700">Cliquez pour ajouter un rappel</span>
-            </div>
-        `;
-        feather.replace();
-    }
+    // TOUJOURS afficher le même message, même s'il y a des rappels
+    reminderDisplay.innerHTML = `
+        <div class="flex items-center justify-center p-3 bg-yellow-50 rounded-lg border border-yellow-200 cursor-pointer" onclick="openReminderPage()">
+            <i data-feather="bell" class="text-yellow-500 mr-2"></i>
+            <span class="font-medium text-gray-700">Gérer vos rappels</span>
+        </div>
+    `;
+    feather.replace();
 }
       
       // --- PAGE DE RAPPELS --- //
