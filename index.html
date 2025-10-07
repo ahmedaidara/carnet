@@ -602,7 +602,7 @@ function renderExams() {
     }
 
     const now = new Date();
-    exams.forEach(exam => {
+    exams.forEach((exam, index) => {
         const examDate = new Date(`${exam.date}T${exam.time}`);
         const diff = examDate - now;
 
@@ -622,10 +622,16 @@ function renderExams() {
                 <div class="font-medium">${exam.name}</div>
                 <div class="text-sm text-gray-500">${exam.date} • ${exam.time}</div>
             </div>
-            <div class="text-purple-600 font-semibold">${countdown}</div>
+            <div class="flex items-center">
+                <div class="text-purple-600 font-semibold mr-4">${countdown}</div>
+                <button onclick="deleteExam(${index})" class="text-red-500 hover:text-red-700">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>
         `;
         list.appendChild(div);
     });
+    feather.replace();
 }
 
 // --- Mise à jour du compte à rebours en direct --- //
@@ -636,10 +642,18 @@ setInterval(() => {
     loadNextExam();
 }, 1000);
 
-      function closeExamPage() {
+function closeExamPage() {
     document.getElementById('exam-page').classList.add('hidden');
     document.querySelector('main').classList.remove('hidden');
     document.querySelector('nav').classList.remove('hidden');
+}
+
+function deleteExam(index) {
+    const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    exams.splice(index, 1);
+    localStorage.setItem('exams', JSON.stringify(exams));
+    renderExams();
+    loadNextExam();
 }
     </script>
 </body>
