@@ -198,41 +198,43 @@
 </section>
 
         <!-- Matières récentes -->
-        <section>
-            <h2 class="text-xl font-semibold mb-4 flex items-center">
-                <i data-feather="layers" class="mr-2"></i> Mes matières récentes
-            </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                <a href="subject.html?id=1" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
-                        <i data-feather="code" class="text-blue-600"></i>
-                    </div>
-                    <div class="font-medium">Informatique</div>
-                    <div class="text-xs text-gray-500">Coeff: 3</div>
-                </a>
-                <a href="subject.html?id=2" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
-                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
-                        <i data-feather="atom" class="text-red-600"></i>
-                    </div>
-                    <div class="font-medium">Physique</div>
-                    <div class="text-xs text-gray-500">Coeff: 4</div>
-                </a>
-                <a href="subject.html?id=3" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
-                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
-                        <i data-feather="divide" class="text-green-600"></i>
-                    </div>
-                    <div class="font-medium">Maths</div>
-                    <div class="text-xs text-gray-500">Coeff: 5</div>
-                </a>
-                <a href="subject.html?id=4" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
-                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
-                        <i data-feather="globe" class="text-yellow-600"></i>
-                    </div>
-                    <div class="font-medium">Histoire</div>
-                    <div class="text-xs text-gray-500">Coeff: 2</div>
-                </a>
+       <!-- Remplacez toute la section Analyse des matières par ceci : -->
+<section class="mb-8" id="strength-weakness-section">
+    <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <i data-feather="target" class="mr-2"></i> Analyse des matières
+    </h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Points forts -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center text-green-600">
+                <i data-feather="trending-up" class="mr-2"></i> Points forts
+            </h3>
+            <div class="h-64">
+                <canvas id="strongSubjectsChart"></canvas>
             </div>
-        </section>
+            <div id="no-strong-subjects" class="text-center py-8 text-gray-500">
+                <i data-feather="smile" class="w-12 h-12 mx-auto mb-2"></i>
+                <p>Aucun point fort identifié</p>
+                <p class="text-sm">(Moyenne ≥ 14/20)</p>
+            </div>
+        </div>
+        
+        <!-- Points faibles -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center text-red-600">
+                <i data-feather="trending-down" class="mr-2"></i> Points à améliorer
+            </h3>
+            <div class="h-64">
+                <canvas id="weakSubjectsChart"></canvas>
+            </div>
+            <div id="no-weak-subjects" class="text-center py-8 text-gray-500">
+                <i data-feather="frown" class="w-12 h-12 mx-auto mb-2"></i>
+                <p>Aucun point faible majeur</p>
+                <p class="text-sm">(Moyenne < 10/20)</p>
+            </div>
+        </div>
+    </div>
+</section>
       
 
 
@@ -348,28 +350,37 @@ function initPage() {
     
     // Dynamic greeting
     const hour = now.getHours();
-    let greeting;
-    
-    if (hour < 12) {
-        greeting = "Bonjour";
-    } else if (hour < 18) {
-        greeting = "Bonsoir";
-    } else {
-        greeting = "Bonsoir";
-    }
-    
+    let greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bonsoir" : "Bonsoir";
     document.getElementById('greeting').textContent = greeting;
     
     // Load data from schedule page
     loadNextExam();
     loadNextSubjects();
-    updateRemindersDisplay(); // Affiche toujours le bouton "cliquez pour ajouter"
+    updateRemindersDisplay();
+    
+    // ⭐⭐ CHARGEMENT GARANTI DES GRAP HIQUES ⭐⭐
+    setTimeout(() => {
+        console.log("🎯 DÉMARRAGE DES GRAPHIQUES...");
+        loadStrengthWeaknessCharts();
+    }, 500);
     
     // Set up intervals to refresh data
-   setInterval(() => {
-    loadNextExam();
-}, 1000); // Refresh every minute
-    setInterval(loadNextSubjects, 60000); // Refresh every minute
+    setInterval(loadNextExam, 1000);
+    setInterval(loadNextSubjects, 60000);
+    
+    // Ajouter bouton de test
+    addDebugButton();
+}
+
+// Ajouter un bouton debug
+function addDebugButton() {
+    const btn = document.createElement('button');
+    btn.innerHTML = '<i data-feather="refresh-cw" class="w-4 h-4"></i>';
+    btn.className = 'fixed top-4 right-4 bg-purple-600 text-white p-3 rounded-full shadow-lg z-50';
+    btn.title = 'Forcer le chargement des graphiques';
+    btn.onclick = forceLoadCharts;
+    document.body.appendChild(btn);
+    feather.replace();
 }
         
       
@@ -1193,6 +1204,7 @@ function saveBulletin() {
     const bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
     bulletins.push(bulletin);
     localStorage.setItem('bulletins', JSON.stringify(bulletins));
+  
     
     // Mettre à jour l'affichage
     loadSavedBulletins();
@@ -1202,6 +1214,8 @@ function saveBulletin() {
     resetGradesForm();
     
     alert('Bulletin enregistré avec succès !');
+      setTimeout(loadStrengthWeaknessCharts, 100);
+
 }
 
 // Charger les bulletins sauvegardés
@@ -1530,6 +1544,7 @@ function deleteBulletin(bulletinId) {
     
     // Message de confirmation
     showNotification(`Bulletin "${bulletinToDelete.title}" supprimé`, 'success');
+  setTimeout(loadStrengthWeaknessCharts, 100);
 }
       
 // Fermer la modale de détail - VERSION AMÉLIORÉE
@@ -1799,6 +1814,226 @@ function updateEvolutionChart() {
     });
     
     console.log("✅ Graphique créé avec noms de bulletins");
+}
+      
+      // === MÉTHODE GARANTIE POUR LES GRAPHIQUES POINTS FORTS/FAIBLES ===
+
+// Fonction principale - À APPELER DIRECTEMENT
+function loadStrengthWeaknessCharts() {
+    console.log("🚀 CHARGEMENT DES GRAPHIQUES POINTS FORTS/FAIBLES");
+    
+    // 1. Vérifier que les éléments existent
+    const section = document.getElementById('strength-weakness-section');
+    if (!section) {
+        console.error("❌ Section non trouvée");
+        return;
+    }
+    
+    // 2. Récupérer les bulletins
+    const bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
+    console.log(`📊 ${bulletins.length} bulletins trouvés`);
+    
+    // 3. Si pas de bulletins, afficher messages
+    if (bulletins.length === 0) {
+        showNoDataState();
+        return;
+    }
+    
+    // 4. Calculer les données
+    const analysis = analyzeSubjects(bulletins);
+    console.log("📈 Analyse:", analysis);
+    
+    // 5. Créer les graphiques
+    createCharts(analysis);
+}
+
+// Analyser les matières
+function analyzeSubjects(bulletins) {
+    const subjectData = {};
+    
+    // Parcourir tous les bulletins et toutes les matières
+    bulletins.forEach(bulletin => {
+        bulletin.subjects.forEach(subject => {
+            if (subject.name && subject.name.trim() !== '' && subject.grade > 0) {
+                const subjectName = subject.name.trim();
+                
+                if (!subjectData[subjectName]) {
+                    subjectData[subjectName] = {
+                        total: 0,
+                        count: 0,
+                        grades: []
+                    };
+                }
+                
+                subjectData[subjectName].total += subject.grade;
+                subjectData[subjectName].count += 1;
+                subjectData[subjectName].grades.push(subject.grade);
+            }
+        });
+    });
+    
+    // Calculer les moyennes
+    Object.keys(subjectData).forEach(subjectName => {
+        const data = subjectData[subjectName];
+        data.average = data.total / data.count;
+    });
+    
+    return subjectData;
+}
+
+// Créer les graphiques
+function createCharts(subjectData) {
+    // Séparer points forts et faibles
+    const strongSubjects = [];
+    const weakSubjects = [];
+    
+    Object.keys(subjectData).forEach(subjectName => {
+        const data = subjectData[subjectName];
+        
+        if (data.average >= 14) {
+            strongSubjects.push({
+                name: subjectName,
+                average: data.average,
+                count: data.count
+            });
+        } else if (data.average < 10) {
+            weakSubjects.push({
+                name: subjectName,
+                average: data.average,
+                count: data.count
+            });
+        }
+    });
+    
+    // Trier
+    strongSubjects.sort((a, b) => b.average - a.average);
+    weakSubjects.sort((a, b) => a.average - b.average);
+    
+    console.log(`✅ Points forts: ${strongSubjects.length}, Points faibles: ${weakSubjects.length}`);
+    
+    // Créer le graphique points forts
+    if (strongSubjects.length > 0) {
+        createBarChart('strongSubjectsChart', strongSubjects, 'green');
+        document.getElementById('no-strong-subjects').classList.add('hidden');
+    } else {
+        document.getElementById('no-strong-subjects').classList.remove('hidden');
+        document.getElementById('strongSubjectsChart').style.display = 'none';
+    }
+    
+    // Créer le graphique points faibles
+    if (weakSubjects.length > 0) {
+        createBarChart('weakSubjectsChart', weakSubjects, 'red');
+        document.getElementById('no-weak-subjects').classList.add('hidden');
+    } else {
+        document.getElementById('no-weak-subjects').classList.remove('hidden');
+        document.getElementById('weakSubjectsChart').style.display = 'none';
+    }
+}
+
+// Créer un graphique en barres
+function createBarChart(canvasId, data, color) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        console.error(`❌ Canvas ${canvasId} non trouvé`);
+        return;
+    }
+    
+    // Afficher le canvas
+    canvas.style.display = 'block';
+    
+    // Couleurs
+    const colors = {
+        green: {
+            bg: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'],
+            border: ['#059669', '#10B981', '#34D399', '#6EE7B7']
+        },
+        red: {
+            bg: ['#EF4444', '#F87171', '#FCA5A5', '#FECACA'],
+            border: ['#DC2626', '#EF4444', '#F87171', '#FCA5A5']
+        }
+    };
+    
+    const colorSet = colors[color] || colors.green;
+    
+    // Préparer les données
+    const labels = data.map(item => 
+        item.name.length > 12 ? item.name.substring(0, 12) + '...' : item.name
+    );
+    
+    const averages = data.map(item => item.average);
+    
+    // Détruire l'ancien graphique s'il existe
+    if (window[canvasId + 'Instance']) {
+        window[canvasId + 'Instance'].destroy();
+    }
+    
+    // Créer le nouveau graphique
+    window[canvasId + 'Instance'] = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Moyenne',
+                data: averages,
+                backgroundColor: colorSet.bg,
+                borderColor: colorSet.border,
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const item = data[context.dataIndex];
+                            return [
+                                `Moyenne: ${context.parsed.y.toFixed(2)}/20`,
+                                `Notes: ${item.count} bulletin(s)`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: color === 'red' ? 10 : 20,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '/20';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+    
+    console.log(`✅ Graphique ${canvasId} créé avec ${data.length} éléments`);
+}
+
+// État pas de données
+function showNoDataState() {
+    document.getElementById('no-strong-subjects').classList.remove('hidden');
+    document.getElementById('no-weak-subjects').classList.remove('hidden');
+    document.getElementById('strongSubjectsChart').style.display = 'none';
+    document.getElementById('weakSubjectsChart').style.display = 'none';
+}
+
+// Fonction de test FORCÉE
+function forceLoadCharts() {
+    console.log("🔧 FORCAGE DU CHARGEMENT DES GRAPHIQUES");
+    loadStrengthWeaknessCharts();
 }
     </script>
   
