@@ -1250,22 +1250,48 @@ function loadSavedBulletins() {
 }
 
 // Afficher les détails d'un bulletin
-// Afficher les détails d'un bulletin - VERSION FONCTIONNELLE
+// Afficher les détails d'un bulletin - VERSION AVEC BOUTON SUPPRIMER
 function showBulletinDetails(bulletin) {
+    // Si bulletin est une string (venant du HTML), le parser
+    if (typeof bulletin === 'string') {
+        try {
+            bulletin = JSON.parse(bulletin);
+        } catch (e) {
+            console.error("❌ Erreur de parsing du bulletin:", e);
+            return;
+        }
+    }
+    
     console.log("📋 Affichage des détails pour:", bulletin.title);
     
     let detailsHTML = `
         <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-xl font-semibold mb-4">${bulletin.title}</h3>
-            
-            <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
-                <div><strong>Date:</strong> ${bulletin.date}</div>
-                ${bulletin.studentName ? `<div><strong>Élève:</strong> ${bulletin.studentName}</div>` : ''}
-                ${bulletin.studentClass ? `<div><strong>Classe:</strong> ${bulletin.studentClass}</div>` : ''}
-                ${bulletin.rank ? `<div><strong>Rang:</strong> ${bulletin.rank}</div>` : ''}
+            <!-- En-tête avec bouton supprimer -->
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex-1">
+                    <h3 class="text-xl font-semibold text-gray-800">${bulletin.title}</h3>
+                    <div class="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                        <span>${bulletin.date}</span>
+                        ${bulletin.studentClass ? `<span>• ${bulletin.studentClass}</span>` : ''}
+                        ${bulletin.rank ? `<span>• Rang: ${bulletin.rank}</span>` : ''}
+                    </div>
+                </div>
+                <button onclick="event.stopPropagation(); confirmDeleteBulletin('${bulletin.id}')" 
+                        class="ml-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-red-200"
+                        title="Supprimer ce bulletin">
+                    <i data-feather="trash-2" class="w-5 h-5"></i>
+                </button>
             </div>
             
-            <h4 class="font-semibold mb-3">Notes détaillées:</h4>
+            ${bulletin.studentName ? `
+                <div class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="text-sm text-blue-800">
+                        <strong>Élève:</strong> ${bulletin.studentName}
+                    </div>
+                </div>
+            ` : ''}
+            
+            <h4 class="font-semibold mb-3 text-gray-700">Notes détaillées:</h4>
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse mb-4">
                     <thead>
@@ -1308,18 +1334,19 @@ function showBulletinDetails(bulletin) {
                 </table>
             </div>
             
-            <div class="grid grid-cols-3 gap-4 mt-4 p-4 bg-purple-50 rounded-lg">
+            <!-- Résultats -->
+            <div class="grid grid-cols-3 gap-4 mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
                 <div class="text-center">
-                    <div class="text-lg font-bold">${bulletin.totalCoeff}</div>
-                    <div class="text-sm text-gray-600">Total Coeff</div>
+                    <div class="text-xl font-bold text-purple-700">${bulletin.totalCoeff}</div>
+                    <div class="text-sm text-purple-600">Total Coeff</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-lg font-bold">${bulletin.totalPoints.toFixed(2)}</div>
-                    <div class="text-sm text-gray-600">Total Points</div>
+                    <div class="text-xl font-bold text-blue-700">${bulletin.totalPoints.toFixed(2)}</div>
+                    <div class="text-sm text-blue-600">Total Points</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-lg font-bold ${getGradeColor(bulletin.average)}">${bulletin.average}/20</div>
-                    <div class="text-sm text-gray-600">Moyenne</div>
+                    <div class="text-xl font-bold ${getGradeColor(bulletin.average)}">${bulletin.average}/20</div>
+                    <div class="text-sm ${getGradeColor(bulletin.average)}">Moyenne</div>
                 </div>
             </div>
     `;
@@ -1329,20 +1356,20 @@ function showBulletinDetails(bulletin) {
         detailsHTML += `
             <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h5 class="font-semibold text-green-800 mb-2 flex items-center">
+                    <h5 class="font-semibold text-green-800 mb-3 flex items-center">
                         <i data-feather="trending-up" class="w-4 h-4 mr-2"></i>
                         Points forts
                     </h5>
-                    <div class="text-sm text-green-700">
+                    <div class="text-sm text-green-700 space-y-1">
                         ${getStrongPoints(bulletin.subjects)}
                     </div>
                 </div>
                 <div class="bg-red-50 p-4 rounded-lg border border-red-200">
-                    <h5 class="font-semibold text-red-800 mb-2 flex items-center">
+                    <h5 class="font-semibold text-red-800 mb-3 flex items-center">
                         <i data-feather="trending-down" class="w-4 h-4 mr-2"></i>
                         Points à améliorer
                     </h5>
-                    <div class="text-sm text-red-700">
+                    <div class="text-sm text-red-700 space-y-1">
                         ${getWeakPoints(bulletin.subjects)}
                     </div>
                 </div>
@@ -1352,10 +1379,10 @@ function showBulletinDetails(bulletin) {
     
     detailsHTML += `</div>`;
     
-    // CRÉATION DE LA MODALE - CORRECTION ICI
+    // CRÉATION DE LA MODALE
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-60 flex items-center justify-center p-4';
-    modal.style.zIndex = '9999'; // Assurer qu'elle soit au-dessus de tout
+    modal.style.zIndex = '9999';
     modal.innerHTML = `
         <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white">
@@ -1367,25 +1394,143 @@ function showBulletinDetails(bulletin) {
             <div class="p-6">
                 ${detailsHTML}
             </div>
-            <div class="flex justify-end p-6 border-t border-gray-200 sticky bottom-0 bg-white">
-                <button onclick="closeBulletinModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                    Fermer
+            <div class="flex justify-between items-center p-6 border-t border-gray-200 sticky bottom-0 bg-white">
+                <button onclick="closeBulletinModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    Retour à la liste
                 </button>
+                <div class="flex space-x-2">
+                    <button onclick="event.stopPropagation(); confirmDeleteBulletin('${bulletin.id}')" 
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center">
+                        <i data-feather="trash-2" class="w-4 h-4 mr-2"></i>
+                        Supprimer
+                    </button>
+                </div>
             </div>
         </div>
     `;
     
     modal.id = 'bulletin-details-modal';
-    
-    // AJOUTER DIRECTEMENT AU BODY - ÇA DOIT FONCTIONNER
     document.body.appendChild(modal);
-    
-    // Replacer les icônes Feather
     feather.replace();
     
-    console.log("✅ Fenêtre de détail affichée");
+    console.log("✅ Fenêtre de détail affichée avec bouton supprimer");
 }
 
+      // Fenêtre de confirmation de suppression - VERSION AMÉLIORÉE
+// Fenêtre de confirmation de suppression - VERSION CORRIGÉE
+function confirmDeleteBulletin(bulletinId) {
+    const bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
+    const bulletin = bulletins.find(b => b.id === bulletinId);
+    
+    if (!bulletin) {
+        console.error("❌ Bulletin non trouvé pour suppression:", bulletinId);
+        return;
+    }
+    
+    // ⭐⭐ AJOUTEZ CETTE LIGNE ⭐⭐ - Fermer la fenêtre de détail
+    closeBulletinModal();
+    
+    // CRÉATION DE LA MODALE DANS LA PAGE BULLETIN
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-70 flex items-center justify-center p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+            <!-- Icône d'alerte -->
+            <div class="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-4">
+                <i data-feather="alert-triangle" class="w-8 h-8 text-red-600"></i>
+            </div>
+            
+            <!-- Titre -->
+            <h3 class="text-xl font-semibold text-center mb-3 text-gray-800">Supprimer le bulletin</h3>
+            
+            <!-- Message -->
+            <div class="text-center mb-6">
+                <p class="text-gray-600 mb-2">Voulez-vous vraiment supprimer ce bulletin ?</p>
+                <p class="text-lg font-medium text-purple-600">"${bulletin.title}"</p>
+                <p class="text-sm text-gray-500 mt-2">Cette action est irréversible</p>
+            </div>
+            
+            <!-- Informations du bulletin -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="text-gray-600">Date:</div>
+                    <div class="font-medium">${bulletin.date}</div>
+                    
+                    <div class="text-gray-600">Moyenne:</div>
+                    <div class="font-medium ${getGradeColor(bulletin.average)}">${bulletin.average}/20</div>
+                    
+                    ${bulletin.studentClass ? `
+                        <div class="text-gray-600">Classe:</div>
+                        <div class="font-medium">${bulletin.studentClass}</div>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <!-- Boutons d'action -->
+            <div class="flex space-x-3">
+                <button onclick="closeDeleteModal()" 
+                        class="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium">
+                    Annuler
+                </button>
+                <button onclick="deleteBulletin('${bulletinId}')" 
+                        class="flex-1 px-4 py-3 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium flex items-center justify-center">
+                    <i data-feather="trash-2" class="w-4 h-4 mr-2"></i>
+                    Supprimer
+                </button>
+            </div>
+        </div>
+    `;
+    
+    modal.id = 'delete-bulletin-modal';
+    
+    // AJOUTER LA MODALE DANS LA PAGE BULLETIN, PAS DANS LE BODY
+    const gradesPage = document.getElementById('grades-page');
+    gradesPage.appendChild(modal);
+    
+    feather.replace();
+}
+
+// Fermer la modale de suppression - VERSION CORRIGÉE
+function closeDeleteModal() {
+    const modal = document.getElementById('delete-bulletin-modal');
+    if (modal && modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+    }
+}
+
+// Supprimer définitivement un bulletin - VERSION CORRIGÉE
+function deleteBulletin(bulletinId) {
+    console.log("🗑️ Suppression du bulletin:", bulletinId);
+    
+    let bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
+    const bulletinToDelete = bulletins.find(b => b.id === bulletinId);
+    
+    if (!bulletinToDelete) {
+        console.error("❌ Bulletin non trouvé lors de la suppression");
+        return;
+    }
+    
+    // Filtrer pour supprimer le bulletin
+    bulletins = bulletins.filter(b => b.id !== bulletinId);
+    
+    // Sauvegarder la nouvelle liste
+    localStorage.setItem('bulletins', JSON.stringify(bulletins));
+    
+    // Fermer TOUTES les modales
+    closeDeleteModal();
+    closeBulletinModal(); // Fermer aussi la fenêtre de détails
+    
+    // Mettre à jour l'affichage
+    loadSavedBulletins();
+    updateHomePageGrades();
+    updateEvolutionChart();
+    
+    console.log("✅ Bulletin supprimé avec succès");
+    
+    // Message de confirmation
+    showNotification(`Bulletin "${bulletinToDelete.title}" supprimé`, 'success');
+}
+      
 // Fermer la modale de détail - VERSION AMÉLIORÉE
 function closeBulletinModal() {
     const modal = document.getElementById('bulletin-details-modal');
@@ -1397,6 +1542,47 @@ function closeBulletinModal() {
     }
 }
 
+      // Supprimer définitivement un bulletin - VERSION AMÉLIORÉE
+function deleteBulletin(bulletinId) {
+    console.log("🗑️ Suppression du bulletin:", bulletinId);
+    
+    let bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
+    const bulletinToDelete = bulletins.find(b => b.id === bulletinId);
+    const initialLength = bulletins.length;
+    
+    if (!bulletinToDelete) {
+        console.error("❌ Bulletin non trouvé lors de la suppression");
+        return;
+    }
+    
+    // Filtrer pour supprimer le bulletin
+    bulletins = bulletins.filter(b => b.id !== bulletinId);
+    
+    // Sauvegarder la nouvelle liste
+    localStorage.setItem('bulletins', JSON.stringify(bulletins));
+    
+    // Fermer la modale
+    closeDeleteModal();
+    
+    // Mettre à jour l'affichage
+    loadSavedBulletins();
+    updateHomePageGrades();
+    updateEvolutionChart();
+    
+    console.log("✅ Bulletin supprimé avec succès");
+    
+    // Message de confirmation avec plus d'infos
+    showNotification(`Bulletin "${bulletinToDelete.title}" supprimé`, 'success');
+}
+
+// Fermer la modale de suppression
+function closeDeleteModal() {
+    const modal = document.getElementById('delete-bulletin-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+      
 // Fonctions points forts/faibles - VERSION AMÉLIORÉE
 function getStrongPoints(subjects) {
     const strongSubjects = subjects.filter(subject => 
@@ -1491,17 +1677,15 @@ function updateHomePageGrades() {
     }
 }
       // Mettre à jour le graphique d'évolution
-// Mettre à jour le graphique d'évolution - VERSION SIMPLIFIÉE ET FONCTIONNELLE
+// Mettre à jour le graphique d'évolution - VERSION AVEC NOMS DE BULLETINS
 function updateEvolutionChart() {
     const bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
     const canvas = document.getElementById('evolutionChart');
     
-    console.log("🔄 Mise à jour du graphique...");
-    console.log("Bulletins trouvés:", bulletins.length);
-    console.log("Canvas trouvé:", !!canvas);
+    console.log("🔄 Mise à jour du graphique avec noms de bulletins...");
     
     if (!canvas) {
-        console.error("❌ Canvas 'evolutionChart' non trouvé dans le DOM");
+        console.error("❌ Canvas 'evolutionChart' non trouvé");
         return;
     }
     
@@ -1523,18 +1707,19 @@ function updateEvolutionChart() {
     
     // Trier par date
     const sortedBulletins = bulletins.sort((a, b) => 
-        new Date(a.createdAt) - new Date(b.createdAt)
+        new Date(a.createdAt) - new Date(a.createdAt)
     );
     
-    // Préparer les données
+    // Utiliser les TITRES des bulletins comme labels
     const labels = sortedBulletins.map(b => {
-        const date = new Date(b.date || b.createdAt);
-        return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        // Tronquer les titres trop longs
+        const title = b.title.length > 15 ? b.title.substring(0, 15) + '...' : b.title;
+        return title;
     });
     
     const averages = sortedBulletins.map(b => parseFloat(b.average));
     
-    console.log("Labels:", labels);
+    console.log("Labels (noms bulletins):", labels);
     console.log("Moyennes:", averages);
     
     // Créer le nouveau graphique
@@ -1569,8 +1754,18 @@ function updateEvolutionChart() {
                     titleColor: '#ffffff',
                     bodyColor: '#ffffff',
                     callbacks: {
+                        title: function(context) {
+                            // Afficher le titre complet dans le tooltip
+                            const bulletin = sortedBulletins[context[0].dataIndex];
+                            return bulletin.title;
+                        },
                         label: function(context) {
-                            return `Moyenne: ${context.parsed.y}/20`;
+                            const bulletin = sortedBulletins[context[0].dataIndex];
+                            return [
+                                `Moyenne: ${context.parsed.y}/20`,
+                                `Date: ${bulletin.date}`,
+                                bulletin.studentClass ? `Classe: ${bulletin.studentClass}` : ''
+                            ].filter(Boolean);
                         }
                     }
                 }
@@ -1578,8 +1773,8 @@ function updateEvolutionChart() {
             scales: {
                 y: {
                     beginAtZero: false,
-                    min: Math.floor(Math.min(...averages) - 1),
-                    max: Math.ceil(Math.max(...averages) + 1),
+                    min: Math.max(0, Math.floor(Math.min(...averages) - 1)),
+                    max: Math.min(20, Math.ceil(Math.max(...averages) + 1)),
                     ticks: {
                         callback: function(value) {
                             return value + '/20';
@@ -1592,13 +1787,17 @@ function updateEvolutionChart() {
                 x: {
                     grid: {
                         color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
                     }
                 }
             }
         }
     });
     
-    console.log("✅ Graphique créé avec succès");
+    console.log("✅ Graphique créé avec noms de bulletins");
 }
     </script>
   
