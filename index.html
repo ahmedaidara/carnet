@@ -110,12 +110,17 @@
             </div>
         </div>
         
-        <div id="reminder-display" class="flex-grow max-w-md px-4">
-            <!-- Les rappels seront affichés ici dynamiquement -->
-        </div>
+<div id="reminder-display" class="flex-grow max-w-md px-4 cursor-pointer" onclick="openReminderPage()">
+    <div class="flex items-center justify-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+        <i data-feather="bell" class="text-yellow-500 mr-2"></i>
+        <span class="font-medium text-gray-700">RAPPEL</span>
+    </div>
+</div>
     </div>
 </section>
 <!-- PAGE EXAMENS -->
+      
+      
 <!-- Prochain Examen -->
 <section class="mb-8 bg-white rounded-xl shadow-sm p-6">
     <div class="flex justify-center items-center">
@@ -216,7 +221,7 @@
             </div>
         </section>
       
-   
+
 
     </main>
 
@@ -248,6 +253,39 @@
             <div class="flex justify-end space-x-2">
                 <button onclick="closeExamForm()" class="px-3 py-1 rounded-lg border">Annuler</button>
                 <button onclick="addExam()" class="px-3 py-1 bg-purple-600 text-white rounded-lg">Ajouter</button>
+            </div>
+        </div>
+    </div>
+</div>
+  
+  <!-- Page Rappels -->
+<div id="reminder-page" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
+    <div class="flex items-center justify-between mb-6">
+        <button onclick="closeReminderPage()" class="text-gray-500 hover:text-purple-600">
+            <i data-feather="arrow-left"></i> Retour
+        </button>
+        <h2 class="text-xl font-semibold flex items-center">
+            <i data-feather="bell" class="mr-2"></i> Mes rappels
+        </h2>
+        <button onclick="openReminderForm()" class="bg-purple-600 text-white rounded-full p-2 hover:bg-purple-700">
+            <i data-feather="plus"></i>
+        </button>
+    </div>
+
+    <div id="reminder-list" class="space-y-3">
+        <!-- Les rappels seront affichés ici -->
+    </div>
+
+    <!-- Fenêtre de formulaire -->
+    <div id="reminder-form" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-60">
+        <div class="bg-white rounded-xl p-6 w-80">
+            <h3 class="text-lg font-semibold mb-3">Nouveau rappel</h3>
+            <input id="reminder-title" type="text" placeholder="Titre" class="w-full border rounded-lg p-2 mb-2">
+            <textarea id="reminder-details" type="text" placeholder="Détails (optionnel)" class="w-full border rounded-lg p-2 mb-4 h-20"></textarea>
+            <input id="reminder-date" type="date" class="w-full border rounded-lg p-2 mb-4">
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeReminderForm()" class="px-3 py-1 rounded-lg border">Annuler</button>
+                <button onclick="addReminder()" class="px-3 py-1 bg-purple-600 text-white rounded-lg">Ajouter</button>
             </div>
         </div>
     </div>
@@ -450,34 +488,141 @@ function loadNextSubjects() {
 }
 
 // Update reminders display
+// Update reminders display
 function updateRemindersDisplay() {
     const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
     const reminderDisplay = document.getElementById('reminder-display');
     
     if (reminders.length > 0) {
-        // Filter out the "Révision des formules des alcanes" reminder
-        const filteredReminders = reminders.filter(reminder => 
-            !reminder.title.includes('Révision') || 
-            !reminder.details.includes('formules des alcanes')
-        );
-        
-        if (filteredReminders.length > 0) {
-            reminderDisplay.innerHTML = `
-                <div class="flex items-start p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                    <i data-feather="bell" class="text-yellow-500 mr-2 mt-0.5"></i>
-                    <div>
-                        <div class="font-medium">${filteredReminders[0].title}</div>
-                        <div class="text-sm text-gray-600">${filteredReminders[0].details}</div>
-                    </div>
+        // Afficher le premier rappel (sans filtre)
+        const firstReminder = reminders[0];
+        reminderDisplay.innerHTML = `
+            <div class="flex items-start p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <i data-feather="bell" class="text-yellow-500 mr-2 mt-0.5"></i>
+                <div>
+                    <div class="font-medium">${firstReminder.title}</div>
+                    <div class="text-sm text-gray-600">${firstReminder.details}</div>
                 </div>
-            `;
-            feather.replace();
-        } else {
-            reminderDisplay.innerHTML = '';
-        }
+            </div>
+        `;
+        feather.replace();
     } else {
-        reminderDisplay.innerHTML = '';
+        // Si aucun rappel, afficher un message par défaut
+        reminderDisplay.innerHTML = `
+            <div class="flex items-center justify-center p-3 bg-yellow-50 rounded-lg border border-yellow-200 cursor-pointer" onclick="openReminderPage()">
+                <i data-feather="bell" class="text-yellow-500 mr-2"></i>
+                <span class="font-medium text-gray-700">Cliquez pour ajouter un rappel</span>
+            </div>
+        `;
+        feather.replace();
     }
+}
+      
+      // --- PAGE DE RAPPELS --- //
+function openReminderPage() {
+    document.getElementById('reminder-page').classList.remove('hidden');
+    document.querySelector('main').classList.add('hidden');
+    document.querySelector('nav').classList.add('hidden');
+    renderReminders();
+    feather.replace();
+    window.reminderInterval = setInterval(renderReminders, 1000);
+}
+
+function openReminderForm() {
+    document.getElementById('reminder-form').classList.remove('hidden');
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('reminder-date').value = today;
+}
+
+function closeReminderForm() {
+    document.getElementById('reminder-form').classList.add('hidden');
+}
+
+function addReminder() {
+    const title = document.getElementById('reminder-title').value.trim();
+    const details = document.getElementById('reminder-details').value.trim();
+    const date = document.getElementById('reminder-date').value;
+    if (!title || !date) return alert("Titre et date obligatoires !");
+    
+    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    reminders.push({ title, details, date });
+    localStorage.setItem('reminders', JSON.stringify(reminders));
+    
+    document.getElementById('reminder-title').value = '';
+    document.getElementById('reminder-details').value = '';
+    document.getElementById('reminder-date').value = '';
+    
+    closeReminderForm();
+    renderReminders();
+}
+
+      
+      function editReminder(index) {
+    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    const reminder = reminders[index];
+    document.getElementById('reminder-title').value = reminder.title;
+    document.getElementById('reminder-details').value = reminder.details || '';
+    document.getElementById('reminder-date').value = reminder.date;
+    closeReminderForm(); // Ferme si ouvert
+    openReminderForm();
+    // Pour save, modifiez addReminder en update si index existe
+    window.currentEditIndex = index;
+}
+      
+function renderReminders() {
+    const list = document.getElementById('reminder-list');
+    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    list.innerHTML = '';
+
+    if (reminders.length === 0) {
+        list.innerHTML = `<div class="text-center text-gray-500">Aucun rappel ajouté</div>`;
+        return;
+    }
+
+    const now = new Date();
+    reminders.sort((a, b) => new Date(a.date) - new Date(b.date)); // Tri par date
+
+    reminders.forEach((reminder, index) => {
+        const remDate = new Date(reminder.date);
+        const diff = remDate - now;
+        let status = 'Futur';
+        if (diff < 0) status = 'Passé';
+
+        const div = document.createElement('div');
+        div.className = "p-4 border rounded-lg flex justify-between items-start";
+        div.innerHTML = `
+            <div class="flex-1">
+                <div class="font-medium">${reminder.title}</div>
+                <div class="text-sm text-gray-500">${reminder.date}</div>
+                ${reminder.details ? `<div class="text-sm text-gray-600 mt-1 break-words">${reminder.details}</div>` : ''}
+                <div class="text-xs text-gray-400">Statut: ${status}</div>
+            </div>
+           <div class="flex items-center ml-4 space-x-2">
+    <button onclick="editReminder(${index})" class="text-blue-500 hover:text-blue-700">
+        <i data-feather="edit-3" class="w-4 h-4"></i>
+    </button>
+    <button onclick="deleteReminder(${index})" class="text-red-500 hover:text-red-700">
+        <i data-feather="trash-2" class="w-4 h-4"></i>
+    </button>
+</div>
+        `;
+        list.appendChild(div);
+    });
+    feather.replace();
+}
+
+function closeReminderPage() {
+    document.getElementById('reminder-page').classList.add('hidden');
+    document.querySelector('main').classList.remove('hidden');
+    document.querySelector('nav').classList.remove('hidden');
+    if (window.reminderInterval) clearInterval(window.reminderInterval);
+}
+
+function deleteReminder(index) {
+    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    reminders.splice(index, 1);
+    localStorage.setItem('reminders', JSON.stringify(reminders));
+    renderReminders();
 }
 
 // Initialize the new functions
