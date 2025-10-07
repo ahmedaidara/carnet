@@ -3,307 +3,513 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudySync - Accueil</title>
+    <title>StudySync - Emploi du temps</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <style>
-        :root {
-            --primary: #6C63FF;
-            --secondary: #4D44DB;
-            --accent: #FF6584;
-            --light: #F8F9FA;
-            --dark: #343A40;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F5F7FB;
-        }
-        .greeting {
-            animation: fadeIn 1s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .subject-card {
+        .schedule-card {
             transition: all 0.3s ease;
         }
-        .subject-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        .schedule-card:hover {
+            transform: translateY(-3px);
         }
-        .countdown {
-            font-feature-settings: "tnum";
+        .time-slot {
+            transition: background-color 0.2s ease;
         }
-        .nav-item.active {
-            border-bottom: 3px solid var(--primary);
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none !important;
-            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2) !important;
+        .time-slot:hover {
+            background-color: #F5F3FF;
         }
         [contenteditable]:focus {
             outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
         }
-      .add-btn {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  background: #2563eb;
+        .subject-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .subject-popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+      
+      .time-cell:focus {
+    outline: none;
+    background-color: #F5F3FF;
+    border-color: #8B5CF6;
+}
+      
+      /* Adaptation mobile */
+@media (max-width: 768px) {
+    .schedule-table-mobile {
+        font-size: 0.75rem;
+    }
+    
+    .time-cell-mobile {
+        min-height: 3rem;
+        padding: 0.25rem;
+    }
+    
+    .day-header-mobile {
+        padding: 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    .time-header-mobile {
+        padding: 0.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Empêcher le zoom sur les inputs sur mobile */
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Améliorer l'expérience tactile */
+.time-cell {
+    min-height: 4rem;
+}
+
+@media (max-width: 768px) {
+    .time-cell {
+        min-height: 3rem;
+        font-size: 0.8rem;
+    }
+}
+      /* Styles pour empêcher le débordement du texte */
+.time-cell {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.2;
+    max-height: 4rem;
+    overflow-y: auto;
+}
+
+/* Pour l'affichage des matières sauvegardées */
+.subject-text {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.2;
+    max-height: 4rem;
+    overflow: hidden;
+}
+
+/* Scrollbar personnalisée pour les cellules */
+.time-cell::-webkit-scrollbar {
+    width: 4px;
+}
+
+.time-cell::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+}
+
+.time-cell::-webkit-scrollbar-thumb {
+    background: #c4b5fd;
+    border-radius: 2px;
+}
+
+.time-cell::-webkit-scrollbar-thumb:hover {
+    background: #8b5cf6;
+}
+
+/* Adaptation mobile  améliorée */
+@media (max-width: 768px) {
+    .time-cell {
+        max-height: 3rem;
+        font-size: 0.7rem;
+        line-height: 1.1;
+        padding: 0.25rem;
+    }
+    
+    .subject-text {
+        max-height: 3rem;
+        font-size: 0.7rem;
+        line-height: 1.1;
+    }
+}
+      
+      #scheduleDisplay table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: center;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#scheduleDisplay th {
+  background: linear-gradient(to right, #7e22ce, #9333ea);
   color: white;
-  font-size: 28px;
-  border: none;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 999;
+  padding: 6px;
 }
 
-.exam-list {
-  margin-top: 80px;
-  padding: 20px;
-}
-.reminder-item {
-    max-height: none !important;
-    overflow: visible !important;
+#scheduleDisplay td {
+  border: 1px solid #eee;
+  padding: 4px;
+  background: #fff;
 }
 
-.reminder-details {
-    white-space: normal !important;
-    word-wrap: break-word !important;
-    max-height: none !important;
-    overflow: visible !important;
+#scheduleDisplay tbody tr:nth-child(even) td {
+  background: #fafafa;
 }
+
+#scheduleDisplay h2 {
+  font-size: 1rem;
+  color: #4b0082;
+  margin-bottom: 0.5rem;
+}
+
+      
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen bg-gray-50">
     <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-10">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <i data-feather="book-open" class="text-purple-600"></i>
-                <h1 class="text-xl font-bold text-gray-800">StudySync</h1>
+                <a href="index.html" class="text-gray-600">
+                    <i data-feather="arrow-left"></i>
+                </a>
+                <h1 class="text-xl font-bold text-gray-800">Emploi du temps</h1>
             </div>
-            
-            <div class="relative w-1/2">
-                <input type="text" placeholder="Rechercher une matière, document..." 
-                       class="w-full px-4 py-2 rounded-full border border-gray-200 focus:border-purple-400 focus:ring-0">
-                <i data-feather="search" class="absolute right-3 top-2.5 text-gray-400"></i>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <div id="greeting" class="greeting font-medium text-gray-700">Bonjour</div>
-                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-                    <i data-feather="user" class="text-purple-600"></i>
-                </div>
+            <div class="flex space-x-2">
+                <button id="addScheduleBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                    <i data-feather="plus"></i>
+                </button>
+                <button id="addExamBtn" class="p-2 rounded-full bg-purple-100 text-purple-600">
+                    <i data-feather="edit-3"></i>
+                </button>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-6">
-        <!-- Date & Countdown -->
-      <!-- Date & Countdown -->
-<section class="mb-8 bg-white rounded-xl shadow-sm p-6">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <i data-feather="calendar" class="text-purple-600"></i>
-            </div>
-            <div>
-                <div class="text-gray-500">Aujourd'hui</div>
-                <div id="current-date" class="font-semibold text-lg">Lundi 12 juin 2023</div>
-                <div id="current-time" class="font-semibold text-purple-600 text-sm"></div>
+    <main class="container mx-auto px-4 py-6 pb-32">
+        <!-- Add Schedule Modal -->
+        <div id="addScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Nouvel emploi du temps</h2>
+                    <button id="closeScheduleModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                        <input type="text" id="scheduleName" placeholder="Ex: Scolaire, Personnel, Vacances" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Couleur</label>
+                        <div class="flex space-x-2">
+                            <button data-color="purple" class="color-option w-8 h-8 rounded-full bg-purple-500 border-2 border-white ring-2 ring-offset-2 ring-purple-500"></button>
+                            <button data-color="blue" class="color-option w-8 h-8 rounded-full bg-blue-500 border-2 border-white"></button>
+                            <button data-color="green" class="color-option w-8 h-8 rounded-full bg-green-500 border-2 border-white"></button>
+                            <button data-color="red" class="color-option w-8 h-8 rounded-full bg-red-500 border-2 border-white"></button>
+                            <button data-color="yellow" class="color-option w-8 h-8 rounded-full bg-yellow-400 border-2 border-white"></button>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddSchedule" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddSchedule" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Créer</button>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- Configure Schedule Modal -->
+        <div id="configureScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Configurer l'emploi du temps</h2>
+                    <button id="closeConfigureModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jours à afficher</label>
+                            <div class="flex flex-wrap gap-2">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Lundi" checked>
+                                    <span class="ml-2">Lundi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Mardi" checked>
+                                    <span class="ml-2">Mardi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Mercredi" checked>
+                                    <span class="ml-2">Mercredi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Jeudi" checked>
+                                    <span class="ml-2">Jeudi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Vendredi" checked>
+                                    <span class="ml-2">Vendredi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Samedi">
+                                    <span class="ml-2">Samedi</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="day-checkbox" value="Dimanche">
+                                    <span class="ml-2">Dimanche</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Heures</label>
+                            <div id="timeSlotsContainer" class="space-y-2">
+                                <div class="flex items-center space-x-2">
+                                    <input type="time" class="time-start px-2 py-1 rounded border border-gray-300" value="08:00">
+                                    <span>-</span>
+                                    <input type="time" class="time-end px-2 py-1 rounded border border-gray-300" value="10:00">
+                                    <button class="remove-time-slot text-red-500">
+                                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button id="addTimeSlot" class="mt-2 text-sm text-purple-600 flex items-center">
+                                <i data-feather="plus" class="mr-1 w-4 h-4"></i> Ajouter un créneau horaire
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="scheduleTablePreview" class="mt-4">
+                        <!-- Le tableau d'emploi du temps sera généré ici -->
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelConfigureSchedule" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmConfigureSchedule" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Exam Modal -->
+        <div id="addExamModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Nouvel examen</h2>
+                    <button id="closeExamModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                        <input type="text" id="examName" placeholder="Ex: BAC Blanc, DS Math" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input type="date" id="examDate" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Heure</label>
+                        <input type="time" id="examTime" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddExam" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddExam" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Reminder Modal -->
+        <div id="addReminderModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Nouveau rappel</h2>
+                    <button id="closeReminderModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                        <input type="text" id="reminderTitle" placeholder="Titre du rappel" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Détails</label>
+                        <textarea id="reminderDetails" placeholder="Détails du rappel" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400" rows="3"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button id="cancelAddReminder" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                        <button id="confirmAddReminder" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject Popup -->
         
-<div id="reminder-display" class="flex-grow max-w-md px-4 cursor-pointer" onclick="openReminderPage()">
-    <div class="flex items-center justify-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-        <i data-feather="bell" class="text-yellow-500 mr-2"></i>
-        <span class="font-medium text-gray-700">RAPPEL</span>
-    </div>
-</div>
-    </div>
-</section>
-<!-- PAGE EXAMENS -->
-      
-      
-<!-- Prochain Examen -->
-<section class="mb-8 bg-white rounded-xl shadow-sm p-6">
-    <div class="flex justify-center items-center">
-        <button onclick="openExamPage()" class="text-gray-500 hover:text-purple-600 transition flex flex-col items-center text-center">
-            <i data-feather="clock" class="w-6 h-6 mb-2 text-purple-600"></i>
-            <div>Prochain examen</div>
-            <div id="next-exam" class="font-bold text-purple-600 underline">Chargement...</div>
+
+   <!-- Autre emploi du temps -->
+<div class="mt-8">
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="text-lg font-semibold">Autre emploi du temps</h2>
+        <button id="addOtherScheduleBtn" class="text-purple-600 text-sm flex items-center">
+            <i data-feather="plus" class="mr-1 w-4 h-4"></i> Ajouter
         </button>
     </div>
-</section>
+    <div id="otherSchedulesList" class="space-y-6">
+        <!-- Les autres emplois du temps s'afficheront ici -->
+    </div>
+</div>
 
-        <!-- Tomorrow's Schedule -->
-     <!-- Prochaines matières -->
-<section class="mb-8">
-    <h2 class="text-xl font-semibold mb-4 flex items-center">
-        <i data-feather="clock" class="mr-2"></i> À suivre
-    </h2>
-    <div class="bg-white rounded-xl shadow-sm p-4">
-        <div class="flex justify-between items-center mb-3">
-            <h3 class="font-medium">Prochaines matières</h3>
-            <a href="schedule.html" class="text-sm text-purple-600 flex items-center">
-                Voir plus <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-            </a>
+
+        <!-- Current Week Schedule -->
+        <div id="currentScheduleSection">
+            <!-- Le planning de la semaine actuelle sera généré ici dynamiquement -->
         </div>
-        <div id="next-subjects" class="space-y-3">
-            <!-- Les 2 prochaines matières seront affichées ici dynamiquement -->
+
+        <!-- Upcoming Exams -->
+        <div class="mt-8">
+            <h2 class="text-lg font-semibold mb-3">Examens à venir</h2>
+            <div class="bg-white rounded-xl shadow-sm p-4">
+                <div id="examsList" class="space-y-3">
+                    <!-- Les examens seront générés ici dynamiquement -->
+                </div>
+                <button id="addExamBtn2" class="mt-4 w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center">
+                    <i data-feather="plus" class="mr-2 w-4 h-4"></i> Ajouter un examen
+                </button>
+            </div>
+        </div>
+
+<!-- Add Other Schedule Modal -->
+<div id="addOtherScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-6xl p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">Nouvel emploi du temps</h2>
+            <button id="closeOtherScheduleModal" class="text-gray-500 hover:text-gray-700">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <!-- En-tête avec titre et couleur -->
+            <div class="flex items-center space-x-4 mb-4">
+                <input type="text" id="otherScheduleName" placeholder="Nom de l'emploi du temps" class="text-xl font-bold border-none focus:ring-0 flex-grow">
+                <div class="flex space-x-2">
+                    <button data-color="purple" class="color-option w-6 h-6 rounded-full bg-purple-500 border-2 border-white ring-2 ring-offset-2 ring-purple-500"></button>
+                    <button data-color="blue" class="color-option w-6 h-6 rounded-full bg-blue-500 border-2 border-white"></button>
+                    <button data-color="green" class="color-option w-6 h-6 rounded-full bg-green-500 border-2 border-white"></button>
+                    <button data-color="red" class="color-option w-6 h-6 rounded-full bg-red-500 border-2 border-white"></button>
+                    <button data-color="yellow" class="color-option w-6 h-6 rounded-full bg-yellow-400 border-2 border-white"></button>
+                </div>
+            </div>
+
+            <!-- Jours à afficher -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Jours à afficher</label>
+                <div class="flex flex-wrap gap-3">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Lundi" checked>
+                        <span class="ml-2">Lundi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Mardi" checked>
+                        <span class="ml-2">Mardi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Mercredi" checked>
+                        <span class="ml-2">Mercredi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Jeudi" checked>
+                        <span class="ml-2">Jeudi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Vendredi" checked>
+                        <span class="ml-2">Vendredi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Samedi">
+                        <span class="ml-2">Samedi</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="other-day-checkbox" value="Dimanche">
+                        <span class="ml-2">Dimanche</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Créneaux horaires -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Créneaux horaires</label>
+                <div id="otherTimeSlotsContainer" class="space-y-2 mb-3">
+                    <div class="flex items-center space-x-2">
+                        <input type="time" class="other-time-start px-2 py-1 rounded border border-gray-300" value="08:00">
+                        <span>-</span>
+                        <input type="time" class="other-time-end px-2 py-1 rounded border border-gray-300" value="09:00">
+                        <button class="remove-other-time-slot text-red-500">
+                            <i data-feather="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <button id="addOtherTimeSlot" class="text-sm text-purple-600 flex items-center">
+                    <i data-feather="plus" class="mr-1 w-4 h-4"></i> Ajouter un créneau horaire
+                </button>
+            </div>
+
+            <!-- Tableau emploi du temps -->
+            <div id="otherScheduleTable" class="bg-gray-50 rounded-lg overflow-hidden">
+                <!-- Le tableau sera généré ici dynamiquement -->
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4">
+                <button id="cancelAddOtherSchedule" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                <button id="confirmAddOtherSchedule" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Enregistrer</button>
+            </div>
         </div>
     </div>
-</section>
-
-        <!-- Bulletin & Evolution -->
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Bulletin -->
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <h2 class="text-xl font-semibold mb-4 flex items-center">
-                    <i data-feather="file-text" class="mr-2"></i> Bulletin de notes
-                </h2>
-                <div class="mb-4">
-                    <div class="text-gray-500 mb-1">Dernier bulletin</div>
-                    <div class="font-medium">1er Trimestre 2023-2024</div>
-                    <div class="text-sm text-gray-500">Moyenne: 14.5/20</div>
-                </div>
-                <a href="grades.html" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-                    <i data-feather="plus" class="mr-2 w-4 h-4"></i> Nouveau bulletin
-                </a>
+</div>
+        <!-- Reminders Section -->
+        <div class="mt-8">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold">Rappels</h2>
+                <button id="addReminderBtn" class="text-purple-600 text-sm flex items-center">
+                    <i data-feather="plus" class="mr-1 w-4 h-4"></i> Nouveau rappel
+                </button>
             </div>
-            
-            <!-- Evolution -->
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <h2 class="text-xl font-semibold mb-4 flex items-center">
-                    <i data-feather="trending-up" class="mr-2"></i> Évolution
-                </h2>
-                <div class="h-48">
-                    <canvas id="evolutionChart"></canvas>
-                </div>
-                <div class="mt-4 text-right">
-                    <a href="grades.html#evolution" class="text-purple-600 text-sm flex items-center justify-end">
-                        Voir le détail <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-                    </a>
+            <div class="bg-white rounded-xl shadow-sm p-4">
+                <div id="remindersList" class="space-y-3">
+                    <!-- Les rappels seront générés ici dynamiquement -->
                 </div>
             </div>
-        </section>
-
-        <!-- Matières récentes -->
-        <section>
-            <h2 class="text-xl font-semibold mb-4 flex items-center">
-                <i data-feather="layers" class="mr-2"></i> Mes matières récentes
-            </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                <a href="subject.html?id=1" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
-                        <i data-feather="code" class="text-blue-600"></i>
-                    </div>
-                    <div class="font-medium">Informatique</div>
-                    <div class="text-xs text-gray-500">Coeff: 3</div>
-                </a>
-                <a href="subject.html?id=2" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
-                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
-                        <i data-feather="atom" class="text-red-600"></i>
-                    </div>
-                    <div class="font-medium">Physique</div>
-                    <div class="text-xs text-gray-500">Coeff: 4</div>
-                </a>
-                <a href="subject.html?id=3" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
-                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
-                        <i data-feather="divide" class="text-green-600"></i>
-                    </div>
-                    <div class="font-medium">Maths</div>
-                    <div class="text-xs text-gray-500">Coeff: 5</div>
-                </a>
-                <a href="subject.html?id=4" class="subject-card bg-white rounded-xl shadow-sm p-4 flex flex-col items-center text-center hover:shadow-md">
-                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
-                        <i data-feather="globe" class="text-yellow-600"></i>
-                    </div>
-                    <div class="font-medium">Histoire</div>
-                    <div class="text-xs text-gray-500">Coeff: 2</div>
-                </a>
-            </div>
-        </section>
-      
-
-
+        </div>
     </main>
 
-     <!-- Page Examens -->
-<div id="exam-page" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
-    <div class="flex items-center justify-between mb-6">
-      <button onclick="closeExamPage()" class="text-gray-500 hover:text-purple-600">
-    <i data-feather="arrow-left"></i> Retour
-</button>
-        <h2 class="text-xl font-semibold flex items-center">
-            <i data-feather="calendar" class="mr-2"></i> Mes examens
-        </h2>
-        <button onclick="openExamForm()" class="bg-purple-600 text-white rounded-full p-2 hover:bg-purple-700">
-            <i data-feather="plus"></i>
-        </button>
-    </div>
-
-    <div id="exam-list" class="space-y-3">
-        <!-- Les examens seront affichés ici -->
-    </div>
-
-    <!-- Fenêtre de formulaire -->
-    <div id="exam-form" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-        <div class="bg-white rounded-xl p-6 w-80">
-            <h3 class="text-lg font-semibold mb-3">Nouvel examen</h3>
-            <input id="exam-name" type="text" placeholder="Nom de l'examen" class="w-full border rounded-lg p-2 mb-2">
-            <input id="exam-date" type="date" class="w-full border rounded-lg p-2 mb-2">
-            <input id="exam-time" type="time" class="w-full border rounded-lg p-2 mb-4">
-            <div class="flex justify-end space-x-2">
-                <button onclick="closeExamForm()" class="px-3 py-1 rounded-lg border">Annuler</button>
-                <button onclick="addExam()" class="px-3 py-1 bg-purple-600 text-white rounded-lg">Ajouter</button>
-            </div>
-        </div>
-    </div>
-</div>
-  
-  <!-- Page Rappels -->
-<div id="reminder-page" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
-    <div class="flex items-center justify-between mb-6">
-        <button onclick="closeReminderPage()" class="text-gray-500 hover:text-purple-600">
-            <i data-feather="arrow-left"></i> Retour
-        </button>
-        <h2 class="text-xl font-semibold flex items-center">
-            <i data-feather="bell" class="mr-2"></i> Mes rappels
-        </h2>
-        <button onclick="openReminderForm()" class="bg-purple-600 text-white rounded-full p-2 hover:bg-purple-700">
-            <i data-feather="plus"></i>
-        </button>
-    </div>
-
-    <div id="reminder-list" class="space-y-3">
-        <!-- Les rappels seront affichés ici -->
-    </div>
-
-    <!-- Fenêtre de formulaire -->
-    <div id="reminder-form" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-60">
-        <div class="bg-white rounded-xl p-6 w-80">
-            <h3 class="text-lg font-semibold mb-3">Nouveau rappel</h3>
-            <input id="reminder-title" type="text" placeholder="Titre" class="w-full border rounded-lg p-2 mb-2">
-            <textarea id="reminder-details" type="text" placeholder="Détails (optionnel)" class="w-full border rounded-lg p-2 mb-4 h-20"></textarea>
-            <input id="reminder-date" type="date" class="w-full border rounded-lg p-2 mb-4">
-            <div class="flex justify-end space-x-2">
-                <button onclick="closeReminderForm()" class="px-3 py-1 rounded-lg border">Annuler</button>
-                <button onclick="addReminder()" class="px-3 py-1 bg-purple-600 text-white rounded-lg">Ajouter</button>
-            </div>
-        </div>
-    </div>
-</div>
     <!-- Bottom Navigation -->
     <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
         <div class="container mx-auto flex justify-around">
-            <a href="index.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
+            <a href="index.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
                 <i data-feather="home" class="w-6 h-6"></i>
                 <span class="text-xs mt-1">Accueil</span>
             </a>
@@ -315,7 +521,7 @@
                 <i data-feather="bookmark" class="w-6 h-6"></i>
                 <span class="text-xs mt-1">Bibliothèque</span>
             </a>
-            <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+            <a href="schedule.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
                 <i data-feather="calendar" class="w-6 h-6"></i>
                 <span class="text-xs mt-1">Emploi du temps</span>
             </a>
@@ -326,606 +532,1691 @@
         </div>
     </nav>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Initialize Feather Icons
-      // Initialize the page
-function initPage() {
-    feather.replace();
-    
-    // Set current date and time
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
-    
-    // Start real-time clock
-    updateCurrentTime();
-    setInterval(updateCurrentTime, 1000);
-    
-    // Dynamic greeting
-    const hour = now.getHours();
-    let greeting;
-    
-    if (hour < 12) {
-        greeting = "Bonjour";
-    } else if (hour < 18) {
-        greeting = "Bonsoir";
-    } else {
-        greeting = "Bonsoir";
-    }
-    
-    document.getElementById('greeting').textContent = greeting;
-    
-    // Load data from schedule page
-    loadNextExam();
-    loadNextSubjects();
-    updateRemindersDisplay(); // Affiche toujours le bouton "cliquez pour ajouter"
-    
-    // Set up intervals to refresh data
-   setInterval(() => {
-    loadNextExam();
-}, 1000); // Refresh every minute
-    setInterval(loadNextSubjects, 60000); // Refresh every minute
-}
+        feather.replace();
         
-      
-   // Update current time
-function updateCurrentTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('fr-FR', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        second: '2-digit'
-    });
-    document.getElementById('current-time').textContent = timeString;
-}
-setInterval(updateCurrentTime, 1000);
-updateCurrentTime();
+        // DOM Elements
+        const addScheduleModal = document.getElementById('addScheduleModal');
+        const addScheduleBtn = document.getElementById('addScheduleBtn');
+        const closeScheduleModal = document.getElementById('closeScheduleModal');
+        const cancelAddSchedule = document.getElementById('cancelAddSchedule');
+        const confirmAddSchedule = document.getElementById('confirmAddSchedule');
+        
+        const configureScheduleModal = document.getElementById('configureScheduleModal');
+        const closeConfigureModal = document.getElementById('closeConfigureModal');
+        const cancelConfigureSchedule = document.getElementById('cancelConfigureSchedule');
+        const confirmConfigureSchedule = document.getElementById('confirmConfigureSchedule');
+        const addTimeSlot = document.getElementById('addTimeSlot');
+        const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+        const scheduleTablePreview = document.getElementById('scheduleTablePreview');
+        
+        const addExamModal = document.getElementById('addExamModal');
+        const addExamBtn = document.getElementById('addExamBtn');
+        const addExamBtn2 = document.getElementById('addExamBtn2');
+        const closeExamModal = document.getElementById('closeExamModal');
+        const cancelAddExam = document.getElementById('cancelAddExam');
+        const confirmAddExam = document.getElementById('confirmAddExam');
+        
+        const addReminderModal = document.getElementById('addReminderModal');
+        const addReminderBtn = document.getElementById('addReminderBtn');
+        const closeReminderModal = document.getElementById('closeReminderModal');
+        const cancelAddReminder = document.getElementById('cancelAddReminder');
+        const confirmAddReminder = document.getElementById('confirmAddReminder');
+        
+        const subjectPopup = document.getElementById('subjectPopup');
+        const closeSubjectPopup = document.getElementById('closeSubjectPopup');
+        
+        const schedulesList = document.getElementById('schedulesList');
+        const currentScheduleSection = document.getElementById('currentScheduleSection');
+        const examsList = document.getElementById('examsList');
+        const remindersList = document.getElementById('remindersList');
+        
+        // Data Storage
+        let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+        let exams = JSON.parse(localStorage.getItem('exams')) || [];
+        let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+        let currentScheduleId = localStorage.getItem('currentScheduleId');
+        let otherSchedules = JSON.parse(localStorage.getItem('otherSchedules')) || [];
 
-// Load next exam from schedule
-function loadNextExam() {
-    const exams = JSON.parse(localStorage.getItem('exams')) || [];
-    const now = new Date();
+        // Initialize the page
+        function initPage() {
+            renderSchedulesList();
+            renderCurrentSchedule();
+            renderExamsList();
+            renderRemindersList();
+        }
+        
+        // Render schedules list
+   function renderSchedulesList() {
+    schedulesList.innerHTML = '';
     
-    // Examen en cours (+1h)
-    const ongoingExam = exams.find(exam => {
-        const examStart = new Date(`${exam.date}T${exam.time}`);
-        const examEnd = new Date(examStart.getTime() + 60 * 60 * 1000);
-        return now >= examStart && now <= examEnd;
-    });
-    
-    const nextExamElement = document.getElementById('next-exam');
-    
-    if (ongoingExam) {
-        nextExamElement.textContent = `${ongoingExam.name} - En cours`;
+    if (schedules.length === 0) {
+        schedulesList.innerHTML = `
+            <div class="col-span-full text-center py-8 text-gray-500">
+                <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                <p>Aucun emploi du temps créé</p>
+            </div>
+        `;
+        feather.replace();
         return;
     }
     
-    // Examen futur le plus proche
-    const futureExams = exams
-        .filter(exam => new Date(`${exam.date}T${exam.time}`) > now)
-        .sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
-
-    if (futureExams.length > 0) {
-        const nextExam = futureExams[0];
-        const examDate = new Date(`${nextExam.date}T${nextExam.time}`);
-        const diff = examDate - now;
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-        nextExamElement.innerHTML = `${nextExam.name} dans <span id="countdown-home">${days}J-${hours}H-${mins}MN-${secs}S</span>`;
-    } else {
-        nextExamElement.textContent = "Aucun examen prévu";
-    }
-}
-
- 
-// Load next  subjects
-// Load next subjects from schedules
-function loadNextSubjects() {
-    const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
-    const now = new Date();
-    const currentDay = now.toLocaleDateString('fr-FR', { weekday: 'long' });
-    const currentTime = now.toTimeString().substring(0, 5); // HH:MM format
+    schedulesList.className = 'grid grid-cols-1 gap-6'; // Une colonne pour les tableaux complets
     
-    // Tableau pour stocker toutes les matières futures
-    let allFutureSubjects = [];
-    
-    // Parcourir tous les emplois du temps
     schedules.forEach(schedule => {
-        if (schedule.data && schedule.days) {
-            schedule.days.forEach(day => {
-                if (schedule.data[day]) {
-                    Object.keys(schedule.data[day]).forEach(timeSlotId => {
-                        const subject = schedule.data[day][timeSlotId];
-                        if (subject && subject.trim() !== '') {
-                            // Trouver le créneau horaire correspondant
-                            const timeSlot = schedule.timeSlots.find(ts => ts.id === timeSlotId);
-                            if (timeSlot) {
-                                // Calculer si c'est une matière future
-                                const subjectDateTime = calculateSubjectDateTime(day, timeSlot.start, now);
-                                
-                                // Vérifier si c'est une matière future (aujourd'hui ou après)
-                                if (subjectDateTime >= now) {
-                                    allFutureSubjects.push({
-                                        subject: subject,
-                                        day: day,
-                                        startTime: timeSlot.start,
-                                        endTime: timeSlot.end,
-                                        scheduleName: schedule.name,
-                                        dateTime: subjectDateTime,
-                                        scheduleColor: schedule.color
-                                    });
-                                }
-                            }
-                        }
-                    });
-                }
+        const scheduleElement = document.createElement('div');
+        scheduleElement.className = 'bg-white rounded-xl shadow-sm p-4';
+        scheduleElement.innerHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">${schedule.name}</h3>
+                <div class="flex space-x-2">
+                    <button class="edit-schedule p-2 rounded-full hover:bg-gray-100 bg-purple-100" data-id="${schedule.id}">
+                        <i data-feather="edit-2" class="w-4 h-4 text-purple-600"></i>
+                    </button>
+                    <button class="delete-schedule p-2 rounded-full hover:bg-gray-100 bg-red-100" data-id="${schedule.id}">
+                        <i data-feather="trash-2" class="w-4 h-4 text-red-600"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-gray-50 rounded-lg overflow-hidden">
+                <div class="grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                    ${schedule.days.map(day => `
+                        <div class="bg-gray-100 p-2 text-center font-medium">${day}</div>
+                    `).join('')}
+                    
+                    ${schedule.timeSlots.map(timeSlot => `
+                        <div class="col-span-${schedule.days.length} grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                            ${schedule.days.map(day => {
+                                const subject = schedule.data && schedule.data[day] && schedule.data[day][timeSlot.id] ? schedule.data[day][timeSlot.id] : '';
+                                return `
+                                    <div class="time-slot bg-white p-2">
+                                        <div class="text-xs text-gray-500 mb-1">${timeSlot.start} - ${timeSlot.end}</div>
+                                        ${subject ? `
+                                            <div class="subject text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-2 py-1 truncate">
+                                                ${subject}
+                                            </div>
+                                        ` : '<div class="h-8"></div>'}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        schedulesList.appendChild(scheduleElement);
+    });
+    
+    feather.replace();
+    
+    document.querySelectorAll('.edit-schedule').forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-id');
+            openConfigureScheduleModal(scheduleId);
+        });
+    });
+    
+    document.querySelectorAll('.delete-schedule').forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-id');
+            deleteSchedule(scheduleId);
+        });
+    });
+}
+        
+      // Charger les emplois du temps complets sur la page d'accueil
+function loadHomeSchedules() {
+    const homeSchedulesList = document.getElementById('homeSchedulesList');
+    const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    
+    homeSchedulesList.innerHTML = '';
+    
+    if (schedules.length === 0) {
+        homeSchedulesList.innerHTML = `
+            <div class="text-center py-8 text-gray-500 bg-white rounded-xl shadow-sm">
+                <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                <p>Aucun emploi du temps créé</p>
+                <a href="schedule.html" class="text-purple-600 text-sm mt-2 inline-block">Créer le premier</a>
+            </div>
+        `;
+        feather.replace();
+        return;
+    }
+    
+    // Afficher tous les emplois du temps avec leurs tableaux complets
+    schedules.forEach(schedule => {
+        const scheduleElement = document.createElement('div');
+        scheduleElement.className = 'bg-white rounded-xl shadow-sm p-4';
+        scheduleElement.innerHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">${schedule.name}</h3>
+                <span class="w-4 h-4 rounded-full bg-${schedule.color}-500"></span>
+            </div>
+            <div class="bg-gray-50 rounded-lg overflow-hidden">
+                <div class="grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                    ${schedule.days.map(day => `
+                        <div class="bg-gray-100 p-2 text-center font-medium text-sm">${day}</div>
+                    `).join('')}
+                    
+                    ${schedule.timeSlots.map(timeSlot => `
+                        <div class="col-span-${schedule.days.length} grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                            ${schedule.days.map(day => {
+                                const subject = schedule.data && schedule.data[day] && schedule.data[day][timeSlot.id] ? schedule.data[day][timeSlot.id] : '';
+                                return `
+                                    <div class="time-slot bg-white p-2">
+                                        <div class="text-xs text-gray-500 mb-1">${timeSlot.start} - ${timeSlot.end}</div>
+                                        ${subject ? `
+                                            <div class="subject text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-2 py-1 truncate">
+                                                ${subject}
+                                            </div>
+                                        ` : '<div class="h-8"></div>'}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        homeSchedulesList.appendChild(scheduleElement);
+    });
+    
+    feather.replace();
+}
+        // Render current schedule
+        function renderCurrentSchedule() {
+            if (!currentScheduleId) {
+                currentScheduleSection.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                        <p>Aucun emploi du temps sélectionné</p>
+                        <p class="text-sm">Créez ou sélectionnez un emploi du temps pour commencer</p>
+                    </div>
+                `;
+                feather.replace();
+                return;
+            }
+            
+            const schedule = schedules.find(s => s.id === currentScheduleId);
+            if (!schedule) {
+                currentScheduleId = null;
+                localStorage.removeItem('currentScheduleId');
+                renderCurrentSchedule();
+                return;
+            }
+            
+            currentScheduleSection.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-lg font-semibold">${schedule.name}</h2>
+                    <div class="flex items-center space-x-2">
+                        <button class="p-1 rounded-full hover:bg-gray-100">
+                            <i data-feather="chevron-left" class="w-5 h-5 text-gray-600"></i>
+                        </button>
+                        <span class="text-sm font-medium">${getCurrentWeekRange()}</span>
+                        <button class="p-1 rounded-full hover:bg-gray-100">
+                            <i data-feather="chevron-right" class="w-5 h-5 text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                        ${schedule.days.map(day => `
+                            <div class="bg-gray-100 p-2 text-center font-medium text-sm">${day}</div>
+                        `).join('')}
+                        
+                        ${schedule.timeSlots.map(timeSlot => `
+                            <div class="col-span-${schedule.days.length} grid grid-cols-${schedule.days.length} gap-px bg-gray-200">
+                                ${schedule.days.map(day => {
+                                    const subject = schedule.data && schedule.data[day] && schedule.data[day][timeSlot.id] ? schedule.data[day][timeSlot.id] : '';
+                                    return `
+                                        <div class="time-slot bg-white p-2 h-24">
+                                            <div class="text-xs text-gray-500 mb-1">${timeSlot.start} - ${timeSlot.end}</div>
+                                            ${subject ? `
+                                                <div class="subject text-sm bg-${schedule.color}-50 text-${schedule.color}-800 rounded px-1 py-0.5 truncate" 
+                                                      data-day="${day}" data-time="${timeSlot.id}" data-subject="${subject}">
+                                                    ${subject}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            feather.replace();
+            
+            // Add event listeners for subjects
+            document.querySelectorAll('.subject').forEach(subject => {
+                subject.addEventListener('click', function() {
+                    const day = this.getAttribute('data-day');
+                    const timeId = this.getAttribute('data-time');
+                    const subjectText = this.getAttribute('data-subject');
+                    const timeSlot = schedule.timeSlots.find(ts => ts.id === timeId);
+                    
+                    showSubjectPopup(subjectText, day, timeSlot);
+                });
+                
+                // Make subjects editable
+                subject.setAttribute('contenteditable', 'true');
+                subject.addEventListener('blur', function() {
+                    const day = this.getAttribute('data-day');
+                    const timeId = this.getAttribute('data-time');
+                    const newSubject = this.textContent.trim();
+                    
+                    if (!schedule.data) schedule.data = {};
+                    if (!schedule.data[day]) schedule.data[day] = {};
+                    
+                    if (newSubject) {
+                        schedule.data[day][timeId] = newSubject;
+                    } else {
+                        delete schedule.data[day][timeId];
+                    }
+                    
+                    saveSchedules();
+                });
             });
         }
-    });
+        
+        // Render exams list
+       // Ajouter fonction deleteExam
+function deleteExam(examId) {
+    exams = exams.filter(e => e.id !== examId);
+    saveExams();
+    renderExamsList();
+}
+
+// Modifier renderExamsList
+function renderExamsList() {
+    examsList.innerHTML = '';
     
-    // Trier les matières par date/heure (les plus proches en premier)
-    allFutureSubjects.sort((a, b) => a.dateTime - b.dateTime);
-    
-    // Prendre seulement les 2 prochaines matières
-    const nextSubjects = allFutureSubjects.slice(0, 2);
-    
-    // Afficher les résultats
-    const nextSubjectsContainer = document.getElementById('next-subjects');
-    nextSubjectsContainer.innerHTML = '';
-    
-    if (nextSubjects.length > 0) {
-        nextSubjects.forEach((item, index) => {
-            const timeUntil = calculateTimeUntil(item.dateTime, now);
-            
-            const subjectElement = document.createElement('div');
-            subjectElement.className = `flex items-center p-3 ${index % 2 === 0 ? 'bg-purple-50' : 'bg-blue-50'} rounded-lg border ${index % 2 === 0 ? 'border-purple-100' : 'border-blue-100'}`;
-            subjectElement.innerHTML = `
-                <div class="w-10 h-10 rounded-full ${index % 2 === 0 ? 'bg-purple-100' : 'bg-blue-100'} flex items-center justify-center mr-3">
-                    <i data-feather="book" class="${index % 2 === 0 ? 'text-purple-600' : 'text-blue-600'}"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="font-medium">${item.subject}</div>
-                    <div class="text-sm text-gray-600">
-                        ${item.day} • ${item.startTime} - ${item.endTime}
-                    </div>
-                    <div class="text-xs ${index % 2 === 0 ? 'text-purple-500' : 'text-blue-500'} font-medium mt-1">
-                        ${timeUntil}
-                    </div>
-                </div>
-            `;
-            nextSubjectsContainer.appendChild(subjectElement);
-        });
-    } else {
-        nextSubjectsContainer.innerHTML = `
-            <div class="text-center py-6 text-gray-500 bg-gray-50 rounded-lg">
-                <i data-feather="book-open" class="w-8 h-8 mx-auto mb-2"></i>
-                <p>Aucune matière à venir</p>
-                <p class="text-sm mt-1">Toutes les matières sont terminées pour aujourd'hui</p>
+    if (exams.length === 0) {
+        examsList.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+                <p>Aucun examen à venir</p>
             </div>
         `;
-    }
-    
-    feather.replace();
-}
-
-// Fonction pour calculer la date/heure d'une matière
-function calculateSubjectDateTime(day, startTime, currentDate) {
-    const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    const targetDayIndex = daysOfWeek.indexOf(day);
-    const currentDayIndex = currentDate.getDay();
-    
-    // Calculer le nombre de jours jusqu'au jour cible
-    let daysToAdd = targetDayIndex - currentDayIndex;
-    if (daysToAdd < 0) {
-        daysToAdd += 7; // Semaine suivante
-    }
-    
-    // Créer la date cible
-    const targetDate = new Date(currentDate);
-    targetDate.setDate(currentDate.getDate() + daysToAdd);
-    
-    // Ajouter l'heure de début
-    const [hours, minutes] = startTime.split(':');
-    targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-    
-    return targetDate;
-}
-
-// Fonction pour calculer le temps restant jusqu'à la matière
-function calculateTimeUntil(targetDate, currentDate) {
-    const diff = targetDate - currentDate;
-    const diffMinutes = Math.floor(diff / (1000 * 60));
-    const diffHours = Math.floor(diffMinutes / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffDays > 0) {
-        return `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
-    } else if (diffHours > 0) {
-        const remainingMinutes = diffMinutes % 60;
-        if (remainingMinutes > 0) {
-            return `Dans ${diffHours}h ${remainingMinutes}min`;
-        }
-        return `Dans ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
-    } else if (diffMinutes > 0) {
-        return `Dans ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
-    } else {
-        return 'Maintenant';
-    }
-}
-
-      // Fonction utilitaire pour formater la date
-function formatDate(date) {
-    return date.toLocaleDateString('fr-FR', { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long' 
-    });
-}
-      
-// Update reminders display
-function updateRemindersDisplay() {
-    const reminderDisplay = document.getElementById('reminder-display');
-    
-    // TOUJOURS afficher le même message, même s'il y a des rappels
-    reminderDisplay.innerHTML = `
-        <div class="flex items-center justify-center p-3 bg-yellow-50 rounded-lg border border-yellow-200 cursor-pointer" onclick="openReminderPage()">
-            <i data-feather="bell" class="text-yellow-500 mr-2"></i>
-            <span class="font-medium text-gray-700">Gérer vos rappels</span>
-        </div>
-    `;
-    feather.replace();
-}
-      
-      // --- PAGE DE RAPPELS --- //
-function openReminderPage() {
-    document.getElementById('reminder-page').classList.remove('hidden');
-    document.querySelector('main').classList.add('hidden');
-    document.querySelector('nav').classList.add('hidden');
-    renderReminders();
-    feather.replace();
-    window.reminderInterval = setInterval(renderReminders, 1000);
-}
-
-function openReminderForm() {
-    document.getElementById('reminder-form').classList.remove('hidden');
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('reminder-date').value = today;
-}
-
-function closeReminderForm() {
-    document.getElementById('reminder-form').classList.add('hidden');
-}
-
-function addReminder() {
-    const title = document.getElementById('reminder-title').value.trim();
-    const details = document.getElementById('reminder-details').value.trim();
-    const date = document.getElementById('reminder-date').value;
-    if (!title || !date) return alert("Titre et date obligatoires !");
-    
-    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-    reminders.push({ title, details, date });
-    localStorage.setItem('reminders', JSON.stringify(reminders));
-    
-    document.getElementById('reminder-title').value = '';
-    document.getElementById('reminder-details').value = '';
-    document.getElementById('reminder-date').value = '';
-    
-    closeReminderForm();
-    renderReminders();
-}
-
-      
-      function editReminder(index) {
-    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-    const reminder = reminders[index];
-    document.getElementById('reminder-title').value = reminder.title;
-    document.getElementById('reminder-details').value = reminder.details || '';
-    document.getElementById('reminder-date').value = reminder.date;
-    closeReminderForm(); // Ferme si ouvert
-    openReminderForm();
-    // Pour save, modifiez addReminder en update si index existe
-    window.currentEditIndex = index;
-}
-      
-function renderReminders() {
-    const list = document.getElementById('reminder-list');
-    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-    list.innerHTML = '';
-
-    if (reminders.length === 0) {
-        list.innerHTML = `<div class="text-center text-gray-500">Aucun rappel ajouté</div>`;
         return;
     }
-
-    const now = new Date();
-    reminders.sort((a, b) => new Date(a.date) - new Date(b.date)); // Tri par date
-
-    reminders.forEach((reminder, index) => {
-        const remDate = new Date(reminder.date);
-        const diff = remDate - now;
-        let status = 'Futur';
-        if (diff < 0) status = 'Passé';
-
-        const div = document.createElement('div');
-        div.className = "p-4 border rounded-lg flex justify-between items-start";
-        div.innerHTML = `
-            <div class="flex-1">
-                <div class="font-medium">${reminder.title}</div>
-                <div class="text-sm text-gray-500">${reminder.date}</div>
-                ${reminder.details ? `<div class="text-sm text-gray-600 mt-1 break-words">${reminder.details}</div>` : ''}
-                <div class="text-xs text-gray-400">Statut: ${status}</div>
+    
+    exams.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+    
+    exams.forEach(exam => {
+        const examDate = new Date(exam.date + 'T' + exam.time);
+        const now = new Date();
+        const diffTime = examDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let bgColor = 'yellow';
+        let icon = 'edit-3';
+        
+        if (diffDays <= 3) {
+            bgColor = 'red';
+            icon = 'alert-triangle';
+        } else if (diffDays <= 7) {
+            bgColor = 'orange';
+            icon = 'clock';
+        }
+        
+        const examElement = document.createElement('div');
+        examElement.className = `flex items-center justify-between p-3 bg-${bgColor}-50 rounded-lg`;
+        examElement.innerHTML = `
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-${bgColor}-100 flex items-center justify-center mr-3">
+                    <i data-feather="${icon}" class="text-${bgColor}-600"></i>
+                </div>
+                <div>
+                    <div class="font-medium">${exam.name}</div>
+                    <div class="text-sm text-gray-600">${formatDate(exam.date)} • ${exam.time}</div>
+                </div>
             </div>
-           <div class="flex items-center ml-4 space-x-2">
-    <button onclick="editReminder(${index})" class="text-blue-500 hover:text-blue-700">
-        <i data-feather="edit-3" class="w-4 h-4"></i>
-    </button>
-    <button onclick="deleteReminder(${index})" class="text-red-500 hover:text-red-700">
-        <i data-feather="trash-2" class="w-4 h-4"></i>
-    </button>
-</div>
+            <div class="flex items-center space-x-2">
+                <div class="text-sm font-medium text-${bgColor}-600">${diffDays > 0 ? `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}` : 'Aujourd\'hui'}</div>
+                <button class="delete-exam p-1 rounded-full hover:bg-gray-200" data-id="${exam.id}">
+                    <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                </button> 
+            </div>
         `;
-        list.appendChild(div);
+        examsList.appendChild(examElement);
     });
+    
     feather.replace();
-}
-
-function closeReminderPage() {
-    document.getElementById('reminder-page').classList.add('hidden');
-    document.querySelector('main').classList.remove('hidden');
-    document.querySelector('nav').classList.remove('hidden');
-    if (window.reminderInterval) clearInterval(window.reminderInterval);
-}
-
-function deleteReminder(index) {
-    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
-    reminders.splice(index, 1);
-    localStorage.setItem('reminders', JSON.stringify(reminders));
-    renderReminders();
-}
-
-// Initialize the new functions
-// Initialize the new functions
-document.addEventListener('DOMContentLoaded', function() {
-    loadNextExam();
-    loadNextSubjects();
-    updateRemindersDisplay();
     
-    // Mise à jour du compte à rebours toutes les secondes sur l'accueil
-    setInterval(loadNextExam, 1000);
-   setInterval(loadNextSubjects, 60000);
-    
-    // Update when schedules change
-    window.addEventListener('storage', function() {
-        loadNextExam();
-        loadNextSubjects();
-        updateRemindersDisplay();
+    // Ajouter event listeners pour delete
+    document.querySelectorAll('.delete-exam').forEach(button => {
+        button.addEventListener('click', function() {
+            const examId = this.getAttribute('data-id');
+            deleteExam(examId);
+        });
     });
-});
-        // Countdown timer (example for BAC 2026)
-        function updateCountdown() {
-            const bacDate = new Date('2026-06-15T08:00:00');
-            const now = new Date();
-            const diff = bacDate - now;
+}
+        
+        // Render reminders list
+        function renderRemindersList() {
+            remindersList.innerHTML = '';
             
-            if (diff > 0) {
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                document.getElementById('countdown').textContent = 
-                    `BAC 2026: ${days}j ${hours}h ${minutes}m ${seconds}s`;
+            if (reminders.length === 0) {
+                remindersList.innerHTML = `
+                    <div class="text-center py-4 text-gray-500">
+                        <p>Aucun rappel</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            reminders.forEach(reminder => {
+                const reminderElement = document.createElement('div');
+                reminderElement.className = 'flex items-start p-3 bg-gray-50 rounded-lg';
+                reminderElement.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
+                        <i data-feather="bell" class="text-gray-600"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="font-medium">${reminder.title}</div>
+                        <div class="text-sm text-gray-600">${reminder.details}</div>
+                    </div>
+                    <button class="delete-reminder p-1 rounded-full hover:bg-gray-200 ml-2" data-id="${reminder.id}">
+                        <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+                    </button>
+                `;
+                remindersList.appendChild(reminderElement);
+            });
+            
+            feather.replace();
+            
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-reminder').forEach(button => {
+                button.addEventListener('click', function() {
+                    const reminderId = this.getAttribute('data-id');
+                    deleteReminder(reminderId);
+                });
+            });
+        }
+        
+        // Show subject popup
+        function showSubjectPopup(subject, day, timeSlot) {
+            document.getElementById('subjectTitle').textContent = subject;
+            document.getElementById('subjectDetails').innerHTML = `
+                <p><strong>Jour:</strong> ${day}</p>
+                <p><strong>Horaire:</strong> ${timeSlot.start} - ${timeSlot.end}</p>
+                <p><strong>Matière:</strong> ${subject}</p>
+            `;
+            subjectPopup.classList.remove('hidden');
+        }
+        
+        // Toggle modals
+        function toggleScheduleModal(show) {
+            if (show) {
+                addScheduleModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
             } else {
-                document.getElementById('countdown').textContent = "BAC 2026: Terminé!";
+                addScheduleModal.classList.add('hidden');
+                document.body.style.overflow = '';
             }
         }
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
         
-        // Sample reminder
-        const reminders = [
-            { title: "Révision", description: "Réviser les formules des alcanes" },
-            { title: "Histoire", description: "Apprendre la leçon L1 sur la révolution" }
-        ];
+        function toggleConfigureScheduleModal(show) {
+            if (show) {
+                configureScheduleModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                configureScheduleModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
         
-        const reminderDisplay = document.getElementById('reminder-display');
-        if (reminders.length > 0) {
-            reminderDisplay.innerHTML = `
-                <div class="flex items-start p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                    <i data-feather="bell" class="text-yellow-500 mr-2 mt-0.5"></i>
-                    <div>
-                        <div class="font-medium">${reminders[0].title}</div>
-                        <div class="text-sm text-gray-600">${reminders[0].description}</div>
-                    </div>
-                </div>
+        function toggleExamModal(show) {
+            if (show) {
+                addExamModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addExamModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        function toggleReminderModal(show) {
+            if (show) {
+                addReminderModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                addReminderModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Open configure schedule modal
+        function openConfigureScheduleModal(scheduleId = null) {
+            const schedule = scheduleId ? schedules.find(s => s.id === scheduleId) : null;
+            
+            // Reset form
+            document.querySelectorAll('.day-checkbox').forEach(checkbox => {
+                checkbox.checked = schedule ? schedule.days.includes(checkbox.value) : ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'].includes(checkbox.value);
+            });
+            
+            timeSlotsContainer.innerHTML = '';
+            if (schedule && schedule.timeSlots) {
+                schedule.timeSlots.forEach(timeSlot => {
+                    addTimeSlotElement(timeSlot.start, timeSlot.end, timeSlot.id);
+                });
+            } else {
+                addTimeSlotElement('08:00', '10:00');
+                addTimeSlotElement('10:15', '12:15');
+            }
+            
+            // Generate preview
+            generateSchedulePreview(schedule);
+            
+            // Store the current schedule ID for saving
+            configureScheduleModal.setAttribute('data-schedule-id', scheduleId);
+            
+            toggleConfigureScheduleModal(true);
+        }
+        
+        // Add time slot element
+        function addTimeSlotElement(start = '', end = '', id = null) {
+            const timeSlotId = id || generateId();
+            const timeSlotElement = document.createElement('div');
+            timeSlotElement.className = 'flex items-center space-x-2';
+            timeSlotElement.innerHTML = `
+                <input type="time" class="time-start px-2 py-1 rounded border border-gray-300" value="${start}">
+                <span>-</span>
+                <input type="time" class="time-end px-2 py-1 rounded border border-gray-300" value="${end}">
+                <button class="remove-time-slot text-red-500">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                </button>
             `;
+            timeSlotElement.querySelector('.remove-time-slot').addEventListener('click', function() {
+                timeSlotElement.remove();
+                generateSchedulePreview();
+            });
+            
+            // Add change listeners to update preview
+            timeSlotElement.querySelectorAll('input').forEach(input => {
+                input.addEventListener('change', generateSchedulePreview);
+            });
+            
+            timeSlotsContainer.appendChild(timeSlotElement);
             feather.replace();
         }
         
-        // Evolution Chart
-        const ctx = document.getElementById('evolutionChart').getContext('2d');
-        const evolutionChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Trim 1', 'Trim 2', 'Trim 3', 'Trim 1', 'Trim 2'],
-                datasets: [{
-                    label: 'Moyenne générale',
-                    data: [12.5, 13.2, 14.0, 14.5, 15.2],
-                    borderColor: '#6C63FF',
-                    backgroundColor: 'rgba(108, 99, 255, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 10,
-                        max: 20
-                    }
-                }
+        // Generate schedule preview
+        function generateSchedulePreview(schedule = null) {
+            const selectedDays = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
+            const timeSlots = Array.from(timeSlotsContainer.children).map(el => {
+                return {
+                    id: generateId(),
+                    start: el.querySelector('.time-start').value,
+                    end: el.querySelector('.time-end').value
+                };
+            });
+            
+            scheduleTablePreview.innerHTML = `
+                <h3 class="text-md font-medium mb-2">Aperçu</h3>
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="grid grid-cols-${selectedDays.length} gap-px bg-gray-200">
+                        ${selectedDays.map(day => `
+                            <div class="bg-gray-100 p-2 text-center font-medium text-sm">${day}</div>
+                        `).join('')}
+                        
+                        ${timeSlots.map(timeSlot => `
+                            <div class="col-span-${selectedDays.length} grid grid-cols-${selectedDays.length} gap-px bg-gray-200">
+                                ${selectedDays.map(day => {
+                                    const subject = schedule && schedule.data && schedule.data[day] && schedule.data[day][timeSlot.id] ? schedule.data[day][timeSlot.id] : '';
+                                    return `
+                                        <div class="time-slot bg-white p-2 h-24">
+                                            <div class="text-xs text-gray-500 mb-1">${timeSlot.start} - ${timeSlot.end}</div>
+                                            <div class="subject-preview text-sm bg-purple-50 text-purple-800 rounded px-1 py-0.5 truncate" contenteditable="true">${subject}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Create new schedule
+       function createSchedule(name, color) {
+    const newSchedule = {
+        id: generateId(),
+        name: name,
+        color: color,
+        days: Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value),
+        timeSlots: Array.from(timeSlotsContainer.children).map(el => {
+            return {
+                id: generateId(),
+                start: el.querySelector('.time-start').value,
+                end: el.querySelector('.time-end').value
+            };
+        }),
+        data: {}
+    };
+    
+    schedules.push(newSchedule);
+    saveSchedules();
+    setCurrentSchedule(newSchedule.id);
+    renderSchedulesList();
+    renderCurrentSchedule(); // Ajout pour afficher le tableau immédiatement
+    toggleConfigureScheduleModal(false);
+}
+        
+        // Update schedule
+      // Fonctions pour autres emplois du temps
+function initOtherScheduleModal() {
+    generateOtherScheduleTable();
+    initColorSelection(); // ← AJOUTE  CETTE LIGNE
+    
+    // Écouter les changements de jours
+    document.querySelectorAll('.other-day-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', generateOtherScheduleTable);
+    });
+    
+    // Écouter les changements d'heures
+    document.querySelectorAll('.other-time-start, .other-time-end').forEach(input => {
+        input.addEventListener('change', generateOtherScheduleTable);
+    });
+}
+
+function generateOtherScheduleTable() {
+    const selectedDays = Array.from(document.querySelectorAll('.other-day-checkbox:checked')).map(cb => cb.value);
+    const timeSlots = Array.from(document.querySelectorAll('#otherTimeSlotsContainer > div')).map(el => ({
+        start: el.querySelector('.other-time-start').value,
+        end: el.querySelector('.other-time-end').value
+    }));
+    
+    // Trier les créneaux horaires
+    timeSlots.sort((a, b) => a.start.localeCompare(b.start));
+    
+    const scheduleTable = document.getElementById('otherScheduleTable');
+    
+    if (selectedDays.length === 0 || timeSlots.length === 0) {
+        scheduleTable.innerHTML = '<div class="p-4 text-center text-gray-500">Sélectionnez des jours et des créneaux horaires</div>';
+        return;
+    }
+    
+    scheduleTable.innerHTML = `
+        <div class="grid grid-cols-${selectedDays.length + 1} gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden schedule-table-mobile">
+            <!-- En-tête du tableau -->
+            <div class="bg-gray-100 p-2 md:p-3 font-medium border-r border-gray-200 day-header-mobile"></div>
+            ${selectedDays.map(day => `
+                <div class="bg-gray-100 p-2 md:p-3 text-center font-medium border-r border-gray-200 last:border-r-0 day-header-mobile text-xs md:text-sm truncate">${day}</div>
+            `).join('')}
+            
+            <!-- Lignes de créneaux horaires -->
+            ${timeSlots.map((timeSlot, index) => `
+                <div class="contents">
+                    <!-- Colonne des horaires (gauche) -->
+                    <div class="bg-gray-50 p-2 md:p-3 flex items-center justify-between border-r border-gray-200 border-t border-gray-200 time-header-mobile">
+                        <span class="text-xs md:text-sm font-medium whitespace-normal break-words">${timeSlot.start} - ${timeSlot.end}</span>
+
+                        <button class="remove-time-row text-red-500 hover:text-red-700 ml-1 md:ml-2" data-index="${index}">
+                            <i data-feather="trash-2" class="w-3 h-3 md:w-4 md:h-4"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Colonnes des jours (cases à remplir) -->
+                    ${selectedDays.map(day => `
+                        <div class="bg-white p-1 md:p-2 border-r border-gray-200 border-t border-gray-200 last:border-r-0">
+                            <div class="time-cell time-cell-mobile w-full h-12 md:h-16 p-1 md:p-2 rounded border border-gray-300 hover:border-purple-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 cursor-text transition-colors text-xs md:text-sm break-words overflow-hidden" 
+                                 contenteditable="true"
+                                 data-day="${day}"
+                                 data-time="${timeSlot.start}-${timeSlot.end}"
+                                 placeholder="Matière..."></div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    feather.replace();
+    
+    // Ajouter les événements pour supprimer les lignes
+    document.querySelectorAll('.remove-time-row').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = this.getAttribute('data-index');
+            removeOtherTimeSlot(index);
+        });
+    });
+    
+    // Ajouter le placeholder aux cellules
+    document.querySelectorAll('.time-cell').forEach(cell => {
+        if (!cell.textContent.trim()) {
+            cell.innerHTML = '<span class="text-gray-400">Matière...</span>';
+        }
+        
+        cell.addEventListener('focus', function() {
+            if (this.innerHTML.includes('text-gray-400')) {
+                this.innerHTML = '';
+                this.classList.remove('text-gray-400');
             }
         });
         
-        // Prevent blue highlight on mobile taps
-        document.addEventListener('touchstart', function() {}, true);
+        cell.addEventListener('blur', function() {
+            if (!this.textContent.trim()) {
+                this.innerHTML = '<span class="text-gray-400">Matière...</span>';
+                this.classList.add('text-gray-400');
+            }
+        });
+        
+        // Empêcher le débordement du texte
+        cell.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    });
+}
+
       
-      // --- PAGE D'EXAMENS --- //
-function openExamPage() {
-    document.getElementById('exam-page').classList.remove('hidden');
-    document.querySelector('main').classList.add('hidden');
-    document.querySelector('nav').classList.add('hidden');
-    renderExams();
+      // Fonction pour initialiser la sélection des couleurs
+function initColorSelection() {
+    const colorOptions = document.querySelectorAll('.color-option');
+    
+    colorOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Retirer toutes les sélections
+            colorOptions.forEach(opt => {
+                opt.classList.remove('ring-2', 'ring-offset-2', 'ring-purple-500');
+            });
+            // Ajouter la sélection à l'option cliquée
+            this.classList.add('ring-2', 'ring-offset-2', 'ring-purple-500');
+        });
+    });
+    
+    // Sélectionner la première couleur par défaut
+    if (!document.querySelector('.color-option.ring-2')) {
+        colorOptions[0].classList.add('ring-2', 'ring-offset-2', 'ring-purple-500');
+    }
+}
+      
+function addOtherTimeSlot() {
+    const container = document.getElementById('otherTimeSlotsContainer');
+    const timeSlotElement = document.createElement('div');
+    timeSlotElement.className = 'flex items-center space-x-2';
+    timeSlotElement.innerHTML = `
+        <input type="time" class="other-time-start px-2 py-1 rounded border border-gray-300" value="09:00">
+        <span>-</span>
+        <input type="time" class="other-time-end px-2 py-1 rounded border border-gray-300" value="10:00">
+        <button class="remove-other-time-slot text-red-500">
+            <i data-feather="trash-2" class="w-4 h-4"></i>
+        </button>
+    `;
+    
+    container.appendChild(timeSlotElement);
     feather.replace();
     
-    // Interval local
-    window.examInterval = setInterval(() => {
-        renderExams();
-        loadNextExam();
-    }, 1000);
-}
-
-function openExamForm() {
-    document.getElementById('exam-form').classList.remove('hidden');
-}
-
-function closeExamForm() {
-    document.getElementById('exam-form').classList.add('hidden');
-}
-
-function addExam() {
-    const name = document.getElementById('exam-name').value.trim();
-    const date = document.getElementById('exam-date').value;
-    const time = document.getElementById('exam-time').value;
-    if (!name || !date || !time) return alert("Veuillez remplir tous les champs !");
+    // Ajouter les événements
+    timeSlotElement.querySelector('.remove-other-time-slot').addEventListener('click', function() {
+        timeSlotElement.remove();
+        generateOtherScheduleTable();
+    });
     
-    const exams = JSON.parse(localStorage.getItem('exams')) || [];
-    exams.push({ name, date, time });
-    localStorage.setItem('exams', JSON.stringify(exams));
+    timeSlotElement.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', generateOtherScheduleTable);
+    });
     
-    document.getElementById('exam-name').value = '';
-    document.getElementById('exam-date').value = '';
-    document.getElementById('exam-time').value = '';
-    
-    closeExamForm();
-    renderExams();
-    loadNextExam(); // actualise aussi l’accueil
+    generateOtherScheduleTable();
 }
 
-function renderExams() {
-    const list = document.getElementById('exam-list');
-    const exams = JSON.parse(localStorage.getItem('exams')) || [];
-    list.innerHTML = '';
+function removeOtherTimeSlot(index) {
+    const timeSlots = document.querySelectorAll('#otherTimeSlotsContainer > div');
+    if (timeSlots[index]) {
+        timeSlots[index].remove();
+        generateOtherScheduleTable();
+    }
+}
 
-    if (exams.length === 0) {
-        list.innerHTML = `<div class="text-center text-gray-500">Aucun examen ajouté</div>`;
+      // Fonction pour afficher la confirmation de suppression
+function showDeleteConfirmation(scheduleId) {
+    // Créer la modale de confirmation
+    const confirmationModal = document.createElement('div');
+    confirmationModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+    confirmationModal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
+                <i data-feather="alert-triangle" class="w-6 h-6 text-red-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-center mb-2">Confirmer la suppression</h3>
+            <p class="text-gray-600 text-center mb-6">Voulez-vous vraiment supprimer cet emploi du temps ?</p>
+            <div class="flex justify-center space-x-3">
+                <button id="cancelDelete" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Annuler</button>
+                <button id="confirmDelete" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors" data-id="${scheduleId}">Supprimer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(confirmationModal);
+    feather.replace();
+    
+    // Événements
+    document.getElementById('cancelDelete').addEventListener('click', () => {
+        document.body.removeChild(confirmationModal);
+    });
+    
+    document.getElementById('confirmDelete').addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        deleteOtherSchedule(id);
+        document.body.removeChild(confirmationModal);
+    });
+    
+    // Fermer en cliquant à l'extérieur
+    confirmationModal.addEventListener('click', (e) => {
+        if (e.target === confirmationModal) {
+            document.body.removeChild(confirmationModal);
+        }
+    });
+}
+      
+function createOtherSchedule() {
+    const name = document.getElementById('otherScheduleName').value.trim() || 'Nouvel emploi du temps';
+    const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+    const selectedDays = Array.from(document.querySelectorAll('.other-day-checkbox:checked')).map(cb => cb.value);
+    
+    const timeSlots = Array.from(document.querySelectorAll('#otherTimeSlotsContainer > div')).map(el => ({
+        start: el.querySelector('.other-time-start').value,
+        end: el.querySelector('.other-time-end').value
+    })).sort((a, b) => a.start.localeCompare(b.start));
+    
+    // Récupérer les données du tableau
+    const data = {};
+    document.querySelectorAll('.time-cell').forEach(cell => {
+        const day = cell.getAttribute('data-day');
+        const time = cell.getAttribute('data-time');
+        const subject = cell.textContent.trim();
+        
+        if (subject) {
+            if (!data[day]) data[day] = {};
+            data[day][time] = subject;
+        }
+    });
+    
+    const newSchedule = {
+        id: Date.now().toString(),
+        name: name,
+        color: color,
+        days: selectedDays,
+        timeSlots: timeSlots,
+        data: data
+    };
+    
+    otherSchedules.push(newSchedule);
+    saveOtherSchedules();
+    renderOtherSchedules();
+    toggleOtherScheduleModal(false);
+}
+
+function renderOtherSchedules() {
+    const container = document.getElementById('otherSchedulesList');
+    container.innerHTML = '';
+    
+    if (otherSchedules.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500 bg-white rounded-xl shadow-sm">
+                <i data-feather="calendar" class="w-12 h-12 mx-auto mb-2"></i>
+                <p>Aucun emploi du temps supplémentaire</p>
+            </div>
+        `;
+        feather.replace();
         return;
     }
-
-    const now = new Date();
-    exams.forEach((exam, index) => {
-        const examDate = new Date(`${exam.date}T${exam.time}`);
-        const diff = examDate - now;
-
-        let countdown = 'Terminé';
-        if (diff > 0) {
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-            countdown = `${days}J-${hours}H-${mins}MN-${secs}S`;
-        }
-
-        const div = document.createElement('div');
-        div.className = "p-4 border rounded-lg flex justify-between items-center";
-        div.innerHTML = `
-            <div>
-                <div class="font-medium">${exam.name}</div>
-                <div class="text-sm text-gray-500">${exam.date} • ${exam.time}</div>
+    
+    otherSchedules.forEach(schedule => {
+        const scheduleElement = document.createElement('div');
+        scheduleElement.className = 'bg-white rounded-xl shadow-sm p-4';
+        scheduleElement.innerHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-3">
+                    <h3 class="text-lg font-semibold">${schedule.name}</h3>
+                    <span class="w-4 h-4 rounded-full bg-${schedule.color}-500"></span>
+                </div>
+                <div class="flex space-x-1">
+                    <button class="edit-other-schedule p-2 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
+                        <i data-feather="edit-2" class="w-4 h-4 text-purple-600"></i>
+                    </button>
+                    <button class="delete-other-schedule p-2 rounded-full hover:bg-gray-100" data-id="${schedule.id}">
+                        <i data-feather="trash-2" class="w-4 h-4 text-red-600"></i>
+                    </button>
+                </div>
             </div>
-            <div class="flex items-center">
-                <div class="text-purple-600 font-semibold mr-4">${countdown}</div>
-                <button onclick="deleteExam(${index})" class="text-red-500 hover:text-red-700">
-                    <i data-feather="trash-2" class="w-4 h-4"></i>
+            <div class="bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
+                <div class="grid grid-cols-${schedule.days.length + 1} gap-px bg-gray-200">
+                    <!-- En-tête -->
+                    <div class="bg-gray-100 p-3 font-medium border-r border-gray-200"></div>
+                    ${schedule.days.map(day => `
+                        <div class="bg-gray-100 p-3 text-center font-medium text-sm border-r border-gray-200 last:border-r-0">${day}</div>
+                    `).join('')}
+                    
+                    <!-- Lignes -->
+                    ${schedule.timeSlots.map(timeSlot => `
+                        <div class="contents">
+                            <!-- Colonne horaire -->
+                            <div class="bg-gray-50 p-3 border-r border-gray-200 border-t border-gray-200">
+                                <div class="text-xs text-gray-500 whitespace-normal break-words">${timeSlot.start} - ${timeSlot.end}</div>
+
+                            </div>
+                            
+                            <!-- Colonnes des matières -->
+                           
+${schedule.days.map(day => {
+    const subject = schedule.data && schedule.data[day] && schedule.data[day][`${timeSlot.start}-${timeSlot.end}`] ? schedule.data[day][`${timeSlot.start}-${timeSlot.end}`] : '';
+    return `
+        <div class="bg-white p-1 md:p-2 border-r border-gray-200 border-t border-gray-200 last:border-r-0">
+            ${subject ? `
+                <div class="text-xs md:text-sm bg-${schedule.color}-100 text-${schedule.color}-800 rounded px-1 md:px-2 py-1 text-center break-words whitespace-normal overflow-hidden max-h-16 leading-tight">
+                    ${subject}
+                </div>
+            ` : ''}
+        </div>
+    `;
+}).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        container.appendChild(scheduleElement);
+    });
+    
+    feather.replace();
+    
+    // Ajouter les événements de suppression
+    document.querySelectorAll('.delete-other-schedule').forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-id');
+            showDeleteConfirmation(scheduleId);
+        });
+    });
+    
+    // Ajouter les événements de modification
+    document.querySelectorAll('.edit-other-schedule').forEach(button => {
+        button.addEventListener('click', function() {
+            const scheduleId = this.getAttribute('data-id');
+            editOtherSchedule(scheduleId);
+        });
+    });
+}
+
+   // Fonction pour modifier un emploi du temps existant
+function editOtherSchedule(scheduleId) {
+    const schedule = otherSchedules.find(s => s.id === scheduleId);
+    if (!schedule) return;
+    
+    // Remplir le formulaire avec les données existantes
+    document.getElementById('otherScheduleName').value = schedule.name;
+    
+    // Sélectionner la couleur
+    document.querySelectorAll('.color-option').forEach(option => {
+        option.classList.remove('ring-2', 'ring-offset-2', 'ring-purple-500');
+        if (option.getAttribute('data-color') === schedule.color) {
+            option.classList.add('ring-2', 'ring-offset-2', 'ring-purple-500');
+        }
+    });
+    
+    // Cocher les jours
+    document.querySelectorAll('.other-day-checkbox').forEach(checkbox => {
+        checkbox.checked = schedule.days.includes(checkbox.value);
+    });
+    
+    // Remplir les créneaux horaires
+    const timeContainer = document.getElementById('otherTimeSlotsContainer');
+    timeContainer.innerHTML = '';
+    
+    schedule.timeSlots.forEach(timeSlot => {
+        const timeSlotElement = document.createElement('div');
+        timeSlotElement.className = 'flex items-center space-x-2';
+        timeSlotElement.innerHTML = `
+            <input type="time" class="other-time-start px-2 py-1 rounded border border-gray-300" value="${timeSlot.start}">
+            <span>-</span>
+            <input type="time" class="other-time-end px-2 py-1 rounded border border-gray-300" value="${timeSlot.end}">
+            <button class="remove-other-time-slot text-red-500">
+                <i data-feather="trash-2" class="w-4 h-4"></i>
+            </button>
+        `;
+        timeContainer.appendChild(timeSlotElement);
+    });
+    
+    feather.replace();
+    
+    // Ajouter les événements aux nouveaux time slots
+    document.querySelectorAll('.remove-other-time-slot').forEach(button => {
+        button.addEventListener('click', function() {
+            this.parentElement.remove();
+            generateOtherScheduleTable();
+        });
+    });
+    
+    document.querySelectorAll('.other-time-start, .other-time-end').forEach(input => {
+        input.addEventListener('change', generateOtherScheduleTable);
+    });
+    
+    // Générer le tableau avec les données existantes
+    generateOtherScheduleTable();
+    
+    // Remplir les matières dans le tableau
+    setTimeout(() => {
+        document.querySelectorAll('.time-cell').forEach(cell => {
+            const day = cell.getAttribute('data-day');
+            const time = cell.getAttribute('data-time');
+            const subject = schedule.data && schedule.data[day] && schedule.data[day][time] ? schedule.data[day][time] : '';
+            
+            if (subject) {
+                cell.textContent = subject;
+                cell.classList.remove('text-gray-400');
+            }
+        });
+    }, 100);
+    
+    // Stocker l'ID pour la mise à jour
+    document.getElementById('addOtherScheduleModal').setAttribute('data-edit-id', scheduleId);
+    
+    // Changer le texte du bouton
+    document.getElementById('confirmAddOtherSchedule').textContent = 'Mettre à jour';
+    
+    toggleOtherScheduleModal(true);
+}
+
+// Modifier la fonction createOtherSchedule pour gérer l'édition
+function createOtherSchedule() {
+    const editId = document.getElementById('addOtherScheduleModal').getAttribute('data-edit-id');
+    
+    if (editId) {
+        // Mode édition
+        updateOtherSchedule(editId);
+    } else {
+        // Mode création
+        const name = document.getElementById('otherScheduleName').value.trim() || 'Nouvel emploi du temps';
+        const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+        const selectedDays = Array.from(document.querySelectorAll('.other-day-checkbox:checked')).map(cb => cb.value);
+        
+        const timeSlots = Array.from(document.querySelectorAll('#otherTimeSlotsContainer > div')).map(el => ({
+            start: el.querySelector('.other-time-start').value,
+            end: el.querySelector('.other-time-end').value
+        })).sort((a, b) => a.start.localeCompare(b.start));
+        
+        // Récupérer les données du tableau
+        const data = {};
+        document.querySelectorAll('.time-cell').forEach(cell => {
+            const day = cell.getAttribute('data-day');
+            const time = cell.getAttribute('data-time');
+            const subject = cell.textContent.trim();
+            
+            if (subject && !cell.innerHTML.includes('text-gray-400')) {
+                if (!data[day]) data[day] = {};
+                data[day][time] = subject;
+            }
+        });
+        
+        const newSchedule = {
+            id: Date.now().toString(),
+            name: name,
+            color: color,
+            days: selectedDays,
+            timeSlots: timeSlots,
+            data: data
+        };
+        
+        otherSchedules.push(newSchedule);
+        saveOtherSchedules();
+        renderOtherSchedules();
+        toggleOtherScheduleModal(false);
+    }
+}
+
+      
+      // Charger les examens depuis le localStorage
+// Charger les examens depuis le localStorage
+function loadExams() {
+    const examsList = document.getElementById('examsList');
+    const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    
+    examsList.innerHTML = '';
+    
+    if (exams.length === 0) {
+        examsList.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+                <p>Aucun examen à venir</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Trier les examens par date
+    exams.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+    
+    exams.forEach(exam => {
+        const examDateTime = new Date(exam.date + 'T' + exam.time);
+        const now = new Date();
+        
+        // Calculer la différence en millisecondes
+        const diffTime = examDateTime - now;
+        
+        let bgColor = 'yellow';
+        let icon = 'edit-3';
+        let statusText = '';
+        
+        if (diffTime < 0) {
+            // EXAMEN PASSÉ
+            bgColor = 'gray';
+            icon = 'check-circle';
+            statusText = 'Passé';
+        } else {
+            // EXAMEN FUTUR - calculer jours et heures
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            if (diffDays === 0) {
+                // AUJOURD'HUI
+                if (diffHours <= 3) {
+                    bgColor = 'red';
+                    icon = 'alert-triangle';
+                    statusText = `Dans ${diffHours}h`;
+                } else {
+                    bgColor = 'orange';
+                    icon = 'clock';
+                    statusText = `Aujourd'hui • ${exam.time}`;
+                }
+            } else if (diffDays <= 3) {
+                // DANS 1-3 JOURS
+                bgColor = 'red';
+                icon = 'alert-triangle';
+                statusText = `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+            } else if (diffDays <= 7) {
+                // DANS 4-7 JOURS
+                bgColor = 'orange';
+                icon = 'clock';
+                statusText = `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+            } else {
+                // PLUS DE 7 JOURS
+                bgColor = 'yellow';
+                icon = 'edit-3';
+                statusText = `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+            }
+        }
+        
+        const examElement = document.createElement('div');
+        examElement.className = `flex items-center justify-between p-3 bg-${bgColor}-50 rounded-lg`;
+        examElement.innerHTML = `
+            <div class="flex items-center flex-grow">
+                <div class="w-10 h-10 rounded-full bg-${bgColor}-100 flex items-center justify-center mr-3">
+                    <i data-feather="${icon}" class="text-${bgColor}-600"></i>
+                </div>
+                <div class="flex-grow">
+                    <div class="font-medium">${exam.name}</div>
+                    <div class="text-sm text-gray-600">${formatDate(exam.date)} • ${exam.time}</div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <div class="text-sm font-medium text-${bgColor}-600 whitespace-nowrap">${statusText}</div>
+                <button class="delete-exam p-2 rounded-full hover:bg-${bgColor}-100" data-id="${exam.id}">
+                    <i data-feather="trash-2" class="w-4 h-4 text-red-600"></i>
                 </button>
             </div>
         `;
-        list.appendChild(div);
+        examsList.appendChild(examElement);
     });
+    
     feather.replace();
+    
+    // Ajouter les événements de suppression
+    document.querySelectorAll('.delete-exam').forEach(button => {
+        button.addEventListener('click', function() {
+            const examId = this.getAttribute('data-id');
+            deleteExam(examId);
+        });
+    });
 }
 
-// --- Mise à jour du compte à rebours en direct --- //
-setInterval(() => {
-    if (!document.getElementById('exam-page').classList.contains('hidden')) {
-        renderExams();
-    }
-    loadNextExam();
-}, 1000);
-
-function closeExamPage() {
-    document.getElementById('exam-page').classList.add('hidden');
-    document.querySelector('main').classList.remove('hidden');
-    document.querySelector('nav').classList.remove('hidden');
-    if (window.examInterval) clearInterval(window.examInterval);
-}
-
-function deleteExam(index) {
-    const exams = JSON.parse(localStorage.getItem('exams')) || [];
-    exams.splice(index, 1);
-    localStorage.setItem('exams', JSON.stringify(exams));
-    renderExams();
-    loadNextExam();
+      // Fonction pour supprimer un examen
+// Fonction pour supprimer un examen (version robuste)
+function deleteExam(examId) {
+    // Lire directement depuis le localStorage à chaque fois
+    let exams = JSON.parse(localStorage.getItem('exams')) || [];
+    
+    // Créer la modale de confirmation
+    const confirmationModal = document.createElement('div');
+    confirmationModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+    confirmationModal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
+                <i data-feather="alert-triangle" class="w-6 h-6 text-red-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-center mb-2">Confirmer la suppression</h3>
+            <p class="text-gray-600 text-center mb-6">Voulez-vous vraiment supprimer cet examen ?</p>
+            <div class="flex justify-center space-x-3">
+                <button id="cancelDeleteExam" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Annuler</button>
+                <button id="confirmDeleteExam" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors">Supprimer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(confirmationModal);
+    feather.replace();
+    
+    // É vénements
+    document.getElementById('cancelDeleteExam').addEventListener('click', () => {
+        document.body.removeChild(confirmationModal);
+    });
+    
+    document.getElementById('confirmDeleteExam').addEventListener('click', function() {
+        // Filtrer pour supprimer l'examen
+        exams = exams.filter(e => e.id !== examId);
+        // Sauvegarder dans le localStorage
+        localStorage.setItem('exams', JSON.stringify(exams));
+        
+        loadExams(); // Recharger l'a frfichage
+        document.body.removeChild(confirmationModal);
+    });
+    
+    // Fermer en cliquant à l'extérieur
+    confirmationModal.addEventListener('click', (e) => {
+        if (e.target === confirmationModal) {
+            document.body.removeChild(confirmationModal);
+        }
+    });
 }
       
-      function startHomeCountdown() {
-    setInterval(() => {
-        const exams = JSON.parse(localStorage.getItem('exams')) || [];
-        const now = new Date();
-        
-        const ongoingExam = exams.find(exam => {
-            const examStart = new Date(`${exam.date}T${exam.time}`);
-            const examEnd = new Date(examStart.getTime() + 60 * 60 * 1000);
-            return now >= examStart && now <= examEnd;
+      // Fonction utilitaire pour formater la date
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+}
+// Charger les rappels depuis le localStorage
+function loadReminders() {
+    const remindersList = document.getElementById('remindersList');
+    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    
+    remindersList.innerHTML = '';
+    
+    if (reminders.length === 0) {
+        remindersList.innerHTML = `
+            <div class="text-center py-4 text-gray-500">
+                <p>Aucun rappel</p>
+            </div>
+        `;
+        return;
+    }
+    
+    reminders.forEach(reminder => {
+        const reminderElement = document.createElement('div');
+        reminderElement.className = 'flex items-start p-3 bg-gray-50 rounded-lg';
+        reminderElement.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
+                <i data-feather="bell" class="text-gray-600"></i>
+            </div>
+            <div class="flex-grow">
+                <div class="font-medium">${reminder.title}</div>
+                <div class="text-sm text-gray-600">${reminder.details}</div>
+            </div>
+            <button class="delete-reminder p-1 rounded-full hover:bg-gray-200 ml-2" data-id="${reminder.id}">
+                <i data-feather="trash-2" class="w-4 h-4 text-gray-500"></i>
+            </button>
+        `;
+        remindersList.appendChild(reminderElement);
+    });
+    
+    feather.replace();
+    
+    // Ajouter les événements de suppression
+    document.querySelectorAll('.delete-reminder').forEach(button => {
+        button.addEventListener('click', function() {
+            const reminderId = this.getAttribute('data-id');
+            deleteReminder(reminderId);
         });
+    });
+}
+
+// Fonction pour supprimer un rappel
+function deleteReminder(reminderId) {
+    let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    reminders = reminders.filter(r => r.id !== reminderId);
+    localStorage.setItem('reminders', JSON.stringify(reminders));
+    loadReminders(); // Recharger l'affichage
+}
+
+// Fonction utilitaire pour formater la date
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+}
+// Fonction pour mettre à jour un emploi du temps
+function updateOtherSchedule(scheduleId) {
+    const scheduleIndex = otherSchedules.findIndex(s => s.id === scheduleId);
+    if (scheduleIndex === -1) return;
+    
+    const name = document.getElementById('otherScheduleName').value.trim() || 'Nouvel emploi du temps';
+    const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+    const selectedDays = Array.from(document.querySelectorAll('.other-day-checkbox:checked')).map(cb => cb.value);
+    
+    const timeSlots = Array.from(document.querySelectorAll('#otherTimeSlotsContainer > div')).map(el => ({
+        start: el.querySelector('.other-time-start').value,
+        end: el.querySelector('.other-time-end').value
+    })).sort((a, b) => a.start.localeCompare(b.start));
+    
+    // Récupérer les données du tableau
+    const data = {};
+    document.querySelectorAll('.time-cell').forEach(cell => {
+        const day = cell.getAttribute('data-day');
+        const time = cell.getAttribute('data-time');
+        const subject = cell.textContent.trim();
         
-        const nextExamElement = document.getElementById('next-exam');
-        if (ongoingExam) {
-            nextExamElement.textContent = `${ongoingExam.name} - En cours`;
+        if (subject && !cell.innerHTML.includes('text-gray-400')) {
+            if (!data[day]) data[day] = {};
+            data[day][time] = subject;
+        }
+    });
+    
+    // Mettre à jour l'emploi du temps
+    otherSchedules[scheduleIndex] = {
+        ...otherSchedules[scheduleIndex],
+        name: name,
+        color: color,
+        days: selectedDays,
+        timeSlots: timeSlots,
+        data: data
+    };
+    
+    saveOtherSchedules();
+    renderOtherSchedules();
+    toggleOtherScheduleModal(false);
+    
+    // Réinitialiser le mode édition
+    document.getElementById('addOtherScheduleModal').removeAttribute('data-edit-id');
+    document.getElementById('confirmAddOtherSchedule').textContent = 'Enregistrer';
+}   
+      
+function deleteOtherSchedule(scheduleId) {
+    otherSchedules = otherSchedules.filter(s => s.id !== scheduleId);
+    saveOtherSchedules();
+    renderOtherSchedules();
+}
+
+function saveOtherSchedules() {
+    localStorage.setItem('otherSchedules', JSON.stringify(otherSchedules));
+}
+
+function toggleOtherScheduleModal(show) {
+    const modal = document.getElementById('addOtherScheduleModal');
+    if (show) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        initOtherScheduleModal();
+    } else {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+// Événements
+document.getElementById('addOtherScheduleBtn').addEventListener('click', () => toggleOtherScheduleModal(true));
+document.getElementById('closeOtherScheduleModal').addEventListener('click', () => toggleOtherScheduleModal(false));
+document.getElementById('cancelAddOtherSchedule').addEventListener('click', () => toggleOtherScheduleModal(false));
+document.getElementById('confirmAddOtherSchedule').addEventListener('click', createOtherSchedule);
+document.getElementById('addOtherTimeSlot').addEventListener('click', addOtherTimeSlot);
+
+// Initialisation au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    renderOtherSchedules();
+  loadExams(); // ← AJOUTE CETTE LIGNE
+    loadReminders(); 
+});
+      // Corriger updateSchedule pour ordre   (ts pus day)
+function updateSchedule(scheduleId) {
+    const schedule = schedules.find(s => s.id === scheduleId);
+    if (!schedule) return;
+    
+    schedule.days = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
+    schedule.timeSlots = Array.from(timeSlotsContainer.children).map(el => {
+        return {
+            id: generateId(),
+            start: el.querySelector('.time-start').value,
+            end: el.querySelector('.time-end').value
+        };
+    });
+    
+    // Preserve existing data + new from preview (ordre ts puis day pour matcher DOM)
+    const newData = schedule.data || {};
+    const previewSubjects = document.querySelectorAll('.subject-preview');
+    let i = 0;
+    
+    schedule.timeSlots.forEach(timeSlot => {
+        schedule.days.forEach(day => {
+            if (previewSubjects[i]) {
+                const subject = previewSubjects[i].textContent.trim();
+                if (subject) {
+                    if (!newData[day]) newData[day] = {};
+                    newData[day][timeSlot.id] = subject;
+                }
+                i++;
+            }
+        });
+    });
+    
+    schedule.data = newData;
+    
+    saveSchedules();
+    renderSchedulesList();
+    renderCurrentSchedule();
+    toggleConfigureScheduleModal(false);
+}
+
+// Ajouter lecture preview dans createSchedule
+function createSchedule(name, color) {
+    const newSchedule = {
+        id: generateId(),
+        name: name,
+        color: color,
+        days: Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value),
+        timeSlots: Array.from(timeSlotsContainer.children).map(el => {
+            return {
+                id: generateId(),
+                start: el.querySelector('.time-start').value,
+                end: el.querySelector('.time-end').value
+            };
+        }),
+        data: {}
+    };
+    
+    // Lire preview pour data (ordre ts puis day)
+    const previewSubjects = document.querySelectorAll('.subject-preview');
+    let i = 0;
+    
+    newSchedule.timeSlots.forEach(timeSlot => {
+        newSchedule.days.forEach(day => {
+            if (previewSubjects[i]) {
+                const subject = previewSubjects[i].textContent.trim();
+                if (subject) {
+                    if (!newSchedule.data[day]) newSchedule.data[day] = {};
+                    newSchedule.data[day][timeSlot.id] = subject;
+                }
+                i++;
+            }
+        });
+    });
+    
+    schedules.push(newSchedule);
+    saveSchedules();
+    setCurrentSchedule(newSchedule.id);
+    renderSchedulesList();
+    renderCurrentSchedule();
+    toggleConfigureScheduleModal(false);
+}
+        
+      // === CONFIGURATION EMPLOI DU TEMPS ===
+
+// Génération du tableau d'emploi du temps
+function generateScheduleTable(days, timeSlots) {
+  let table = `<table class="w-full border-collapse text-sm text-center">
+    <thead class="bg-purple-100">
+      <tr>
+        <th class="border p-2">Heures</th>`;
+  days.forEach(day => {
+    table += `<th class="border p-2">${day}</th>`;
+  });
+  table += `</tr></thead><tbody>`;
+
+  timeSlots.forEach(slot => {
+    table += `<tr>
+      <td class="border p-2">${slot.start} - ${slot.end}</td>`;
+    days.forEach(() => {
+      table += `<td class="border p-2 text-gray-500 italic">Libre</td>`;
+    });
+    table += `</tr>`;
+  });
+
+  table += `</tbody></table>`;
+  return table;
+}
+
+// Sauvegarde et affichage du tableau
+document.getElementById("confirmConfigureSchedule").addEventListener("click", () => {
+  const selectedDays = [...document.querySelectorAll(".day-checkbox:checked")].map(cb => cb.value);
+  const timeSlots = [...document.querySelectorAll("#timeSlotsContainer .flex")].map(el => ({
+    start: el.querySelector(".time-start").value,
+    end: el.querySelector(".time-end").value
+  }));
+
+  const tableHTML = generateScheduleTable(selectedDays, timeSlots);
+
+  // Afficher dans la page d’accueil
+  const display = document.getElementById("scheduleDisplay");
+  const container = document.getElementById("scheduleTableContainer");
+  container.innerHTML = tableHTML;
+  display.classList.remove("hidden");
+
+  // Sauvegarder localement
+  localStorage.setItem("emploiDuTemps", JSON.stringify({ days: selectedDays, timeSlots }));
+
+  // Fermer le modal
+  document.getElementById("configureScheduleModal").classList.add("hidden");
+});
+
+// Charger depuis localStorage au démarrage
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("emploiDuTemps");
+  if (saved) {
+    const { days, timeSlots } = JSON.parse(saved);
+    const tableHTML = generateScheduleTable(days, timeSlots);
+    document.getElementById("scheduleTableContainer").innerHTML = tableHTML;
+    document.getElementById("scheduleDisplay").classList.remove("hidden");
+  }
+});
+
+// Ajouter un créneau
+document.getElementById("addTimeSlot").addEventListener("click", () => {
+  const container = document.getElementById("timeSlotsContainer");
+  const div = document.createElement("div");
+  div.className = "flex items-center space-x-2";
+  div.innerHTML = `
+    <input type="time" class="time-start px-2 py-1 rounded border border-gray-300" value="08:00">
+    <span>-</span>
+    <input type="time" class="time-end px-2 py-1 rounded border border-gray-300" value="10:00">
+    <button class="remove-time-slot text-red-500"><i data-feather="trash-2" class="w-4 h-4"></i></button>`;
+  container.appendChild(div);
+  feather.replace();
+});
+
+// Supprimer un créneau
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".remove-time-slot")) {
+    e.target.closest(".flex").remove();
+  }
+});
+
+        // Delete sChedule
+        function deleteSchedule(scheduleId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet emploi du temps ?')) {
+                schedules = schedules.filter(s => s.id !== scheduleId);
+                if (currentScheduleId === scheduleId) {
+                    currentScheduleId = null;
+                    localStorage.removeItem('currentScheduleId');
+                }
+                saveSchedules();
+                renderSchedulesList();
+                renderCurrentSchedule();
+            }
+        }
+        
+        // Set current schedule
+        function setCurrentSchedule(scheduleId) {
+            currentScheduleId = scheduleId;
+            localStorage.setItem('currentScheduleId', scheduleId);
+            renderCurrentSchedule();
+        }
+        
+        // Add exam
+        function addExam(name, date, time) {
+            const newExam = {
+                id: generateId(),
+                name: name,
+                date: date,
+                time: time
+            };
+            
+            exams.push(newExam);
+            saveExams();
+            renderExamsList();
+            toggleExamModal(false);
+        }
+        
+        // Add reminder
+        function addReminder(title, details) {
+            const newReminder = {
+                id: generateId(),
+                title: title,
+                details: details
+            };
+            
+            reminders.push(newReminder);
+            saveReminders();
+            renderRemindersList();
+            toggleReminderModal(false);
+        }
+        
+        // Delete reminder
+        function deleteReminder(reminderId) {
+            reminders = reminders.filter(r => r.id !== reminderId);
+            saveReminders();
+            renderRemindersList();
+        }
+        
+        // Save data to localStorage
+      function saveSchedules() {
+    localStorage.setItem('schedules', JSON.stringify(schedules));
+    
+    // Déclencher un événement pour notifier le changement
+    window.dispatchEvent(new Event('schedulesUpdated'));
+}
+        
+        function saveExams() {
+            localStorage.setItem('exams', JSON.stringify(exams));
+        }
+        
+        function saveReminders() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+        }
+        
+        // Utility functions
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+        
+        function getCurrentWeekRange() {
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Start from Monday
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            
+            return `${formatDate(startOfWeek.toISOString().split('T')[0])} - ${formatDate(endOfWeek.toISOString().split('T')[0])}`;
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+        }
+        
+        // Event Listeners
+      // Event Listeners
+addScheduleBtn.addEventListener('click', () => toggleScheduleModal(true));
+closeScheduleModal.addEventListener('click', () => toggleScheduleModal(false));
+cancelAddSchedule.addEventListener('click', () => toggleScheduleModal(false));
+confirmAddSchedule.addEventListener('click', () => {
+    const name = document.getElementById('scheduleName').value.trim();
+    const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+    
+    if (!name) {
+        alert('Veuillez donner un nom à votre emploi du temps');
+        return;
+    }
+    
+    openConfigureScheduleModal();
+    toggleScheduleModal(false);
+});
+
+addTimeSlot.addEventListener('click', () => addTimeSlotElement());
+
+closeConfigureModal.addEventListener('click', () => toggleConfigureScheduleModal(false));
+cancelConfigureSchedule.addEventListener('click', () => toggleConfigureScheduleModal(false));
+confirmConfigureSchedule.addEventListener('click', () => {
+    const scheduleId = configureScheduleModal.getAttribute('data-schedule-id');
+    if (scheduleId) {
+        updateSchedule(scheduleId);
+    } else {
+        const name = document.getElementById('scheduleName').value.trim();
+        const color = document.querySelector('.color-option.ring-2')?.getAttribute('data-color') || 'purple';
+        if (!name) {
+            alert('Veuillez donner un nom à votre emploi du temps');
             return;
         }
+        createSchedule(name, color);
+    }
+    toggleConfigureScheduleModal(false);
+});
+
+// Dans createSchedule, supprimez la ligne : toggleScheduleModal(false);
         
-        const futureExams = exams.filter(exam => new Date(`${exam.date}T${exam.time}`) > now)
-            .sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
+        addExamBtn.addEventListener('click', () => toggleExamModal(true));
+        addExamBtn2.addEventListener('click', () => toggleExamModal(true));
+        closeExamModal.addEventListener('click', () => toggleExamModal(false));
+        cancelAddExam.addEventListener('click', () => toggleExamModal(false));
+        confirmAddExam.addEventListener('click', () => {
+            const name = document.getElementById('examName').value.trim();
+            const date = document.getElementById('examDate').value;
+            const time = document.getElementById('examTime').value;
+            
+            if (!name || !date || !time) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            addExam(name, date, time);
+        });
         
-        if (futureExams.length > 0) {
-            const nextExam = futureExams[0];
-            const examDate = new Date(`${nextExam.date}T${nextExam.time}`);
-            const diff = examDate - now;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-            nextExamElement.innerHTML = `${nextExam.name} dans <span class="countdown-home">${days}J-${hours}H-${mins}MN-${secs}S</span>`;
-        } else {
-            nextExamElement.textContent = "Aucun examen prévu";
-        }
-    }, 1000);
-}
+        addReminderBtn.addEventListener('click', () => toggleReminderModal(true));
+        closeReminderModal.addEventListener('click', () => toggleReminderModal(false));
+        cancelAddReminder.addEventListener('click', () => toggleReminderModal(false));
+        confirmAddReminder.addEventListener('click', () => {
+            const title = document.getElementById('reminderTitle').value.trim();
+            const details = document.getElementById('reminderDetails').value.trim();
+            
+            if (!title) {
+                alert('Veuillez donner un titre à votre rappel');
+                return;
+            }
+            
+            addReminder(title, details);
+        });
+        
+        closeSubjectPopup.addEventListener('click', () => {
+            subjectPopup.classList.add('hidden');
+        });
+        
+        // Color selection for schedule
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.color-option').forEach(opt => {
+                    opt.classList.remove('ring-2', 'ring-offset-2', 'ring-purple-500');
+                });
+                this.classList.add('ring-2', 'ring-offset-2', 'ring-purple-500');
+            });
+        });
+        
+        // Day checkbox change listener
+        document.querySelectorAll('.day-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', generateSchedulePreview);
+        });
+        
+        // Initialize the page
+        initPage();
+        
+        // Prevent blue highlight on mobile taps
+        document.addEventListener('touchstart', function() {}, true);
     </script>
 </body>
 </html>
