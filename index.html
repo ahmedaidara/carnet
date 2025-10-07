@@ -46,6 +46,27 @@
         [contenteditable]:focus {
             outline: none;
         }
+      .add-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #2563eb;
+  color: white;
+  font-size: 28px;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 999;
+}
+
+.exam-list {
+  margin-top: 80px;
+  padding: 20px;
+}
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -103,6 +124,8 @@
                 </div>
             </div>
         </section>
+<!-- PAGE EXAMENS -->
+ 
 
         <!-- Tomorrow's Schedule -->
      <!-- Prochaines matières -->
@@ -193,9 +216,16 @@
             </div>
         </section>
       
-      <!-- Page Examens -->
+   
+
+    </main>
+
+     <!-- Page Examens -->
 <div id="exam-page" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
     <div class="flex items-center justify-between mb-6">
+      <button onclick="closeExamPage()" class="text-gray-500 hover:text-purple-600">
+    <i data-feather="arrow-left"></i> Retour
+</button>
         <h2 class="text-xl font-semibold flex items-center">
             <i data-feather="calendar" class="mr-2"></i> Mes examens
         </h2>
@@ -222,9 +252,6 @@
         </div>
     </div>
 </div>
-
-    </main>
-
     <!-- Bottom Navigation -->
     <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
         <div class="container mx-auto flex justify-around">
@@ -609,6 +636,11 @@ setInterval(() => {
     loadNextExam();
 }, 1000);
 
+      function closeExamPage() {
+    document.getElementById('exam-page').classList.add('hidden');
+    document.querySelector('main').classList.remove('hidden');
+    document.querySelector('nav').classList.remove('hidden');
+}
     </script>
 </body>
 </html>
