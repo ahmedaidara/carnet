@@ -212,11 +212,11 @@
             <div class="h-64">
                 <canvas id="strongSubjectsChart"></canvas>
             </div>
-            <div id="no-strong-subjects" class="text-center py-8 text-gray-500">
-                <i data-feather="smile" class="w-12 h-12 mx-auto mb-2"></i>
-                <p>Aucun point fort identifié</p>
-                <p class="text-sm">(Moyenne ≥ 14/20)</p>
-            </div>
+           <div id="no-strong-subjects" class="text-center py-8 text-gray-500">
+    <i data-feather="smile" class="w-12 h-12 mx-auto mb-2"></i>
+    <p>Aucun point fort identifié</p>
+    <p class="text-sm">(Moyenne ≥ 10/20)</p> <!-- Changé de 14 à 10 -->
+</div>
         </div>
         
         <!-- Points faibles -->
@@ -228,10 +228,10 @@
                 <canvas id="weakSubjectsChart"></canvas>
             </div>
             <div id="no-weak-subjects" class="text-center py-8 text-gray-500">
-                <i data-feather="frown" class="w-12 h-12 mx-auto mb-2"></i>
-                <p>Aucun point faible majeur</p>
-                <p class="text-sm">(Moyenne < 10/20)</p>
-            </div>
+    <i data-feather="frown" class="w-12 h-12 mx-auto mb-2"></i>
+    <p>Aucun point faible majeur</p>
+    <p class="text-sm">(Moyenne < 10/20)</p> <!-- Déjà correct -->
+</div>
         </div>
     </div>
 </section>
@@ -1910,21 +1910,25 @@ function analyzeSubjects(bulletins) {
 }
 
 // Créer les graphiques
+// Créer les graphiques
 function createCharts(subjectData) {
-    // Séparer points forts et faibles
+    // Séparer points forts et faibles AVEC NOUVELLES BORNES
     const strongSubjects = [];
     const weakSubjects = [];
     
     Object.keys(subjectData).forEach(subjectName => {
         const data = subjectData[subjectName];
         
-        if (data.average >= 14) {
+        // ⭐⭐ POINTS FORTS : de 10 à 20/20 (au lieu de 14-20)
+        if (data.average >= 10) {
             strongSubjects.push({
                 name: subjectName,
                 average: data.average,
                 count: data.count
             });
-        } else if (data.average < 10) {
+        } 
+        // ⭐⭐ POINTS FAIBLES : moins de 10/20
+        else if (data.average < 10) {
             weakSubjects.push({
                 name: subjectName,
                 average: data.average,
@@ -1941,7 +1945,7 @@ function createCharts(subjectData) {
     
     // Créer le graphique points forts
     if (strongSubjects.length > 0) {
-        createBarChart('strongSubjectsChart', strongSubjects, 'green');
+        createBarChart('strongSubjectsChart', strongSubjects, 'strong');
         document.getElementById('no-strong-subjects').classList.add('hidden');
     } else {
         document.getElementById('no-strong-subjects').classList.remove('hidden');
@@ -1950,7 +1954,7 @@ function createCharts(subjectData) {
     
     // Créer le graphique points faibles
     if (weakSubjects.length > 0) {
-        createBarChart('weakSubjectsChart', weakSubjects, 'red');
+        createBarChart('weakSubjectsChart', weakSubjects, 'weak');
         document.getElementById('no-weak-subjects').classList.add('hidden');
     } else {
         document.getElementById('no-weak-subjects').classList.remove('hidden');
@@ -1958,8 +1962,8 @@ function createCharts(subjectData) {
     }
 }
 
-// Créer un graphique en barres
-function createBarChart(canvasId, data, color) {
+// Créer un graphique en barres avec couleurs par note
+function createBarChart(canvasId, data, chartType) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) {
         console.error(`❌ Canvas ${canvasId} non trouvé`);
@@ -1969,26 +1973,32 @@ function createBarChart(canvasId, data, color) {
     // Afficher le canvas
     canvas.style.display = 'block';
     
-    // Couleurs
-    const colors = {
-        green: {
-            bg: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'],
-            border: ['#059669', '#10B981', '#34D399', '#6EE7B7']
-        },
-        red: {
-            bg: ['#EF4444', '#F87171', '#FCA5A5', '#FECACA'],
-            border: ['#DC2626', '#EF4444', '#F87171', '#FCA5A5']
+    // Fonction pour déterminer la couleur selon la note ET le type de graphique
+    function getBarColor(average, type) {
+        if (type === 'strong') {
+            // COULEURS POINTS FORTS (10-20)
+            if (average >= 16) return { bg: '#10B981', border: '#059669' }; // Vert
+            if (average >= 14) return { bg: '#3B82F6', border: '#1D4ED8' }; // Bleu
+            if (average >= 12) return { bg: '#8B5CF6', border: '#7C3AED' }; // Violet
+            return { bg: '#F59E0B', border: '#D97706' }; // Orange (10-11.9)
+        } else {
+            // COULEURS POINTS FAIBLES (0-9.9) - Dégradé de rouge
+            if (average >= 8) return { bg: '#FCA5A5', border: '#F87171' }; // Rouge clair
+            if (average >= 6) return { bg: '#F87171', border: '#EF4444' }; // Rouge moyen
+            if (average >= 4) return { bg: '#EF4444', border: '#DC2626' }; // Rouge
+            if (average >= 2) return { bg: '#DC2626', border: '#B91C1C' }; // Rouge foncé
+            return { bg: '#991B1B', border: '#7F1D1D' }; // Rouge très foncé
         }
-    };
+    }
     
-    const colorSet = colors[color] || colors.green;
-    
-    // Préparer les données
+    // Préparer les données et couleurs
     const labels = data.map(item => 
         item.name.length > 12 ? item.name.substring(0, 12) + '...' : item.name
     );
     
     const averages = data.map(item => item.average);
+    const backgroundColors = data.map(item => getBarColor(item.average, chartType).bg);
+    const borderColors = data.map(item => getBarColor(item.average, chartType).border);
     
     // Détruire l'ancien graphique s'il existe
     if (window[canvasId + 'Instance']) {
@@ -2003,8 +2013,8 @@ function createBarChart(canvasId, data, color) {
             datasets: [{
                 label: 'Moyenne',
                 data: averages,
-                backgroundColor: colorSet.bg,
-                borderColor: colorSet.border,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
                 borderWidth: 2,
                 borderRadius: 6
             }]
@@ -2031,7 +2041,8 @@ function createBarChart(canvasId, data, color) {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: color === 'red' ? 10 : 20,
+                    max: chartType === 'weak' ? 10 : 20, // Limite différente selon le type
+                    min: chartType === 'weak' ? 0 : 10,  // Commence à 10 pour points forts
                     ticks: {
                         callback: function(value) {
                             return value + '/20';
@@ -2047,10 +2058,10 @@ function createBarChart(canvasId, data, color) {
         }
     });
     
-    console.log(`✅ Graphique ${canvasId} créé avec ${data.length} éléments`);
+    console.log(`✅ Graphique ${canvasId} créé (${chartType}) avec ${data.length} éléments`);
 }
 
-// État pas de données
+// État  pas de données
 function showNoDataState() {
     document.getElementById('no-strong-subjects').classList.remove('hidden');
     document.getElementById('no-weak-subjects').classList.remove('hidden');
