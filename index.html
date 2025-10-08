@@ -336,6 +336,7 @@
     <script>
         // Initialize Feather Icons
       // Initialize the page
+// Initialize the page - VERSION CORRIGÉE
 function initPage() {
     feather.replace();
     
@@ -353,16 +354,20 @@ function initPage() {
     let greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bonsoir" : "Bonsoir";
     document.getElementById('greeting').textContent = greeting;
     
-    // Load data from schedule page
+    // ⭐⭐ CHARGEMENT GARANTI - D'abord les données, puis les graphiques
+    updateHomePageGrades(); // Charge les bulletins d'abord
+    
+    // Load other data
     loadNextExam();
     loadNextSubjects();
     updateRemindersDisplay();
     
-    // ⭐⭐ CHARGEMENT GARANTI DES GRAP HIQUES ⭐⭐
+    // ⭐⭐ FORCER LE CHARGEMENT DES GRAPHIQUES APRÈS UN DELAI
     setTimeout(() => {
-        console.log("🎯 DÉMARRAGE DES GRAPHIQUES...");
+        console.log("🎯 FORCAGE DU CHARGEMENT DES GRAPHIQUES");
         loadStrengthWeaknessCharts();
-    }, 500);
+        updateEvolutionChart();
+    }, 800);
     
     // Set up intervals to refresh data
     setInterval(loadNextExam, 1000);
@@ -1218,6 +1223,18 @@ function saveBulletin() {
 
 }
 
+      // Fonction pour forcer la sauvegarde et le rechargement
+function saveBulletinAndRefresh() {
+    saveBulletin(); // Votre fonction existante
+    
+    // FORCER le rechargement des graphiques après sauvegarde
+    setTimeout(() => {
+        console.log("🔄 Rechargement forcé après sauvegarde");
+        loadStrengthWeaknessCharts();
+        updateEvolutionChart();
+        updateHomePageGrades();
+    }, 500);
+}
 // Charger les bulletins sauvegardés
 function loadSavedBulletins() {
     const container = document.getElementById('saved-bulletins-list');
@@ -1658,6 +1675,7 @@ function resetGradesForm() {
 
 // Mettre à jour l'affichage des notes sur la page d'accueil
 // Mettre à jour l'affichage des notes sur la page d'accueil (VERSION CORRIGÉE)
+// Mettre à jour l'affichage des notes sur la page d'accueil (VERSION AMÉLIORÉE)
 function updateHomePageGrades() {
     const bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
     
@@ -1679,8 +1697,12 @@ function updateHomePageGrades() {
             lastBulletinAverage.className = `text-sm ${getGradeColor(latestBulletin.average)}`;
         }
         
-        // Mettre à jour le graphique d'évolution
-        updateEvolutionChart();
+        // ⭐⭐ FORCER LA MISE À JOUR DES GRAPHIQUES
+        setTimeout(() => {
+            updateEvolutionChart();
+            loadStrengthWeaknessCharts();
+        }, 300);
+        
     } else {
         // Aucun bulletin
         if (lastBulletinTitle) {
@@ -1690,6 +1712,12 @@ function updateHomePageGrades() {
             lastBulletinAverage.textContent = "Moyenne: --/20";
             lastBulletinAverage.className = "text-sm text-gray-500";
         }
+        
+        // ⭐⭐ Même sans bulletins, initialiser les graphiques vides
+        setTimeout(() => {
+            loadStrengthWeaknessCharts();
+            updateEvolutionChart();
+        }, 300);
     }
 }
       // Mettre à jour le graphique d'évolution
@@ -2035,6 +2063,34 @@ function forceLoadCharts() {
     console.log("🔧 FORCAGE DU CHARGEMENT DES GRAPHIQUES");
     loadStrengthWeaknessCharts();
 }
+      // Rechargement automatique des graphiques au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("📄 Page chargée - Initialisation...");
+    
+    // Attendre que tout soit chargé
+    setTimeout(() => {
+        initPage();
+        
+        // Recharger les graphiques même après une réinitialisation
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                console.log("🔄 Rechargement après reset");
+                loadStrengthWeaknessCharts();
+            }, 1000);
+        });
+    }, 100);
+});
+
+// Forcer le rechargement quand on revient sur la page
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        console.log("🔄 Page restaurée depuis le cache - Rechargement des graphiques");
+        setTimeout(() => {
+            loadStrengthWeaknessCharts();
+            updateEvolutionChart();
+        }, 500);
+    }
+});
     </script>
   
   <!-- Page Bulletin de Notes -->
@@ -2130,9 +2186,9 @@ function forceLoadCharts() {
         <button onclick="closeGradesPage()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
             Annuler
         </button>
-        <button onclick="saveBulletin()" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-            Enregistrer le bulletin
-        </button>
+        <button onclick="saveBulletinAndRefresh()" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+    Enregistrer le bulletin
+</button>
     </div>
 
     <!-- Liste des bulletins sauvegardés -->
