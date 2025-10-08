@@ -77,6 +77,17 @@
     max-height: none !important;
     overflow: visible !important;
 }
+      .greeting-section {
+    background: linear-gradient(135deg, #6C63FF 0%, #4D44DB 100%);
+}
+
+.profile-image {
+    transition: transform 0.3s ease;
+}
+
+.profile-image:hover {
+    transform: scale(1.05);
+}
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -106,6 +117,33 @@
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-6">
         <!-- Date & Countdown -->
+      <!-- Nouveau bloc Profil et Salutation -->
+<section class="mb-6 bg-white rounded-xl shadow-md p-6 text-gray-800">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <!-- Photo de profil -->
+            <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-300">
+                <img id="homeProfileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
+                <i data-feather="user" class="text-gray-500" id="homeProfileIcon"></i>
+            </div>
+            
+            <!-- Salutation et citation -->
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 id="dynamicGreeting" class="text-2xl font-bold text-gray-900">Bonjour</h1>
+                    <span id="userDisplayName" class="text-2xl font-bold text-gray-900">!</span>
+                </div>
+                <p id="dailyQuote" class="text-gray-600 mt-2 text-sm italic">"La connaissance est la clé du succès"</p>
+            </div>
+        </div>
+        
+        <!-- Indicateur de statut -->
+        <div class="text-right">
+            <div id="userStatusDisplay" class="text-sm bg-gray-100 px-3 py-1 rounded-full inline-block border border-gray-200"></div>
+        </div>
+    </div>
+</section>
+
       <!-- Date & Countdown -->
 <section class="mb-8 bg-white rounded-xl shadow-sm p-6">
     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -230,7 +268,7 @@
             <div id="no-weak-subjects" class="text-center py-8 text-gray-500">
     <i data-feather="frown" class="w-12 h-12 mx-auto mb-2"></i>
     <p>Aucun point faible majeur</p>
-    <p class="text-sm">(Moyenne < 10/20)</p> <!-- Déjà correct -->
+    <p class="text-sm">(Moyenne < 10/20)</p> <!-- Déjà corre ct -->
 </div>
         </div>
     </div>
@@ -2102,6 +2140,153 @@ window.addEventListener('pageshow', function(event) {
         }, 500);
     }
 });
+      
+      // Citations inspirantes
+const quotes = [
+    "La persévérance est la clé de la réussite.",
+    "Chaque expert était autrefois un débutant.",
+    "Le savoir est la seule chose qui s'accroît quand on le partage.",
+    "L'éducation est l'arme la plus puissante pour changer le monde.",
+    "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme.",
+    "La discipline est le pont entre les objectifs et leur réalisation.",
+    "Crois en toi et tout deviendra possible.",
+    "Le futur appartient à ceux qui croient en la beauté de leurs rêves.",
+    "Chaque jour est une nouvelle occasion d'apprendre.",
+    "La curiosité est le moteur de l'apprentissage.",
+    "Les difficultés préparent les gens ordinaires à des destins extraordinaires.",
+    "Ton éducation est un entraînement pour l'esprit.",
+    "Le plus grand risque est de ne prendre aucun risque.",
+    "La qualité de ton apprentissage détermine la qualité de ta vie.",
+    "Sois le changement que tu veux voir dans le monde."
+];
+
+// Salutations dynamiques
+function getDynamicGreeting() {
+    const now = new Date();
+    const hour = now.getHours();
+    const day = now.getDay(); // 0 = dimanche, 1 = lundi...
+    
+    // Salutations selon l'heure
+    if (hour >= 5 && hour < 10) {
+        const greetings = ["Bon réveil", "Belle matinée", "Bon début de journée"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    } else if (hour >= 10 && hour < 12) {
+        const greetings = ["Bonjour", "Bonne avant-midi", "Excellente journée"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    } else if (hour >= 12 && hour < 14) {
+        return "Bon appétit";
+    } else if (hour >= 14 && hour < 18) {
+        const greetings = ["Bon après-midi", "Bonne continuation", "Courage pour la suite"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    } else if (hour >= 18 && hour < 22) {
+        const greetings = ["Bonsoir", "Belle soirée", "Bon repos"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    } else {
+        const greetings = ["Bonne nuit", "Doux rêves", "Repose-toi bien"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    }
+}
+
+// Salutations spéciales selon le jour
+function getDaySpecificGreeting() {
+    const now = new Date();
+    const day = now.getDay();
+    
+    switch(day) {
+        case 1: return "Bon début de semaine";
+        case 5: return "Bon vendredi";
+        case 6: return "Bon weekend";
+        case 0: return "Bon dimanche";
+        default: return null;
+    }
+}
+
+// Obtenir une citation aléatoire
+function getRandomQuote() {
+    const lastQuoteIndex = localStorage.getItem('lastQuoteIndex');
+    let randomIndex;
+    
+    do {
+        randomIndex = Math.floor(Math.random() * quotes.length);
+    } while (randomIndex == lastQuoteIndex && quotes.length > 1);
+    
+    localStorage.setItem('lastQuoteIndex', randomIndex);
+    return quotes[randomIndex];
+}
+
+// Mettre à jour l'affichage du profil
+function updateProfileDisplay() {
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    
+    // Photo de profil
+    const homeProfileImage = document.getElementById('homeProfileImage');
+    const homeProfileIcon = document.getElementById('homeProfileIcon');
+    
+    if (userProfile.profileImage) {
+        homeProfileImage.src = userProfile.profileImage;
+        homeProfileImage.classList.remove('hidden');
+        homeProfileIcon.classList.add('hidden');
+    }
+    
+    // Nom d'utilisateur
+    const userDisplayName = document.getElementById('userDisplayName');
+    if (userProfile.name && userProfile.name !== 'Jean Dupont') {
+        userDisplayName.textContent = userProfile.name + '!';
+    } else {
+        userDisplayName.textContent = '!';
+    }
+    
+    // Salutation dynamique
+    const dynamicGreeting = document.getElementById('dynamicGreeting');
+    const dayGreeting = getDaySpecificGreeting();
+    const timeGreeting = getDynamicGreeting();
+    
+    dynamicGreeting.textContent = dayGreeting || timeGreeting;
+    
+    // Statut
+    const userStatusDisplay = document.getElementById('userStatusDisplay');
+    const statusMap = {
+        'student': '👨‍🎓 Élève',
+        'college': '🎓 Étudiant', 
+        'teacher': '👨‍🏫 Professeur'
+    };
+    userStatusDisplay.textContent = statusMap[userProfile.status] || '👨‍🎓 Élève';
+    
+    // Citation
+    const dailyQuote = document.getElementById('dailyQuote');
+    dailyQuote.textContent = `"${getRandomQuote()}"`;
+}
+
+// Ajoutez cet appel dans la fonction initPage() de l'accueil :
+function initPage() {
+    feather.replace();
+    
+    // ⭐⭐ NOUVEAU : Charger le profil d'abord
+    updateProfileDisplay();
+    
+    // Le reste de votre code existant...
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
+    
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+    
+    // ⭐⭐ PLUS BESOIN de l'ancienne salutation simple
+    updateHomePageGrades();
+    loadNextExam();
+    loadNextSubjects();
+    updateRemindersDisplay();
+    
+    setTimeout(() => {
+        loadStrengthWeaknessCharts();
+        updateEvolutionChart();
+    }, 800);
+    
+    setInterval(loadNextExam, 1000);
+    setInterval(loadNextSubjects, 60000);
+    addDebugButton();
+}
     </script>
   
   <!-- Page Bulletin de Notes -->
