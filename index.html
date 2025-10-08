@@ -2161,12 +2161,13 @@ const quotes = [
 ];
 
 // Salutations dynamiques
+// Salutations dynamiques - VERSION CORRIGÉE
 function getDynamicGreeting() {
     const now = new Date();
     const hour = now.getHours();
-    const day = now.getDay(); // 0 = dimanche, 1 = lundi...
+    console.log("🕐 Heure actuelle:", hour);
     
-    // Salutations selon l'heure
+    // Salutations selon l'heure - CORRECTION DES PLAGES
     if (hour >= 5 && hour < 10) {
         const greetings = ["Bon réveil", "Belle matinée", "Bon début de journée"];
         return greetings[Math.floor(Math.random() * greetings.length)];
@@ -2182,61 +2183,90 @@ function getDynamicGreeting() {
         const greetings = ["Bonsoir", "Belle soirée", "Bon repos"];
         return greetings[Math.floor(Math.random() * greetings.length)];
     } else {
+        // 22h à 4h59 - CORRECTION ICI
         const greetings = ["Bonne nuit", "Doux rêves", "Repose-toi bien"];
         return greetings[Math.floor(Math.random() * greetings.length)];
     }
 }
 
-// Salutations spéciales selon le jour
+// Salutations spéciales selon le jour - VERSION CORRIGÉE
 function getDaySpecificGreeting() {
     const now = new Date();
-    const day = now.getDay();
+    const day = now.getDay(); // 0 = dimanche, 1 = lundi...
     
+    // Uniquement les jours spéciaux, pas tous les jours
     switch(day) {
-        case 1: return "Bon début de semaine";
-        case 5: return "Bon vendredi";
-        case 6: return "Bon weekend";
-        case 0: return "Bon dimanche";
+        case 1: return "Bon début de semaine 💪";
+        case 5: return "Bon vendredi 🎉"; 
+        case 6: 
+        case 0: return "Bon weekend 😊";
         default: return null;
     }
 }
 
 // Obtenir une citation aléatoire
+// Obtenir une citation aléatoire - VERSION CORRIGÉE
 function getRandomQuote() {
-    const lastQuoteIndex = localStorage.getItem('lastQuoteIndex');
-    let randomIndex;
+    const quotes = [
+        "La persévérance est la clé de la réussite.",
+        "Chaque expert était autrefois un débutant.",
+        "Le savoir est la seule chose qui s'accroît quand on le partage.",
+        "L'éducation est l'arme la plus puissante pour changer le monde.",
+        "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme.",
+        "La discipline est le pont entre les objectifs et leur réalisation.",
+        "Crois en toi et tout deviendra possible.",
+        "Le futur appartient à ceux qui croient en la beauté de leurs rêves.",
+        "Chaque jour est une nouvelle occasion d'apprendre.",
+        "La curiosité est le moteur de l'apprentissage.",
+        "Les difficultés préparent les gens ordinaires à des destins extraordinaires.",
+        "Ton éducation est un entraînement pour l'esprit.",
+        "Le plus grand risque est de ne prendre aucun risque.",
+        "La qualité de ton apprentissage détermine la qualité de ta vie.",
+        "Sois le changement que tu veux voir dans le monde."
+    ];
     
-    do {
-        randomIndex = Math.floor(Math.random() * quotes.length);
-    } while (randomIndex == lastQuoteIndex && quotes.length > 1);
+    // Utiliser l'heure actuelle comme seed pour varier les citations
+    const now = new Date();
+    const seed = now.getHours() * 60 + now.getMinutes(); // Minute dans la journée
     
-    localStorage.setItem('lastQuoteIndex', randomIndex);
-    return quotes[randomIndex];
+    // Choisir une citation basée sur le temps pour varier
+    const quoteIndex = seed % quotes.length;
+    
+    console.log("📖 Citation choisie:", quoteIndex, quotes[quoteIndex]);
+    
+    return quotes[quoteIndex];
 }
 
 // Mettre à jour l'affichage du profil
+// Mettre à jour l'affichage du profil - VERSION CORRIGÉE
 function updateProfileDisplay() {
     const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    console.log("📸 Profil chargé:", userProfile);
     
-    // Photo de profil
+    // Photo de profil - CORRECTION ICI
     const homeProfileImage = document.getElementById('homeProfileImage');
     const homeProfileIcon = document.getElementById('homeProfileIcon');
     
-    if (userProfile.profileImage) {
+    if (userProfile.profileImage && userProfile.profileImage !== '') {
+        console.log("🖼️ Photo trouvée:", userProfile.profileImage.substring(0, 50) + "...");
         homeProfileImage.src = userProfile.profileImage;
         homeProfileImage.classList.remove('hidden');
         homeProfileIcon.classList.add('hidden');
+    } else {
+        console.log("❌ Aucune photo de profil");
+        homeProfileImage.classList.add('hidden');
+        homeProfileIcon.classList.remove('hidden');
     }
     
-    // Nom d'utilisateur
+    // Nom d'utilisateur - CORRECTION ICI
     const userDisplayName = document.getElementById('userDisplayName');
-    if (userProfile.name && userProfile.name !== 'Jean Dupont') {
+    if (userProfile.name && userProfile.name !== 'Jean Dupont' && userProfile.name.trim() !== '') {
         userDisplayName.textContent = userProfile.name + '!';
     } else {
         userDisplayName.textContent = '!';
     }
     
-    // Salutation dynamique
+    // Salutation dynamique - CORRECTION ICI
     const dynamicGreeting = document.getElementById('dynamicGreeting');
     const dayGreeting = getDaySpecificGreeting();
     const timeGreeting = getDynamicGreeting();
@@ -2252,7 +2282,7 @@ function updateProfileDisplay() {
     };
     userStatusDisplay.textContent = statusMap[userProfile.status] || '👨‍🎓 Élève';
     
-    // Citation
+    // Citation - CORRECTION ICI
     const dailyQuote = document.getElementById('dailyQuote');
     dailyQuote.textContent = `"${getRandomQuote()}"`;
 }
@@ -2261,10 +2291,11 @@ function updateProfileDisplay() {
 function initPage() {
     feather.replace();
     
-    // ⭐⭐ NOUVEAU : Charger le profil d'abord
+    // ⭐⭐ FORCER le chargement du profil en PREMIER
+    console.log("🚀 Initialisation de la page...");
     updateProfileDisplay();
     
-    // Le reste de votre code existant...
+    // Le reste...
     const now = new Date();
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
@@ -2272,7 +2303,6 @@ function initPage() {
     updateCurrentTime();
     setInterval(updateCurrentTime, 1000);
     
-    // ⭐⭐ PLUS BESOIN de l'ancienne salutation simple
     updateHomePageGrades();
     loadNextExam();
     loadNextSubjects();
