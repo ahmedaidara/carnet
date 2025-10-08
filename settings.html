@@ -324,18 +324,46 @@ saveProfileBtn.addEventListener('click', () => {
 });
 
 // Fonction d'alerte personnalisée
-function showCustomAlert(message, type = 'info') {
+// Fonction d'alerte personnalisée - VERSION AMÉLIORÉE
+function showCustomAlert(message, type = 'success') {
+    // Supprimer les alertes existantes
+    const existingAlerts = document.querySelectorAll('.custom-success-alert');
+    existingAlerts.forEach(alert => alert.remove());
+    
     const alert = document.createElement('div');
-    alert.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 custom-alert ${
-        type === 'success' ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
-    }`;
-    alert.textContent = message;
+    alert.className = `fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 custom-success-alert`;
+    alert.innerHTML = `
+        <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in-up">
+            <i data-feather="check-circle" class="w-5 h-5"></i>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
     document.body.appendChild(alert);
+    
+    feather.replace();
     
     setTimeout(() => {
         alert.remove();
     }, 3000);
 }
+
+// Ajoutez ce style dans le CSS des paramètres :
+<style>
+.animate-fade-in-up {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+</style>
 
 // Appeler le chargement de l'image au démarrage
 document.addEventListener('DOMContentLoaded', function() {
