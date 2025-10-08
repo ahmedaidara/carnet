@@ -53,22 +53,28 @@
         <section class="mb-8">
             <h2 class="text-lg font-semibold mb-4">Profil</h2>
             <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex flex-col items-center mb-6">
-                    <div class="profile-avatar w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mb-3 overflow-hidden">
-                        <i data-feather="user" class="text-purple-600 w-10 h-10"></i>
-                    </div>
-                    <div class="text-center">
-                        <h3 id="userName" class="font-medium text-gray-800 text-lg" contenteditable="true">Jean Dupont</h3>
-                        <div class="flex items-center justify-center mt-1">
-                            <select id="userStatus" class="text-sm text-gray-500 bg-transparent border-none focus:ring-0">
-                                <option value="student">Élève</option>
-                                <option value="college">Étudiant</option>
-                                <option value="teacher">Professeur</option>
-                            </select>
-                            <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 ml-1"></i>
-                        </div>
-                    </div>
-                </div>
+               <!-- Dans la section Profile, remplacez le bloc avatar par : -->
+<div class="flex flex-col items-center mb-6">
+    <div class="profile-avatar w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mb-3 overflow-hidden cursor-pointer relative" onclick="document.getElementById('profileImageInput').click()">
+        <img id="profileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
+        <i data-feather="user" class="text-purple-600 w-10 h-10" id="profileIcon"></i>
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+            <i data-feather="camera" class="text-white w-6 h-6"></i>
+        </div>
+    </div>
+    <input type="file" id="profileImageInput" accept="image/*" class="hidden" onchange="handleProfileImage(event)">
+    <div class="text-center">
+        <h3 id="userName" class="font-medium text-gray-800 text-lg" contenteditable="true">Jean Dupont</h3>
+        <div class="flex items-center justify-center mt-1">
+            <select id="userStatus" class="text-sm text-gray-500 bg-transparent border-none focus:ring-0">
+                <option value="student">Élève</option>
+                <option value="college">Étudiant</option>
+                <option value="teacher">Professeur</option>
+            </select>
+            <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 ml-1"></i>
+        </div>
+    </div>
+</div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Classe/Niveau</label>
@@ -266,7 +272,75 @@
                 document.body.style.overflow = '';
             }
         }
-        
+        // Gestion de l'image de profil
+function handleProfileImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const profileImage = document.getElementById('profileImage');
+            const profileIcon = document.getElementById('profileIcon');
+            
+            profileImage.src = e.target.result;
+            profileImage.classList.remove('hidden');
+            profileIcon.classList.add('hidden');
+            
+            // Sauvegarder l'image en base64
+            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            userProfile.profileImage = e.target.result;
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Charger l'image de profil au démarrage
+function loadProfileImage() {
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    const profileImage = document.getElementById('profileImage');
+    const profileIcon = document.getElementById('profileIcon');
+    
+    if (userProfile.profileImage) {
+        profileImage.src = userProfile.profileImage;
+        profileImage.classList.remove('hidden');
+        profileIcon.classList.add('hidden');
+    }
+}
+
+// Modifiez la fonction de sauvegarde existante
+saveProfileBtn.addEventListener('click', () => {
+    const userProfile = {
+        name: document.getElementById('userName').textContent,
+        status: document.getElementById('userStatus').value,
+        class: document.getElementById('userClass').value,
+        email: document.getElementById('userEmail').value,
+        profileImage: document.getElementById('profileImage').src || ''
+    };
+    
+    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    
+    // Show success message
+    showCustomAlert('Profil enregistré avec succès!', 'success');
+});
+
+// Fonction d'alerte personnalisée
+function showCustomAlert(message, type = 'info') {
+    const alert = document.createElement('div');
+    alert.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 custom-alert ${
+        type === 'success' ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
+    }`;
+    alert.textContent = message;
+    document.body.appendChild(alert);
+    
+    setTimeout(() => {
+        alert.remove();
+    }, 3000);
+}
+
+// Appeler le chargement de l'image au démarrage
+document.addEventListener('DOMContentLoaded', function() {
+    loadProfileImage();
+});
         // Empty trash
         emptyTrashBtn.addEventListener('click', () => {
             toggleConfirmModal(true, 'Voulez-vous vraiment vider la corbeille ? Cette action est irréversible.');
