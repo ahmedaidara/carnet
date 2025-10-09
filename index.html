@@ -2286,6 +2286,125 @@ function updateProfileDisplay() {
     const dailyQuote = document.getElementById('dailyQuote');
     dailyQuote.textContent = `"${getRandomQuote()}"`;
 }
+      
+      
+      // Mettre à jour l'affichage du profil - VERSION CORRIGÉE
+function updateProfileDisplay() {
+    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    console.log("📸 Profil chargé:", userProfile);
+    
+    // Photo de profil
+    const homeProfileImage = document.getElementById('homeProfileImage');
+    const homeProfileIcon = document.getElementById('homeProfileIcon');
+    
+    if (userProfile.profileImage && userProfile.profileImage !== '') {
+        console.log("🖼️ Photo trouvée:", userProfile.profileImage.substring(0, 50) + "...");
+        homeProfileImage.src = userProfile.profileImage;
+        homeProfileImage.classList.remove('hidden');
+        homeProfileIcon.classList.add('hidden');
+    } else {
+        console.log("❌ Aucune photo de profil");
+        homeProfileImage.classList.add('hidden');
+        homeProfileIcon.classList.remove('hidden');
+    }
+    
+    // Nom d'utilisateur
+    const userDisplayName = document.getElementById('userDisplayName');
+    if (userProfile.name && userProfile.name !== 'Jean Dupont' && userProfile.name.trim() !== '') {
+        userDisplayName.textContent = userProfile.name + '!';
+    } else {
+        userDisplayName.textContent = '!';
+    }
+    
+    // Salutation dynamique
+    const dynamicGreeting = document.getElementById('dynamicGreeting');
+    const dayGreeting = getDaySpecificGreeting();
+    const timeGreeting = getDynamicGreeting();
+    
+    dynamicGreeting.textContent = dayGreeting || timeGreeting;
+    
+    // Statut
+    const userStatusDisplay = document.getElementById('userStatusDisplay');
+    const statusMap = {
+        'student': '👨‍🎓 Élève',
+        'college': '🎓 Étudiant', 
+        'teacher': '👨‍🏫 Professeur'
+    };
+    userStatusDisplay.textContent = statusMap[userProfile.status] || '👨‍🎓 Élève';
+    
+    // Citation
+    const dailyQuote = document.getElementById('dailyQuote');
+    dailyQuote.textContent = `"${getRandomQuote()}"`;
+}
+
+// Salutations dynamiques - VERSION CORRIGÉE
+function getDynamicGreeting() {
+    const now = new Date();
+    const hour = now.getHours();
+    console.log("🕐 Heure actuelle:", hour);
+    
+    // Salutations selon l'heure
+    if (hour >= 5 && hour < 10) {
+        const greetings = ["Bon réveil", "Belle matinée", "Bon début de journée"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    } else if (hour >= 10 && hour < 12) {
+        const greetings = ["Bonjour", "Bonne avant-midi", "Excellente journée"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    } else if (hour >= 12 && hour < 14) {
+        return "Bon appétit";
+    } else if (hour >= 14 && hour < 18) {
+        const greetings = ["Bon après-midi", "Bonne continuation", "Courage pour la suite"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    } else if (hour >= 18 && hour < 22) {
+        const greetings = ["Bonsoir", "Belle soirée", "Bon repos"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    } else {
+        // 22h à 4h59
+        const greetings = ["Bonne nuit", "Doux rêves", "Repose-toi bien"];
+        return greetings[Math.floor(Math.random() * greetings.length)];
+    }
+}
+
+// Salutations spéciales selon le jour
+function getDaySpecificGreeting() {
+    const now = new Date();
+    const day = now.getDay(); // 0 = dimanche, 1 = lundi...
+    
+    switch(day) {
+        case 1: return "Bon début de semaine 💪";
+        case 5: return "Bon vendredi 🎉"; 
+        case 6: 
+        case 0: return "Bon weekend 😊";
+        default: return null;
+    }
+}
+
+// Obtenir une citation aléatoire
+function getRandomQuote() {
+    const quotes = [
+        "La persévérance est la clé de la réussite.",
+        "Chaque expert était autrefois un débutant.",
+        "Le savoir est la seule chose qui s'accroît quand on le partage.",
+        "L'éducation est l'arme la plus puissante pour changer le monde.",
+        "Le succès, c'est d'aller d'échec en échec sans perdre son enthousiasme.",
+        "La discipline est le pont entre les objectifs et leur réalisation.",
+        "Crois en toi et tout deviendra possible.",
+        "Le futur appartient à ceux qui croient en la beauté de leurs rêves.",
+        "Chaque jour est une nouvelle occasion d'apprendre.",
+        "La curiosité est le moteur de l'apprentissage.",
+        "Les difficultés préparent les gens ordinaires à des destins extraordinaires.",
+        "Ton éducation est un entraînement pour l'esprit.",
+        "Le plus grand risque est de ne prendre aucun risque.",
+        "La qualité de ton apprentissage détermine la qualité de ta vie.",
+        "Sois le changement que tu veux voir dans le monde."
+    ];
+    
+    const now = new Date();
+    const seed = now.getHours() * 60 + now.getMinutes();
+    const quoteIndex = seed % quotes.length;
+    
+    return quotes[quoteIndex];
+}
 
 // Ajoutez cet appel dans la fonction initPage() de l'accueil :
 function initPage() {
@@ -2295,7 +2414,7 @@ function initPage() {
     console.log("🚀 Initialisation de la page...");
     updateProfileDisplay();
     
-    // Le reste...
+    // Le reste du code existant...
     const now = new Date();
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
@@ -2317,6 +2436,21 @@ function initPage() {
     setInterval(loadNextSubjects, 60000);
     addDebugButton();
 }
+      
+      // Rafraîchir l'affichage quand on revient sur la page
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        console.log("🔄 Page restaurée - Mise à jour du profil");
+        updateProfileDisplay();
+    }
+});
+
+// Rafraîchir aussi quand on change de page et qu'on revient
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        setTimeout(updateProfileDisplay, 100);
+    }
+});
     </script>
   
   <!-- Page Bulletin de Notes -->
