@@ -32,6 +32,19 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.3s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -53,28 +66,29 @@
         <section class="mb-8">
             <h2 class="text-lg font-semibold mb-4">Profil</h2>
             <div class="bg-white rounded-xl shadow-sm p-6">
-               <!-- Dans la section Profile, remplacez le bloc avatar par : -->
-<div class="flex flex-col items-center mb-6">
-    <div class="profile-avatar w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mb-3 overflow-hidden cursor-pointer relative" onclick="document.getElementById('profileImageInput').click()">
-        <img id="profileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
-        <i data-feather="user" class="text-purple-600 w-10 h-10" id="profileIcon"></i>
-        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-            <i data-feather="camera" class="text-white w-6 h-6"></i>
-        </div>
-    </div>
-    <input type="file" id="profileImageInput" accept="image/*" class="hidden" onchange="handleProfileImage(event)">
-    <div class="text-center">
-        <h3 id="userName" class="font-medium text-gray-800 text-lg" contenteditable="true">Jean Dupont</h3>
-        <div class="flex items-center justify-center mt-1">
-            <select id="userStatus" class="text-sm text-gray-500 bg-transparent border-none focus:ring-0">
-                <option value="student">Élève</option>
-                <option value="college">Étudiant</option>
-                <option value="teacher">Professeur</option>
-            </select>
-            <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 ml-1"></i>
-        </div>
-    </div>
-</div>
+                <!-- Bloc Avatar Corrigé -->
+                <div class="flex flex-col items-center mb-6">
+                    <div class="profile-avatar w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mb-3 overflow-hidden cursor-pointer relative" onclick="document.getElementById('profileImageInput').click()">
+                        <img id="profileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
+                        <i data-feather="user" class="text-purple-600 w-10 h-10" id="profileIcon"></i>
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <i data-feather="camera" class="text-white w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <input type="file" id="profileImageInput" accept="image/*" class="hidden" onchange="handleProfileImage(event)">
+                    <div class="text-center">
+                        <h3 id="userName" class="font-medium text-gray-800 text-lg" contenteditable="true">Jean Dupont</h3>
+                        <div class="flex items-center justify-center mt-1">
+                            <select id="userStatus" class="text-sm text-gray-500 bg-transparent border-none focus:ring-0">
+                                <option value="student">Élève</option>
+                                <option value="college">Étudiant</option>
+                                <option value="teacher">Professeur</option>
+                            </select>
+                            <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 ml-1"></i>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Classe/Niveau</label>
@@ -234,16 +248,76 @@
         const confirmAction = document.getElementById('confirmAction');
         const confirmMessage = document.getElementById('confirmMessage');
         
+        // Gestion de l'image de profil
+        function handleProfileImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const profileImage = document.getElementById('profileImage');
+                    const profileIcon = document.getElementById('profileIcon');
+                    
+                    profileImage.src = e.target.result;
+                    profileImage.classList.remove('hidden');
+                    profileIcon.classList.add('hidden');
+                    
+                    // Sauvegarder l'image en base64
+                    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                    userProfile.profileImage = e.target.result;
+                    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+                    
+                    // Afficher un message de succès
+                    showCustomAlert('Photo de profil mise à jour!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Charger l'image de profil au démarrage
+        function loadProfileImage() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            const profileImage = document.getElementById('profileImage');
+            const profileIcon = document.getElementById('profileIcon');
+            
+            if (userProfile.profileImage) {
+                profileImage.src = userProfile.profileImage;
+                profileImage.classList.remove('hidden');
+                profileIcon.classList.add('hidden');
+            }
+        }
+
+        // Fonction d'alerte personnalisée
+        function showCustomAlert(message, type = 'success') {
+            // Supprimer les alertes existantes
+            const existingAlerts = document.querySelectorAll('.custom-success-alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            const alert = document.createElement('div');
+            alert.className = `fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 custom-success-alert`;
+            alert.innerHTML = `
+                <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in-up">
+                    <i data-feather="check-circle" class="w-5 h-5"></i>
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+            document.body.appendChild(alert);
+            
+            feather.replace();
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
         // Load user data from localStorage if available
-        if (localStorage.getItem('userProfile')) {
-            const userProfile = JSON.parse(localStorage.getItem('userProfile'));
-            document.getElementById('userName').textContent = userProfile.name || 'Jean Dupont';
-            document.getElementById('userStatus').value = userProfile.status || 'student';
-            document.getElementById('userClass').value = userStorage.getItem('userProfile'));
-            document.getElementById('userName').textContent = userProfile.name || 'Jean Dupont';
-            document.getElementById('userStatus').value = userProfile.status || 'student';
-            document.getElementById('userClass').value = userProfile.class || '';
-            document.getElementById('userEmail').value = userProfile.email || '';
+        function loadUserData() {
+            if (localStorage.getItem('userProfile')) {
+                const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+                document.getElementById('userName').textContent = userProfile.name || 'Jean Dupont';
+                document.getElementById('userStatus').value = userProfile.status || 'student';
+                document.getElementById('userClass').value = userProfile.class || '';
+                document.getElementById('userEmail').value = userProfile.email || '';
+            }
         }
         
         // Save profile
@@ -255,10 +329,16 @@
                 email: document.getElementById('userEmail').value
             };
             
+            // Ajouter l'image si elle existe
+            const profileImage = document.getElementById('profileImage');
+            if (profileImage.src) {
+                userProfile.profileImage = profileImage.src;
+            }
+            
             localStorage.setItem('userProfile', JSON.stringify(userProfile));
             
             // Show success message
-            alert('Profil enregistré avec succès!');
+            showCustomAlert('Profil enregistré avec succès!');
         });
         
         // Toggle confirmation modal
@@ -272,103 +352,7 @@
                 document.body.style.overflow = '';
             }
         }
-        // Gestion de l'image de profil
-function handleProfileImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const profileImage = document.getElementById('profileImage');
-            const profileIcon = document.getElementById('profileIcon');
-            
-            profileImage.src = e.target.result;
-            profileImage.classList.remove('hidden');
-            profileIcon.classList.add('hidden');
-            
-            // Sauvegarder l'image en base64
-            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-            userProfile.profileImage = e.target.result;
-            localStorage.setItem('userProfile', JSON.stringify(userProfile));
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-// Charger l'image de profil au démarrage
-function loadProfileImage() {
-    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-    const profileImage = document.getElementById('profileImage');
-    const profileIcon = document.getElementById('profileIcon');
-    
-    if (userProfile.profileImage) {
-        profileImage.src = userProfile.profileImage;
-        profileImage.classList.remove('hidden');
-        profileIcon.classList.add('hidden');
-    }
-}
-
-// Modifiez la fonction de sauvegarde existante
-saveProfileBtn.addEventListener('click', () => {
-    const userProfile = {
-        name: document.getElementById('userName').textContent,
-        status: document.getElementById('userStatus').value,
-        class: document.getElementById('userClass').value,
-        email: document.getElementById('userEmail').value,
-        profileImage: document.getElementById('profileImage').src || ''
-    };
-    
-    localStorage.setItem('userProfile', JSON.stringify(userProfile));
-    
-    // Show success message
-    showCustomAlert('Profil enregistré avec succès!', 'success');
-});
-
-// Fonction d'alerte personnalisée
-// Fonction d'alerte personnalisée - VERSION AMÉLIORÉE
-function showCustomAlert(message, type = 'success') {
-    // Supprimer les alertes existantes
-    const existingAlerts = document.querySelectorAll('.custom-success-alert');
-    existingAlerts.forEach(alert => alert.remove());
-    
-    const alert = document.createElement('div');
-    alert.className = `fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 custom-success-alert`;
-    alert.innerHTML = `
-        <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in-up">
-            <i data-feather="check-circle" class="w-5 h-5"></i>
-            <span class="font-medium">${message}</span>
-        </div>
-    `;
-    document.body.appendChild(alert);
-    
-    feather.replace();
-    
-    setTimeout(() => {
-        alert.remove();
-    }, 3000);
-}
-
-// Ajoutez ce style dans le CSS des paramètres :
-<style>
-.animate-fade-in-up {
-    animation: fadeInUp 0.3s ease-out;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translate(-50%, 20px);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
-}
-</style>
-
-// Appeler le chargement de l'image au démarrage
-document.addEventListener('DOMContentLoaded', function() {
-    loadProfileImage();
-});
+        
         // Empty trash
         emptyTrashBtn.addEventListener('click', () => {
             toggleConfirmModal(true, 'Voulez-vous vraiment vider la corbeille ? Cette action est irréversible.');
@@ -378,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 trashList.innerHTML = '';
                 emptyTrashMessage.classList.remove('hidden');
                 toggleConfirmModal(false);
+                showCustomAlert('Corbeille vidée avec succès!');
             };
         });
         
@@ -392,14 +377,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     emptyTrashMessage.classList.remove('hidden');
                 }
                 
-                // In a real app, this would restore the item to its original location
-                alert('Élément restauré avec succès!');
+                showCustomAlert('Élément restauré avec succès!');
             }
         });
         
         // Confirmation modal handlers
         closeConfirmModal.addEventListener('click', () => toggleConfirmModal(false));
         cancelConfirm.addEventListener('click', () => toggleConfirmModal(false));
+        
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            loadProfileImage();
+            feather.replace();
+        });
         
         // Prevent blue highlight on mobile taps
         document.addEventListener('touchstart', function() {}, true);
