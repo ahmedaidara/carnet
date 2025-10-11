@@ -138,11 +138,7 @@
                 <h1 class="text-xl font-bold text-gray-800">JàngTime</h1>
             </div>
             
-            <div class="relative w-1/2">
-                <input type="text" placeholder="Rechercher..." 
-                       class="w-full px-4 py-2 rounded-full border border-gray-200 focus:border-purple-400 focus:ring-0">
-                <i data-feather="search" class="absolute right-3 top-2.5 text-gray-400"></i>
-            </div>
+
             
             <div class="flex items-center space-x-4">
                
@@ -156,7 +152,7 @@
 
     <!-- Page Accueil -->
     <main id="home-page" class="page active flex-grow container mx-auto px-4 py-6">
-        <!-- Nouveau bloc Profil et Saltation -->
+        <!-- Nouveau bloc Profil et Satation -->
         <section class="mb-6 bg-white rounded-xl shadow-md p-6 text-gray-800">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
@@ -1117,7 +1113,7 @@ function addReminder() {
     const title = document.getElementById('reminder-title').value.trim();
     const details = document.getElementById('reminder-details').value.trim();
     const date = document.getElementById('reminder-date').value;
-    if (!title || !date) return alert("Titre et date obligatoires !");
+    if (!title || !date) return showCustomAlert("Titre et date obligatoires !", 'error');
     
     const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
     reminders.push({ title, details, date });
@@ -1195,8 +1191,20 @@ function closeReminderPage() {
 
 function deleteReminder(index) {
     const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    const reminder = reminders[index];
+    
+    // Ajouter à la corbeille
+    addToTrash({
+        type: 'Rappel',
+        title: reminder.title,
+        description: reminder.details || `Date: ${reminder.date}`,
+        data: reminder
+    });
+    
+    // Supprimer de la liste originale
     reminders.splice(index, 1);
     localStorage.setItem('reminders', JSON.stringify(reminders));
+    
     renderReminders();
 }
 
@@ -1344,7 +1352,7 @@ function addExam() {
     const name = document.getElementById('exam-name').value.trim();
     const date = document.getElementById('exam-date').value;
     const time = document.getElementById('exam-time').value;
-    if (!name || !date || !time) return alert("Veuillez remplir tous les champs !");
+    if (!name || !date || !time) return showCustomAlert("Veuillez remplir tous les champs !", 'error');
     
     const exams = JSON.parse(localStorage.getItem('exams')) || [];
     exams.push({ name, date, time });
@@ -1419,8 +1427,20 @@ function closeExamPage() {
 
 function deleteExam(index) {
     const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    const exam = exams[index];
+    
+    // Ajouter à la corbeille au lieu de supprimer directement
+    addToTrash({
+        type: 'Examen',
+        title: exam.name,
+        description: `Le ${exam.date} à ${exam.time}`,
+        data: exam
+    });
+    
+    // Supprimer de la liste originale
     exams.splice(index, 1);
     localStorage.setItem('exams', JSON.stringify(exams));
+    
     renderExams();
     loadNextExam();
 }
@@ -1588,13 +1608,13 @@ function saveBulletin() {
     const rank = document.getElementById('student-rank').value.trim();
     
     if (!title) {
-        alert('Veuillez donner un titre au bulletin');
+       showCustomAlert('Veuillez donner un titre au bulletin', 'error');
         return;
     }
     
     const results = calculateGrades();
     if (results.average === 0) {
-        if (!confirm('Aucune note saisie. Voulez-vous quand même enregistrer ?')) {
+        if (!confirmCustom('Aucune note saisie. Voulez-vous quand même enregistrer ?')) {
             return;
         }
     }
@@ -1636,7 +1656,7 @@ function saveBulletin() {
     // Réinitialiser le formulaire
     resetGradesForm();
     
-    alert('Bulletin enregistré avec succès !');
+    showCustomAlert('Bulletin enregistré avec succès !', 'success');
       setTimeout(loadStrengthWeaknessCharts, 100);
 
 }
@@ -1950,38 +1970,57 @@ function closeDeleteModal() {
 
 // Supprimer définitivement un bulletin - VERSION CORRIGÉE
 function deleteBulletin(bulletinId) {
-    console.log("🗑️ Suppression du bulletin:", bulletinId);
-    
     let bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
     const bulletinToDelete = bulletins.find(b => b.id === bulletinId);
     
-    if (!bulletinToDelete) {
-        console.error("❌ Bulletin non trouvé lors de la suppression");
-        return;
-    }
+    if (!bulletinToDelete) return;
     
-    // Filtrer pour supprimer le bulletin
+    // Ajouter à la corbeille
+    addToTrash({
+        type: 'Bulletin',
+        title: bulletinToDelete.title,
+        description: `Moyenne: ${bulletinToDelete.average}/20 - ${bulletinToDelete.date}`,
+        data: bulletinToDelete
+    });
+    
+    // Supprimer de la liste originale
     bulletins = bulletins.filter(b => b.id !== bulletinId);
-    
-    // Sauvegarder la nouvelle liste
     localStorage.setItem('bulletins', JSON.stringify(bulletins));
     
     // Fermer TOUTES les modales
     closeDeleteModal();
-    closeBulletinModal(); // Fermer aussi la fenêtre de détails
+    closeBulletinModal();
     
     // Mettre à jour l'affichage
     loadSavedBulletins();
     updateHomePageGrades();
     updateEvolutionChart();
     
-    console.log("✅ Bulletin supprimé avec succès");
-    
-    // Message de confirmation
-    showNotification(`Bulletin "${bulletinToDelete.title}" supprimé`, 'success');
-  setTimeout(loadStrengthWeaknessCharts, 100);
+    showCustomAlert(`Bulletin "${bulletinToDelete.title}" déplacé vers la corbeille`);
+    setTimeout(loadStrengthWeaknessCharts, 100);
 }
       
+      function deleteSubject(scheduleIndex, day, timeSlot) {
+    const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    const schedule = schedules[scheduleIndex];
+    const subjectName = schedule.data[day][timeSlot];
+    
+    // Ajouter à la corbeille
+    addToTrash({
+        type: 'Matière',
+        title: subjectName,
+        description: `${day} à ${timeSlot}`,
+        data: { scheduleIndex, day, timeSlot, subjectName }
+    });
+    
+    // Supprimer de l'emploi du temps
+    schedule.data[day][timeSlot] = '';
+    localStorage.setItem('schedules', JSON.stringify(schedules));
+    
+    // Recharger l'affichage
+    renderSchedule();
+    showCustomAlert('Matière déplacée vers la corbeille');
+}
 // Fermer la modale de détail - VERSION AMÉLIORÉE
 function closeBulletinModal() {
     const modal = document.getElementById('bulletin-details-modal');
@@ -2585,6 +2624,117 @@ function getDaySpecificGreeting() {
 }
 
 // Obtenir une citation aléatoire
+      // Fonction pour ajouter un élément à la corbeille
+function addToTrash(item) {
+    const trash = JSON.parse(localStorage.getItem('trash') || '[]');
+    
+    const trashItem = {
+        id: Date.now().toString(),
+        type: item.type,
+        title: item.title,
+        description: item.description,
+        data: item.data,
+        deletedAt: new Date().toLocaleDateString('fr-FR'),
+        deletedTime: new Date().toLocaleTimeString('fr-FR')
+    };
+    
+    trash.push(trashItem);
+    localStorage.setItem('trash', JSON.stringify(trash));
+    
+    // Supprimer l'élément original
+    deleteOriginalItem(item);
+    
+    showCustomAlert(`${item.type} déplacé vers la corbeille`);
+}
+
+// Supprimer l'élément original selon son type
+function deleteOriginalItem(item) {
+    switch(item.type) {
+        case 'Examen':
+            const exams = JSON.parse(localStorage.getItem('exams') || '[]');
+            const filteredExams = exams.filter(exam => exam.name !== item.title);
+            localStorage.setItem('exams', JSON.stringify(filteredExams));
+            break;
+            
+        case 'Rappel':
+            const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+            const filteredReminders = reminders.filter(reminder => reminder.title !== item.title);
+            localStorage.setItem('reminders', JSON.stringify(filteredReminders));
+            break;
+            
+        case 'Matière':
+            // Pour les matières, c'est plus complexe - on garde juste dans la corbeille
+            break;
+    }
+}
+
+// Charger la corbeille
+function loadTrash() {
+    const trash = JSON.parse(localStorage.getItem('trash') || '[]');
+    const trashList = document.getElementById('trashList');
+    const emptyMessage = document.getElementById('emptyTrashMessage');
+    
+    if (trash.length === 0) {
+        trashList.innerHTML = '';
+        emptyMessage.classList.remove('hidden');
+        return;
+    }
+    
+    emptyMessage.classList.add('hidden');
+    trashList.innerHTML = trash.map(item => `
+        <div class="trash-item px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+            <div>
+                <div class="font-medium">${item.title}</div>
+                <div class="text-sm text-gray-500">${item.type} supprimé le ${item.deletedAt}</div>
+                ${item.description ? `<div class="text-xs text-gray-400">${item.description}</div>` : ''}
+            </div>
+            <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600" onclick="restoreFromTrash('${item.id}')">
+                <i data-feather="refresh-ccw" class="w-4 h-4"></i>
+            </button>
+        </div>
+    `).join('');
+    
+    feather.replace();
+}
+
+// Restaurer un élément
+function restoreFromTrash(itemId) {
+    const trash = JSON.parse(localStorage.getItem('trash') || '[]');
+    const itemIndex = trash.findIndex(item => item.id === itemId);
+    
+    if (itemIndex === -1) return;
+    
+    const item = trash[itemIndex];
+    
+    // Restaurer selon le type
+    switch(item.type) {
+        case 'Examen':
+            const exams = JSON.parse(localStorage.getItem('exams') || '[]');
+            exams.push(item.data);
+            localStorage.setItem('exams', JSON.stringify(exams));
+            break;
+            
+        case 'Rappel':
+            const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+            reminders.push(item.data);
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+            break;
+    }
+    
+    // Retirer de la corbeille
+    trash.splice(itemIndex, 1);
+    localStorage.setItem('trash', JSON.stringify(trash));
+    
+    loadTrash();
+    showCustomAlert(`${item.type} restauré avec succès`);
+}
+
+// Vider la corbeille
+function emptyTrash() {
+    localStorage.setItem('trash', '[]');
+    loadTrash();
+    showCustomAlert('Corbeille vidée avec succès');
+}
 // Obtenir une citation aléatoire - VERSION CORRIGÉE
 function getRandomQuote() {
     const quotes = [
@@ -2618,6 +2768,309 @@ function getRandomQuote() {
 }
 
 // Mettre à jour l'affichage du profil
+      // Fonction de recherche globale
+// Fonction de recherche globale en temps réel
+function performSearch(searchTerm) {
+    if (!searchTerm || searchTerm.trim() === '') {
+        closeSearchResults();
+        return;
+    }
+    
+    const term = searchTerm.toLowerCase().trim();
+    const results = [];
+    
+    // Recherche dans TOUT sans filtre strict
+    searchInAllData(term, results);
+    
+    // Afficher les résultats immédiatement
+    showSearchResults(results, term);
+}
+
+// Recherche approfondie dans toutes les données
+function searchInAllData(term, results) {
+    // 1. EXAMENS
+    const exams = JSON.parse(localStorage.getItem('exams') || '[]');
+    exams.forEach(exam => {
+        if (exam.name.toLowerCase().includes(term) || 
+            exam.date.includes(term) || 
+            exam.time.includes(term)) {
+            results.push({
+                type: 'Examen',
+                title: exam.name,
+                description: `📅 ${exam.date} ⏰ ${exam.time}`,
+                action: () => { openExamPage(); closeSearchResults(); }
+            });
+        }
+    });
+    
+    // 2. RAPPELS
+    const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+    reminders.forEach(reminder => {
+        if (reminder.title.toLowerCase().includes(term) || 
+            (reminder.details && reminder.details.toLowerCase().includes(term)) ||
+            reminder.date.includes(term)) {
+            results.push({
+                type: 'Rappel',
+                title: reminder.title,
+                description: `📝 ${reminder.details || 'Sans détail'} • ${reminder.date}`,
+                action: () => { openReminderPage(); closeSearchResults(); }
+            });
+        }
+    });
+    
+    // 3. MATIÈRES (emplois du temps)
+    const schedules = JSON.parse(localStorage.getItem('schedules') || '[]');
+    schedules.forEach((schedule, scheduleIndex) => {
+        Object.keys(schedule.data || {}).forEach(day => {
+            Object.keys(schedule.data[day] || {}).forEach(time => {
+                const subject = schedule.data[day][time];
+                if (subject && subject.toLowerCase().includes(term)) {
+                    results.push({
+                        type: 'Matière',
+                        title: subject,
+                        description: `📚 ${day} • ${time} • ${schedule.name || 'Emploi du temps'}`,
+                        action: () => { 
+                            showPage('schedule-page'); 
+                            closeSearchResults();
+                            // Optionnel: highlight la matière
+                            highlightSubject(scheduleIndex, day, time);
+                        }
+                    });
+                }
+            });
+        });
+    });
+    
+    // 4. BULLETINS
+    const bulletins = JSON.parse(localStorage.getItem('bulletins') || '[]');
+    bulletins.forEach(bulletin => {
+        if (bulletin.title.toLowerCase().includes(term) ||
+            (bulletin.studentName && bulletin.studentName.toLowerCase().includes(term)) ||
+            (bulletin.studentClass && bulletin.studentClass.toLowerCase().includes(term)) ||
+            bulletin.date.includes(term)) {
+            results.push({
+                type: 'Bulletin',
+                title: bulletin.title,
+                description: `📊 Moyenne: ${bulletin.average}/20 • ${bulletin.date}`,
+                action: () => { openGradesPage(); closeSearchResults(); }
+            });
+        }
+        
+        // Recherche dans les notes des matières du bulletin
+        bulletin.subjects.forEach(subject => {
+            if (subject.name && subject.name.toLowerCase().includes(term)) {
+                results.push({
+                    type: 'Note',
+                    title: `${subject.name} - ${subject.grade}/20`,
+                    description: `📋 ${bulletin.title} • Coeff: ${subject.coeff}`,
+                    action: () => { openGradesPage(); closeSearchResults(); }
+                });
+            }
+        });
+    });
+    
+    // 5. CORBEILLE
+    const trash = JSON.parse(localStorage.getItem('trash') || '[]');
+    trash.forEach(item => {
+        if (item.title.toLowerCase().includes(term) || 
+            item.type.toLowerCase().includes(term) ||
+            item.description.toLowerCase().includes(term)) {
+            results.push({
+                type: `🗑️ ${item.type}`,
+                title: item.title,
+                description: `Corbeille • Supprimé le ${item.deletedAt}`,
+                action: () => { showPage('settings-page'); closeSearchResults(); }
+            });
+        }
+    });
+}
+
+// Afficher les résultats de recherche
+// Afficher les résultats de recherche
+function showSearchResults(results, searchTerm) {
+    closeSearchResults(); // Fermer les anciens résultats
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-30 z-50 flex justify-center pt-20';
+    modal.id = 'search-results-modal';
+    modal.onclick = closeSearchResults;
+    
+    modal.innerHTML = `
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-96 overflow-y-auto mx-4 shadow-lg" onclick="event.stopPropagation()">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-purple-50">
+                <h3 class="text-lg font-semibold text-purple-800">
+                    🔍 ${results.length} résultat(s) pour "${searchTerm}"
+                </h3>
+                <button onclick="closeSearchResults()" class="text-purple-600 hover:text-purple-800">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="p-2 max-h-80 overflow-y-auto">
+                ${results.length === 0 ? 
+                    '<div class="text-center text-gray-500 py-8"><i data-feather="search" class="w-12 h-12 mx-auto mb-2"></i><p>Aucun résultat trouvé</p></div>' : 
+                    results.map((result, index) => `
+                        <div class="p-3 border-b border-gray-100 hover:bg-purple-50 cursor-pointer transition-colors" 
+                             onclick="executeSearchAction('${result.type}', '${result.title.replace(/'/g, "\\'")}', '${searchTerm.replace(/'/g, "\\'")}')">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">${result.title}</div>
+                                    <div class="text-sm text-gray-600 mt-1">${result.description}</div>
+                                </div>
+                                <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs rounded-full whitespace-nowrap ml-2">
+                                    ${result.type}
+                                </span>
+                            </div>
+                        </div>
+                    `).join('')
+                }
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    feather.replace();
+}
+
+// Exécuter l'action de recherche avec préservation du texte
+function executeSearchAction(type, title, searchTerm) {
+    console.log("🔍 Navigation vers:", type, "-", title);
+    
+    // Sauvegarder le terme de recherche pour le réutiliser
+    window.lastSearchTerm = searchTerm;
+    window.lastSearchResult = { type, title };
+    
+    // Fermer les résultats
+    closeSearchResults();
+    
+    // Naviguer vers la page appropriée
+    switch(type) {
+        case 'Examen':
+            openExamPage();
+            // Optionnel: highlight l'examen trouvé
+            setTimeout(() => highlightFoundItem('exam', title), 300);
+            break;
+            
+        case 'Rappel':
+            openReminderPage();
+            // Highlight le rappel trouvé
+            setTimeout(() => highlightFoundItem('reminder', title), 300);
+            break;
+            
+        case 'Matière':
+            showPage('schedule-page');
+            // Highlight la matière trouvée
+            setTimeout(() => highlightFoundItem('subject', title), 300);
+            break;
+            
+        case 'Bulletin':
+        case 'Note':
+            openGradesPage();
+            // Highlight le bulletin trouvé
+            setTimeout(() => highlightFoundItem('bulletin', title), 300);
+            break;
+            
+        case '🗑️ Examen':
+        case '🗑️ Rappel':
+        case '🗑️ Matière':
+        case '🗑️ Bulletin':
+            showPage('settings-page');
+            break;
+            
+        default:
+            console.log("Type non géré:", type);
+    }
+}
+
+// Fonction pour highlight l'élément trouvé (à adapter selon vos pages)
+function highlightFoundItem(itemType, title) {
+    console.log(`🎯 Highlight: ${itemType} - ${title}`);
+    
+    switch(itemType) {
+        case 'reminder':
+            // Trouver et highlight le rappel dans la page rappel
+            const reminderItems = document.querySelectorAll('#reminder-list > div');
+            reminderItems.forEach(item => {
+                if (item.textContent.includes(title)) {
+                    item.style.backgroundColor = '#FEF3C7'; // Jaune
+                    item.style.borderLeft = '4px solid #F59E0B';
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Retirer le highlight après 3 secondes
+                    setTimeout(() => {
+                        item.style.backgroundColor = '';
+                        item.style.borderLeft = '';
+                    }, 3000);
+                }
+            });
+            break;
+            
+        case 'exam':
+            // Même logique pour les examens
+            const examItems = document.querySelectorAll('#exam-list > div');
+            examItems.forEach(item => {
+                if (item.textContent.includes(title)) {
+                    item.style.backgroundColor = '#FEF3C7';
+                    item.style.borderLeft = '4px solid #F59E0B';
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    setTimeout(() => {
+                        item.style.backgroundColor = '';
+                        item.style.borderLeft = '';
+                    }, 3000);
+                }
+            });
+            break;
+            
+        // Ajoutez d'autres cas selon vos besoins
+    }
+}
+
+// Fermer les résultats de recherche
+function closeSearchResults() {
+    const existingModal = document.getElementById('search-results-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+}
+
+// Fonction pour une matière (optionnelle)
+function highlightSubject(scheduleIndex, day, time) {
+    // Implémentez cette fonction si vous voulez surligner la matière trouvée
+    console.log(`Highlight: ${scheduleIndex}, ${day}, ${time}`);
+}
+
+// Afficher les résultats de recherche
+function showSearchResults(results, searchTerm) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-96 overflow-y-auto">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Résultats pour "${searchTerm}"</h3>
+                <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                ${results.length === 0 ? 
+                    '<p class="text-center text-gray-500 py-8">Aucun résultat trouvé</p>' : 
+                    results.map(result => `
+                        <div class="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer" onclick="result.action(); this.closest('.fixed').remove();">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="font-medium">${result.title}</div>
+                                    <div class="text-sm text-gray-600">${result.description}</div>
+                                </div>
+                                <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs rounded-full">${result.type}</span>
+                            </div>
+                        </div>
+                    `).join('')
+                }
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    feather.replace();
+}
 // Mettre à jour l'affichage du profil - VERSION CORRIGÉE
 function updateProfileDisplay() {
     const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
@@ -2829,6 +3282,23 @@ window.addEventListener('pageshow', function(event) {
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
         setTimeout(updateProfileDisplay, 100);
+    }
+});
+      // === GESTION DE LA FERMETURE DE LA RECHERCHE ===
+// Fermer la recherche quand on clique ailleurs
+document.addEventListener('click', function(event) {
+    const searchInput = document.getElementById('global-search');
+    const searchModal = document.getElementById('search-results-modal');
+    
+    if (searchModal && !searchInput.contains(event.target) && !searchModal.contains(event.target)) {
+        closeSearchResults();
+    }
+});
+
+// Fermer avec la touche Échap
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeSearchResults();
     }
 });
     </script>
