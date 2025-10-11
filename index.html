@@ -146,7 +146,7 @@
             
             <div class="flex items-center space-x-4">
                
-                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center overflow-hidden">
+                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                     <img id="headerProfileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
                     <i data-feather="user" class="text-purple-600" id="headerProfileIcon"></i>
                 </div>
@@ -161,19 +161,19 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
                     <!-- Photo de profil -->
-                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-300">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-300 flex-shrink-0">
                         <img id="homeProfileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
                         <i data-feather="user" class="text-gray-500" id="homeProfileIcon"></i>
                     </div>
                     
                     <!-- Salutation et citation -->
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h1 id="dynamicGreeting" class="text-2xl font-bold text-gray-900">Bonjour</h1>
-                            <span id="userDisplayName" class="text-2xl font-bold text-gray-900">!</span>
-                        </div>
-                        <p id="dailyQuote" class="text-gray-600 mt-2 text-sm italic">"La connaissance est la clé du succès"</p>
-                    </div>
+                   <div class="flex-1 min-w-0">
+    <div class="flex flex-wrap items-baseline gap-2">
+        <h1 id="dynamicGreeting" class="text-2xl font-bold text-gray-900 whitespace-nowrap">Bonjour</h1>
+        <span id="userDisplayName" class="text-2xl font-bold text-gray-900 break-words min-w-0">!</span>
+    </div>
+    <p id="dailyQuote" class="text-gray-600 mt-2 text-sm italic">"La connaissance est la clé du succès"</p>
+</div>
                 </div>
                 
                 <!-- Indicateur de statut -->
@@ -504,7 +504,7 @@
     </div>
 
     <div id="reminder-list" class="space-y-3">
-        <!-- Les rappels seront affichés ici -->
+        <!-- Les rappels seront afichés ici -->
     </div>
 
     <!-- Fenêtre de formulaire -->
@@ -626,11 +626,11 @@
             // Mettre à jour le statut
             const userStatusDisplay = document.getElementById('userStatusDisplay');
             const statusMap = {
-                'student': '👨‍🎓 Élève',
-                'college': '🎓 Étudiant', 
-                'teacher': '👨‍🏫 Professeur'
+                'student': 'Élève',
+                'college': 'Étudiant', 
+                'teacher': 'Professeur'
             };
-            userStatusDisplay.textContent = statusMap[userProfile.status] || '👨‍🎓 Élève';
+            userStatusDisplay.textContent = statusMap[userProfile.status] || 'Élève';
         }
 
         // Fonction pour surveiller les changements de profil
@@ -2656,11 +2656,11 @@ function updateProfileDisplay() {
     // Statut
     const userStatusDisplay = document.getElementById('userStatusDisplay');
     const statusMap = {
-        'student': '👨‍🎓 Élève',
-        'college': '🎓 Étudiant', 
-        'teacher': '👨‍🏫 Professeur'
+        'student': ' Élève',
+        'college': 'Étudiant', 
+        'teacher': 'Professeur'
     };
-    userStatusDisplay.textContent = statusMap[userProfile.status] || '👨‍🎓 Élève';
+    userStatusDisplay.textContent = statusMap[userProfile.status] || ' Élève';
     
     // Citation - CORRECTION ICI
     const dailyQuote = document.getElementById('dailyQuote');
@@ -2706,11 +2706,11 @@ function updateProfileDisplay() {
     // Statut
     const userStatusDisplay = document.getElementById('userStatusDisplay');
     const statusMap = {
-        'student': '👨‍🎓 Élève',
-        'college': '🎓 Étudiant', 
-        'teacher': '👨‍🏫 Professeur'
+        'student': 'Élève',
+        'college': 'Étudiant', 
+        'teacher': 'Professeur'
     };
-    userStatusDisplay.textContent = statusMap[userProfile.status] || '👨‍🎓 Élève';
+    userStatusDisplay.textContent = statusMap[userProfile.status] || 'Élève';
     
     // Citation
     const dailyQuote = document.getElementById('dailyQuote');
