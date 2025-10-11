@@ -1489,7 +1489,8 @@ function openGradesPage() {
     document.querySelector('nav').classList.add('hidden');
     
     // Initialiser le tableau avec les matières par défaut
-    initializeGradesTable();
+   // Charger les matières personnalisées ou par défaut
+loadCustomSubjects();
     loadSavedBulletins();
     feather.replace();
 }
@@ -1552,22 +1553,28 @@ function addSubjectRow(name = '', coeff = 1) {
     row.id = `subject-row-${rowId}`;
     tableBody.appendChild(row);
     
-    // Ajouter les événements pour le calcul automatique
+    // Ajouter les événements pour le calcul automatique ET la sauvegarde
     const gradeInput = row.querySelector('.subject-grade');
     const coeffInput = row.querySelector('.subject-coeff');
+    const nameInput = row.querySelector('.subject-name');
     
     gradeInput.addEventListener('input', calculateGrades);
-    coeffInput.addEventListener('input', calculateGrades);
+    coeffInput.addEventListener('input', () => {
+        calculateGrades();
+        saveCustomSubjects();
+    });
+    nameInput.addEventListener('input', saveCustomSubjects);
     
     feather.replace();
 }
 
-// Supprimer une ligne de matière
+// Supprimer une lign de matière
 function removeSubjectRow(rowId) {
     const row = document.getElementById(`subject-row-${rowId}`);
     if (row) {
         row.remove();
         calculateGrades();
+        saveCustomSubjects(); // Sauvegarder après suppression
     }
 }
 
@@ -1601,10 +1608,13 @@ function calculateGrades() {
 
 // Sauvegarder le bulletin
 function saveBulletin() {
-    const title = document.getElementById('bulletin-title').value.trim();
-    const date = document.getElementById('bulletin-date').value;
-    const studentName = document.getElementById('student-name').value.trim();
-    const studentClass = document.getElementById('student-class').value.trim();
+  const title = document.getElementById('bulletin-title').value.trim();
+const date = new Date().toISOString().split('T')[0]; // Date actuelle automatique
+
+// Récupérer depuis les paramètres
+const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+const studentName = userProfile.name || '';
+const studentClass = userProfile.class || '';
     const rank = document.getElementById('student-rank').value.trim();
     
     if (!title) {
@@ -1719,6 +1729,34 @@ function loadSavedBulletins() {
 }
 
 // Afficher les détails d'un bulletin
+      // Sauvegarder les matières personnalisées
+function saveCustomSubjects() {
+    const subjects = [];
+    document.querySelectorAll('#grades-table-body tr').forEach(row => {
+        const name = row.querySelector('.subject-name').value.trim();
+        const coeff = parseFloat(row.querySelector('.subject-coeff').value) || 1;
+        if (name) {
+            subjects.push({ name, coeff });
+        }
+    });
+    localStorage.setItem('customSubjects', JSON.stringify(subjects));
+}
+
+// Charger les matières personnalisées
+function loadCustomSubjects() {
+    const customSubjects = JSON.parse(localStorage.getItem('customSubjects') || '[]');
+    if (customSubjects.length > 0) {
+        // Utiliser les matières personnalisées
+        const tableBody = document.getElementById('grades-table-body');
+        tableBody.innerHTML = '';
+        customSubjects.forEach(subject => {
+            addSubjectRow(subject.name, subject.coeff);
+        });
+    } else {
+        // Utiliser les matières par défaut
+        initializeGradesTable();
+    }
+}
 // Afficher les détails d'un bulletin - VERSION AVEC BOUTON SUPPRIMER
 function showBulletinDetails(bulletin) {
     // Si bulletin est une string (venant du HTML), le parser
@@ -1886,7 +1924,7 @@ function showBulletinDetails(bulletin) {
 }
     
 
-      // Fenêtre de confirmation de suppression - VERSION AMÉLIORÉE
+      // Fenêtre de confirmation de suppreLIORÉE
 // Fenêtre de confirmation de suppression - VERSION CORRIGÉE
 function confirmDeleteBulletin(bulletinId) {
     const bulletins = JSON.parse(localStorage.getItem('bulletins')) || [];
@@ -3316,29 +3354,17 @@ document.addEventListener('keydown', function(event) {
         </button>
     </div>
 
-    <!-- Formulaire d'information -->
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <h3 class="text-lg font-semibold mb-4">Informations du bulletin</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Titre du bulletin</label>
-                <input type="text" id="bulletin-title" placeholder="Ex: 1er Devoir du 1er Semestre" 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-200">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input type="date" id="bulletin-date" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
-                <input type="text" id="student-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Classe</label>
-                <input type="text" id="student-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-            </div>
+  <!-- Formulaire d'information SIMPLIFIÉ -->
+<div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <h3 class="text-lg font-semibold mb-4">Informations du bulletin</h3>
+    <div class="grid grid-cols-1 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Titre du bulletin</label>
+            <input type="text" id="bulletin-title" placeholder="Ex: 1er Devoir du 1er Semestre" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-200">
         </div>
     </div>
+</div>
 
     <!-- Tableau des notes -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
@@ -3350,20 +3376,20 @@ document.addEventListener('keydown', function(event) {
         </div>
         
         <div class="overflow-x-auto">
-            <table class="w-full border-collapse">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th class="border p-3 text-left">Matière</th>
-                        <th class="border p-3 text-center">Coefficient</th>
-                        <th class="border p-3 text-center">Note</th>
-                        <th class="border p-3 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="grades-table-body">
-                    <!-- Les lignes seront ajoutées dynamiquement -->
-                </tbody>
-            </table>
-        </div>
+    <table class="w-full border-collapse border">
+        <thead>
+            <tr class="bg-gray-50">
+                <th class="border p-2 text-left w-2/3">Matière</th>
+                <th class="border p-2 text-center w-1/6">Coefficient</th>
+                <th class="border p-2 text-center w-1/6">Note</th>
+                <th class="border p-2 text-center w-1/12">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="grades-table-body">
+            <!-- Les lignes seront ajoutées dynamiquement -->
+        </tbody>
+    </table>
+</div>
     </div>
 
     <!-- Résultats calculés -->
