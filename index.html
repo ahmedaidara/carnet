@@ -46,48 +46,87 @@
         [contenteditable]:focus {
             outline: none;
         }
-      .add-btn {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  background: #2563eb;
-  color: white;
-  font-size: 28px;
-  border: none;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 999;
-}
-
-.exam-list {
-  margin-top: 80px;
-  padding: 20px;
-}
-.reminder-item {
-    max-height: none !important;
-    overflow: visible !important;
-}
-
-.reminder-details {
-    white-space: normal !important;
-    word-wrap: break-word !important;
-    max-height: none !important;
-    overflow: visible !important;
-}
-      .greeting-section {
-    background: linear-gradient(135deg, #6C63FF 0%, #4D44DB 100%);
-}
-
-.profile-image {
-    transition: transform 0.3s ease;
-}
-
-.profile-image:hover {
-    transform: scale(1.05);
-}
+        .add-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: #2563eb;
+            color: white;
+            font-size: 28px;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 999;
+        }
+        .exam-list {
+            margin-top: 80px;
+            padding: 20px;
+        }
+        .reminder-item {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        .reminder-details {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        .greeting-section {
+            background: linear-gradient(135deg, #6C63FF 0%, #4D44DB 100%);
+        }
+        .profile-image {
+            transition: transform 0.3s ease;
+        }
+        .profile-image:hover {
+            transform: scale(1.05);
+        }
+        .profile-avatar {
+            transition: all 0.3s ease;
+        }
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+        .trash-item {
+            transition: all 0.3s ease;
+        }
+        .trash-item:hover {
+            background-color: #F5F3FF;
+        }
+        [contenteditable]:focus {
+            outline: none;
+            background-color: #F5F3FF;
+            border-radius: 4px;
+        }
+        .custom-alert {
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.3s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -96,188 +135,327 @@
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-2">
                 <i data-feather="book-open" class="text-purple-600"></i>
-                <h1 class="text-xl font-bold text-gray-800">StudySync</h1>
+                <h1 class="text-xl font-bold text-gray-800">JàngTime</h1>
             </div>
             
             <div class="relative w-1/2">
-                <input type="text" placeholder="Rechercher une matière, document..." 
+                <input type="text" placeholder="Rechercher..." 
                        class="w-full px-4 py-2 rounded-full border border-gray-200 focus:border-purple-400 focus:ring-0">
                 <i data-feather="search" class="absolute right-3 top-2.5 text-gray-400"></i>
             </div>
             
             <div class="flex items-center space-x-4">
-                <div id="greeting" class="greeting font-medium text-gray-700">Bonjour</div>
-                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-                    <i data-feather="user" class="text-purple-600"></i>
+               
+                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center overflow-hidden">
+                    <img id="headerProfileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
+                    <i data-feather="user" class="text-purple-600" id="headerProfileIcon"></i>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-6">
-        <!-- Date & Countdown -->
-      <!-- Nouveau bloc Profil et Salutation -->
-<section class="mb-6 bg-white rounded-xl shadow-md p-6 text-gray-800">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-            <!-- Photo de profil -->
-            <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-300">
-                <img id="homeProfileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
-                <i data-feather="user" class="text-gray-500" id="homeProfileIcon"></i>
-            </div>
-            
-            <!-- Salutation et citation -->
-            <div>
-                <div class="flex items-center space-x-2">
-                    <h1 id="dynamicGreeting" class="text-2xl font-bold text-gray-900">Bonjour</h1>
-                    <span id="userDisplayName" class="text-2xl font-bold text-gray-900">!</span>
+    <!-- Page Accueil -->
+    <main id="home-page" class="page active flex-grow container mx-auto px-4 py-6">
+        <!-- Nouveau bloc Profil et Saltation -->
+        <section class="mb-6 bg-white rounded-xl shadow-md p-6 text-gray-800">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <!-- Photo de profil -->
+                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-300">
+                        <img id="homeProfileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
+                        <i data-feather="user" class="text-gray-500" id="homeProfileIcon"></i>
+                    </div>
+                    
+                    <!-- Salutation et citation -->
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 id="dynamicGreeting" class="text-2xl font-bold text-gray-900">Bonjour</h1>
+                            <span id="userDisplayName" class="text-2xl font-bold text-gray-900">!</span>
+                        </div>
+                        <p id="dailyQuote" class="text-gray-600 mt-2 text-sm italic">"La connaissance est la clé du succès"</p>
+                    </div>
                 </div>
-                <p id="dailyQuote" class="text-gray-600 mt-2 text-sm italic">"La connaissance est la clé du succès"</p>
+                
+                <!-- Indicateur de statut -->
+                <div class="text-right">
+                    <div id="userStatusDisplay" class="text-sm bg-gray-100 px-3 py-1 rounded-full inline-block border border-gray-200"></div>
+                </div>
             </div>
-        </div>
-        
-        <!-- Indicateur de statut -->
-        <div class="text-right">
-            <div id="userStatusDisplay" class="text-sm bg-gray-100 px-3 py-1 rounded-full inline-block border border-gray-200"></div>
-        </div>
-    </div>
-</section>
+        </section>
 
-      <!-- Date & Countdown -->
-<section class="mb-8 bg-white rounded-xl shadow-sm p-6">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <i data-feather="calendar" class="text-purple-600"></i>
+        <!-- Date & Countdown -->
+        <section class="mb-8 bg-white rounded-xl shadow-sm p-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                        <i data-feather="calendar" class="text-purple-600"></i>
+                    </div>
+                    <div>
+                        <div class="text-gray-500">Aujourd'hui</div>
+                        <div id="current-date" class="font-semibold text-lg">Lundi 12 juin 2023</div>
+                        <div id="current-time" class="font-semibold text-purple-600 text-sm"></div>
+                    </div>
+                </div>
+                
+                <div id="reminder-display" class="flex-grow max-w-md px-4 cursor-pointer" onclick="openReminderPage()">
+                    <div class="flex items-center justify-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <i data-feather="bell" class="text-yellow-500 mr-2"></i>
+                        <span class="font-medium text-gray-700">RAPPEL</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <div class="text-gray-500">Aujourd'hui</div>
-                <div id="current-date" class="font-semibold text-lg">Lundi 12 juin 2023</div>
-                <div id="current-time" class="font-semibold text-purple-600 text-sm"></div>
-            </div>
-        </div>
-        
-<div id="reminder-display" class="flex-grow max-w-md px-4 cursor-pointer" onclick="openReminderPage()">
-    <div class="flex items-center justify-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-        <i data-feather="bell" class="text-yellow-500 mr-2"></i>
-        <span class="font-medium text-gray-700">RAPPEL</span>
-    </div>
-</div>
-    </div>
-</section>
-<!-- PAGE EXAMENS -->
-      
-      
-<!-- Prochain Examen -->
-<section class="mb-8 bg-white rounded-xl shadow-sm p-6">
-    <div class="flex justify-center items-center">
-        <button onclick="openExamPage()" class="text-gray-500 hover:text-purple-600 transition flex flex-col items-center text-center">
-            <i data-feather="clock" class="w-6 h-6 mb-2 text-purple-600"></i>
-            <div>Prochain examen</div>
-            <div id="next-exam" class="font-bold text-purple-600 underline">Chargement...</div>
-        </button>
-    </div>
-</section>
+        </section>
 
-        <!-- Tomorrow's Schedule -->
-     <!-- Prochaines matières -->
-<section class="mb-8">
-    <h2 class="text-xl font-semibold mb-4 flex items-center">
-        <i data-feather="clock" class="mr-2"></i> À suivre
-    </h2>
-    <div class="bg-white rounded-xl shadow-sm p-4">
-        <div class="flex justify-between items-center mb-3">
-            <h3 class="font-medium">Prochaines matières</h3>
-            <a href="schedule.html" class="text-sm text-purple-600 flex items-center">
-                Voir plus <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-            </a>
-        </div>
-        <div id="next-subjects" class="space-y-3">
-            <!-- Les 2 prochaines matières seront affichées ici dynamiquement -->
-        </div>
-    </div>
-</section>
+        <!-- Prochain Examen -->
+        <section class="mb-8 bg-white rounded-xl shadow-sm p-6">
+            <div class="flex justify-center items-center">
+                <button onclick="openExamPage()" class="text-gray-500 hover:text-purple-600 transition flex flex-col items-center text-center">
+                    <i data-feather="clock" class="w-6 h-6 mb-2 text-purple-600"></i>
+                    <div>Prochain examen</div>
+                    <div id="next-exam" class="font-bold text-purple-600 underline">Chargement...</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Prochaines matières -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i data-feather="clock" class="mr-2"></i> À suivre
+            </h2>
+            <div class="bg-white rounded-xl shadow-sm p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-medium">Prochaines matières</h3>
+                    <a href="javascript:void(0)" onclick="showPage('schedule-page')" class="text-sm text-purple-600 flex items-center">
+                        Voir plus <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                    </a>
+                </div>
+                <div id="next-subjects" class="space-y-3">
+                    <!-- Les 2 prochaines matières seront affichées ici dynamiquement -->
+                </div>
+            </div>
+        </section>
 
         <!-- Bulletin & Evolution -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Bulletin -->
-           <!-- Bulletin -->
-<div class="bg-white rounded-xl shadow-sm p-6">
-    <h2 class="text-xl font-semibold mb-4 flex items-center">
-        <i data-feather="file-text" class="mr-2"></i> Bulletin de notes
-    </h2>
-    <div class="mb-4">
-        <div class="text-gray-500 mb-1">Dernier bulletin</div>
-        <div class="font-medium" id="last-bulletin-title">Aucun bulletin</div>
-        <div class="text-sm text-gray-500" id="last-bulletin-average">Moyenne: --/20</div>
-    </div>
-    <button onclick="openGradesPage()" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-        <i data-feather="plus" class="mr-2 w-4 h-4"></i> Nouveau bulletin
-    </button>
-</div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-feather="file-text" class="mr-2"></i> Bulletin de notes
+                </h2>
+                <div class="mb-4">
+                    <div class="text-gray-500 mb-1">Dernier bulletin</div>
+                    <div class="font-medium" id="last-bulletin-title">Aucun bulletin</div>
+                    <div class="text-sm text-gray-500" id="last-bulletin-average">Moyenne: --/20</div>
+                </div>
+                <button onclick="openGradesPage()" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                    <i data-feather="plus" class="mr-2 w-4 h-4"></i> Nouveau bulletin
+                </button>
+            </div>
             
             <!-- Evolution -->
-       <!-- Evolution -->
-    <div class="bg-white rounded-xl shadow-sm p-6">
-        <h2 class="text-xl font-semibold mb-4 flex items-center">
-            <i data-feather="trending-up" class="mr-2"></i> Évolution
-        </h2>
-        <div class="h-48">
-            <!-- ASSUREZ-VOUS QUE CE CANVAS EXISTE -->
-            <canvas id="evolutionChart"></canvas>
-        </div>
-        <div class="mt-4 text-right">
-            <a href="javascript:void(0)" onclick="openGradesPage()" class="text-purple-600 text-sm flex items-center justify-end">
-                Voir les bulletins <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
-            </a>
-        </div>
-    </div>
-</section>
-
-        <!-- Matières récentes -->
-       <!-- Remplacez toute la section Analyse des matières par ceci : -->
-<section class="mb-8" id="strength-weakness-section">
-    <h2 class="text-xl font-semibold mb-4 flex items-center">
-        <i data-feather="target" class="mr-2"></i> Analyse des matières
-    </h2>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Points forts -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-semibold mb-4 flex items-center text-green-600">
-                <i data-feather="trending-up" class="mr-2"></i> Points forts
-            </h3>
-            <div class="h-64">
-                <canvas id="strongSubjectsChart"></canvas>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-feather="trending-up" class="mr-2"></i> Évolution
+                </h2>
+                <div class="h-48">
+                    <canvas id="evolutionChart"></canvas>
+                </div>
+                <div class="mt-4 text-right">
+                    <a href="javascript:void(0)" onclick="openGradesPage()" class="text-purple-600 text-sm flex items-center justify-end">
+                        Voir les bulletins <i data-feather="chevron-right" class="ml-1 w-4 h-4"></i>
+                    </a>
+                </div>
             </div>
-           <div id="no-strong-subjects" class="text-center py-8 text-gray-500">
-    <i data-feather="smile" class="w-12 h-12 mx-auto mb-2"></i>
-    <p>Aucun point fort identifié</p>
-    <p class="text-sm">(Moyenne ≥ 10/20)</p> <!-- Changé de 14 à 10 -->
-</div>
-        </div>
-        
-        <!-- Points faibles -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-semibold mb-4 flex items-center text-red-600">
-                <i data-feather="trending-down" class="mr-2"></i> Points à améliorer
-            </h3>
-            <div class="h-64">
-                <canvas id="weakSubjectsChart"></canvas>
+        </section>
+
+        <!-- Analyse des matières -->
+        <section class="mb-8" id="strength-weakness-section">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i data-feather="target" class="mr-2"></i> Analyse des matières
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Points forts -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center text-green-600">
+                        <i data-feather="trending-up" class="mr-2"></i> Points forts
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="strongSubjectsChart"></canvas>
+                    </div>
+                    <div id="no-strong-subjects" class="text-center py-8 text-gray-500">
+                        <i data-feather="smile" class="w-12 h-12 mx-auto mb-2"></i>
+                        <p>Aucun point fort identifié</p>
+                        <p class="text-sm">(Moyenne ≥ 10/20)</p>
+                    </div>
+                </div>
+                
+                <!-- Points faibles -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center text-red-600">
+                        <i data-feather="trending-down" class="mr-2"></i> Points à améliorer
+                    </h3>
+                    <div class="h-64">
+                        <canvas id="weakSubjectsChart"></canvas>
+                    </div>
+                    <div id="no-weak-subjects" class="text-center py-8 text-gray-500">
+                        <i data-feather="frown" class="w-12 h-12 mx-auto mb-2"></i>
+                        <p>Aucun point faible majeur</p>
+                        <p class="text-sm">(Moyenne < 10/20)</p>
+                    </div>
+                </div>
             </div>
-            <div id="no-weak-subjects" class="text-center py-8 text-gray-500">
-    <i data-feather="frown" class="w-12 h-12 mx-auto mb-2"></i>
-    <p>Aucun point faible majeur</p>
-    <p class="text-sm">(Moyenne < 10/20)</p> <!-- Déjà corre ct -->
-</div>
-        </div>
-    </div>
-</section>
-      
-
-
+        </section>
     </main>
 
+    <!-- Page Paramètres -->
+    <main id="settings-page" class="page container mx-auto px-4 py-6 pb-20">
+        <!-- Profile Section -->
+        <section class="mb-8">
+            <h2 class="text-lg font-semibold mb-4">Profil</h2>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <!-- Bloc Avatar -->
+                <div class="flex flex-col items-center mb-6">
+                    <div class="profile-avatar w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mb-3 overflow-hidden cursor-pointer relative" onclick="document.getElementById('profileImageInput').click()">
+                        <img id="profileImage" src="" alt="Photo de profil" class="w-full h-full object-cover hidden">
+                        <i data-feather="user" class="text-purple-600 w-10 h-10" id="profileIcon"></i>
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <i data-feather="camera" class="text-white w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <input type="file" id="profileImageInput" accept="image/*" class="hidden" onchange="handleProfileImage(event)">
+                    <div class="text-center">
+                        <h3 id="userName" class="font-medium text-gray-800 text-lg" contenteditable="true">Jean Dupont</h3>
+                        <div class="flex items-center justify-center mt-1">
+                            <select id="userStatus" class="text-sm text-gray-500 bg-transparent border-none focus:ring-0">
+                                <option value="student">Élève</option>
+                                <option value="college">Étudiant</option>
+                                <option value="teacher">Professeur</option>
+                            </select>
+                            <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 ml-1"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Classe/Niveau</label>
+                        <input type="text" id="userClass" placeholder="Ex: Terminale S, Licence 2" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email (optionnel)</label>
+                        <input type="email" id="userEmail" placeholder="votre@email.com" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-400">
+                    </div>
+                    <div class="pt-2">
+                        <button id="saveProfile" class="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trash Section -->
+        <section>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Corbeille</h2>
+                <button id="emptyTrash" class="text-sm text-purple-600 flex items-center">
+                    <i data-feather="trash-2" class="mr-1 w-4 h-4"></i> Vider la corbeille
+                </button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div id="trashList">
+                    <!-- Trash items will be loaded here -->
+                    <div class="trash-item px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                        <div>
+                            <div class="font-medium">Mathématiques</div>
+                            <div class="text-sm text-gray-500">Matière supprimée le 10/06/2023</div>
+                        </div>
+                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
+                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="trash-item px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                        <div>
+                            <div class="font-medium">Cours Algèbre.pdf</div>
+                            <div class="text-sm text-gray-500">Document supprimé le 08/06/2023</div>
+                        </div>
+                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
+                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="trash-item px-4 py-3 flex justify-between items-center">
+                        <div>
+                            <div class="font-medium">Photo tableau.png</div>
+                            <div class="text-sm text-gray-500">Photo supprimée le 05/06/2023</div>
+                        </div>
+                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
+                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="emptyTrashMessage" class="hidden text-center py-8">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                        <i data-feather="check" class="text-gray-400 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-gray-700 font-medium">Corbeille vide</h3>
+                    <p class="text-gray-500 text-sm mt-1">Les éléments que vous supprimez apparaîtront ici</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Settings -->
+        <section class="mt-8">
+            <h2 class="text-lg font-semibold mb-4">Autres paramètres</h2>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">Mode sombre</div>
+                        <div class="text-sm text-gray-500">Passer à l'interface sombre</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">Notifications</div>
+                        <div class="text-sm text-gray-500">Activer les rappels et alertes</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+                <a href="javascript:void(0)" class="p-4 flex justify-between items-center text-red-600" onclick="logout()">
+                    <div>
+                        <div class="font-medium">Déconnexion</div>
+                    </div>
+                    <i data-feather="log-out" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- Confirmation Modal -->
+        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 custom-alert">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Confirmation</h2>
+                    <button id="closeConfirmModal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <p id="confirmMessage">Voulez-vous vraiment vider la corbeille ? Cette action est irréversible.</p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button id="cancelConfirm" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Annuler</button>
+                    <button id="confirmAction" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700">Confirmer</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pages supplémentaires (Examens, Rappels, Bulletin) -->
+    <!-- ... (inclure ici les autres pages comme exam-page, reminder-page, grades-page) ... -->
      <!-- Page Examens -->
 <div id="exam-page" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
     <div class="flex items-center justify-between mb-6">
@@ -343,92 +521,294 @@
         </div>
     </div>
 </div>
+
     <!-- Bottom Navigation -->
     <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full">
         <div class="container mx-auto flex justify-around">
-            <a href="index.html" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
+            <a href="javascript:void(0)" onclick="showPage('home-page')" class="nav-item active flex flex-col items-center py-3 px-4 text-purple-600">
                 <i data-feather="home" class="w-6 h-6"></i>
                 <span class="text-xs mt-1">Accueil</span>
             </a>
-            <a href="subjects.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+            <a href="javascript:void(0)" onclick="showPage('subjects-page')" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
                 <i data-feather="book" class="w-6 h-6"></i>
                 <span class="text-xs mt-1">Matières</span>
             </a>
-            <a href="library.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+            <a href="javascript:void(0)" onclick="showPage('library-page')" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
                 <i data-feather="bookmark" class="w-6 h-6"></i>
                 <span class="text-xs mt-1">Bibliothèque</span>
             </a>
-            <a href="schedule.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+            <a href="javascript:void(0)" onclick="showPage('schedule-page')" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
                 <i data-feather="calendar" class="w-6 h-6"></i>
                 <span class="text-xs mt-1">Emploi du temps</span>
             </a>
-            <a href="settings.html" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
+            <a href="javascript:void(0)" onclick="showPage('settings-page')" class="nav-item flex flex-col items-center py-3 px-4 text-gray-500 hover:text-purple-600">
                 <i data-feather="settings" class="w-6 h-6"></i>
                 <span class="text-xs mt-1">Paramètres</span>
             </a>
         </div>
     </nav>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Initialize Feather Icons
-      // Initialize the page
-// Initialize the page - VERSION CORRIGÉE
-function initPage() {
-    feather.replace();
-    
-    // Set current date and time
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
-    
-    // Start real-time clock
-    updateCurrentTime();
-    setInterval(updateCurrentTime, 1000);
-    
-    // Dynamic greeting
-    const hour = now.getHours();
-    let greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bonsoir" : "Bonsoir";
-    document.getElementById('greeting').textContent = greeting;
-    
-    // ⭐⭐ CHARGEMENT GARANTI - D'abord les données, puis les graphiques
-    updateHomePageGrades(); // Charge les bulletins d'abord
-    
-    // Load other data
-    loadNextExam();
-    loadNextSubjects();
-    updateRemindersDisplay();
-    
-    // ⭐⭐ FORCER LE CHARGEMENT DES GRAPHIQUES APRÈS UN DELAI
-    setTimeout(() => {
-        console.log("🎯 FORCAGE DU CHARGEMENT DES GRAPHIQUES");
-        loadStrengthWeaknessCharts();
-        updateEvolutionChart();
-    }, 800);
-    
-    // Set up intervals to refresh data
-    setInterval(loadNextExam, 1000);
-    setInterval(loadNextSubjects, 60000);
-    
-    // Ajouter bouton de test
-    addDebugButton();
-}
+        feather.replace();
 
-// Ajouter un bouton debug
-function addDebugButton() {
-    const btn = document.createElement('button');
-    btn.innerHTML = '<i data-feather="refresh-cw" class="w-4 h-4"></i>';
-    btn.className = 'fixed top-4 right-4 bg-purple-600 text-white p-3 rounded-full shadow-lg z-50';
-    btn.title = 'Forcer le chargement des graphiques';
-    btn.onclick = forceLoadCharts;
-    document.body.appendChild(btn);
-    feather.replace();
-}
-        
-      
-   // Update current time
-function updateCurrentTime() {
+        // Navigation entre pages
+        function showPage(pageId) {
+            // Masquer toutes les pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Afficher la page demandée
+            document.getElementById(pageId).classList.add('active');
+            
+            // Mettre à jour la navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active', 'text-purple-600');
+                item.classList.add('text-gray-500');
+            });
+            
+            // Activer l'élément de navigation correspondant
+            const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+                return item.getAttribute('onclick')?.includes(pageId);
+            });
+            if (activeNav) {
+                activeNav.classList.add('active', 'text-purple-600');
+                activeNav.classList.remove('text-gray-500');
+            }
+            
+            // Recharger les données si nécessaire
+            if (pageId === 'home-page') {
+                loadUserProfile();
+            } else if (pageId === 'settings-page') {
+                loadSettingsData();
+            }
+        }
+
+        // Fonction pour charger et afficher le profil utilisateur
+        function loadUserProfile() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            console.log("👤 Profil utilisateur chargé:", userProfile);
+            
+            // Mettre à jour le nom dans la section profil principale
+            const userDisplayName = document.getElementById('userDisplayName');
+            if (userProfile.name && userProfile.name.trim() !== '' && userProfile.name !== 'Jean Dupont') {
+                userDisplayName.textContent = userProfile.name + '!';
+            } else {
+                userDisplayName.textContent = '!';
+            }
+            
+            // Mettre à jour la photo dans la section profil principale
+            const homeProfileImage = document.getElementById('homeProfileImage');
+            const homeProfileIcon = document.getElementById('homeProfileIcon');
+            if (userProfile.profileImage) {
+                homeProfileImage.src = userProfile.profileImage;
+                homeProfileImage.classList.remove('hidden');
+                homeProfileIcon.classList.add('hidden');
+            } else {
+                homeProfileImage.classList.add('hidden');
+                homeProfileIcon.classList.remove('hidden');
+            }
+            
+            // Mettre à jour la photo dans le header
+            const headerProfileImage = document.getElementById('headerProfileImage');
+            const headerProfileIcon = document.getElementById('headerProfileIcon');
+            if (userProfile.profileImage) {
+                headerProfileImage.src = userProfile.profileImage;
+                headerProfileImage.classList.remove('hidden');
+                headerProfileIcon.classList.add('hidden');
+            } else {
+                headerProfileImage.classList.add('hidden');
+                headerProfileIcon.classList.remove('hidden');
+            }
+            
+            // Mettre à jour le statut
+            const userStatusDisplay = document.getElementById('userStatusDisplay');
+            const statusMap = {
+                'student': '👨‍🎓 Élève',
+                'college': '🎓 Étudiant', 
+                'teacher': '👨‍🏫 Professeur'
+            };
+            userStatusDisplay.textContent = statusMap[userProfile.status] || '👨‍🎓 Élève';
+        }
+
+        // Fonction pour surveiller les changements de profil
+        function watchProfileChanges() {
+            // Surveiller les changements dans le localStorage
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'userProfile') {
+                    console.log("🔄 Profil modifié détecté");
+                    loadUserProfile();
+                }
+            });
+            
+            // Surveiller aussi les changements dans la même page
+            setInterval(() => {
+                const currentProfile = localStorage.getItem('userProfile');
+                if (currentProfile !== window.lastProfile) {
+                    window.lastProfile = currentProfile;
+                    loadUserProfile();
+                }
+            }, 1000);
+        }
+
+        // Gestion de l'image de profil (paramètres)
+        function handleProfileImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const profileImage = document.getElementById('profileImage');
+                    const profileIcon = document.getElementById('profileIcon');
+                    
+                    profileImage.src = e.target.result;
+                    profileImage.classList.remove('hidden');
+                    profileIcon.classList.add('hidden');
+                    
+                    // Sauvegarder l'image en base64
+                    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                    userProfile.profileImage = e.target.result;
+                    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+                    
+                    // Mettre à jour l'affichage sur la page d'accueil
+                    loadUserProfile();
+                    
+                    // Afficher un message de succès
+                    showCustomAlert('Photo de profil mise à jour!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Charger les données des paramètres
+        function loadSettingsData() {
+            if (localStorage.getItem('userProfile')) {
+                const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+                document.getElementById('userName').textContent = userProfile.name || 'Jean Dupont';
+                document.getElementById('userStatus').value = userProfile.status || 'student';
+                document.getElementById('userClass').value = userProfile.class || '';
+                document.getElementById('userEmail').value = userProfile.email || '';
+                
+                // Charger l'image de profil
+                const profileImage = document.getElementById('profileImage');
+                const profileIcon = document.getElementById('profileIcon');
+                if (userProfile.profileImage) {
+                    profileImage.src = userProfile.profileImage;
+                    profileImage.classList.remove('hidden');
+                    profileIcon.classList.add('hidden');
+                }
+            }
+        }
+
+        // Sauvegarder le profil
+        document.getElementById('saveProfile').addEventListener('click', () => {
+            const userProfile = {
+                name: document.getElementById('userName').textContent,
+                status: document.getElementById('userStatus').value,
+                class: document.getElementById('userClass').value,
+                email: document.getElementById('userEmail').value
+            };
+            
+            // Ajouter l'image si elle existe
+            const profileImage = document.getElementById('profileImage');
+            if (profileImage.src) {
+                userProfile.profileImage = profileImage.src;
+            }
+            
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            
+            // Mettre à jour l'affichage sur la page d'accueil
+            loadUserProfile();
+            
+            // Show success message
+            showCustomAlert('Profil enregistré avec succès!');
+        });
+
+        // Fonction d'alerte personnalisée
+        function showCustomAlert(message, type = 'success') {
+            // Supprimer les alertes existantes
+            const existingAlerts = document.querySelectorAll('.custom-success-alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            const alert = document.createElement('div');
+            alert.className = `fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 custom-success-alert`;
+            alert.innerHTML = `
+                <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in-up">
+                    <i data-feather="check-circle" class="w-5 h-5"></i>
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+            document.body.appendChild(alert);
+            
+            feather.replace();
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // Déconnexion
+        function logout() {
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                localStorage.removeItem('userProfile');
+                showCustomAlert('Déconnexion réussie');
+                setTimeout(() => {
+                    showPage('home-page');
+                }, 1000);
+            }
+        }
+
+        // Initialisation
+        function initPage() {
+            feather.replace();
+            
+            // ⭐⭐ CHARGEMENT DU PROFIL UTILISATEUR
+            console.log("🚀 Chargement du profil utilisateur...");
+            loadUserProfile();
+            watchProfileChanges();
+            
+            // Le reste du code existant...
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
+            
+            // Start real-time clock
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            
+            // Dynamic greeting
+            const hour = now.getHours();
+            let greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bonsoir" : "Bonsoir";
+            document.getElementById('greeting').textContent = greeting;
+            
+            // ⭐⭐ CHARGEMENT GARANTI - D'abord les données, puis les graphiques
+            updateHomePageGrades(); // Charge les bulletins d'abord
+            
+            // Load other data
+            loadNextExam();
+            loadNextSubjects();
+            updateRemindersDisplay();
+            
+            // ⭐⭐ FORCER LE CHARGEMENT DES GRAPHIQUES APRÈS UN DELAI
+            setTimeout(() => {
+                console.log("🎯 FORCAGE DU CHARGEMENT DES GRAPHIQUES");
+                loadStrengthWeaknessCharts();
+                updateEvolutionChart();
+            }, 800);
+            
+            // Set up intervals to refresh data
+            setInterval(loadNextExam, 1000);
+            setInterval(loadNextSubjects, 60000);
+        }
+
+        // Initialiser la page au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            initPage();
+        });
+
+        // ... (inclure ici toutes les autres fonctions existantes) ...
+      function updateCurrentTime() {
     const now = new Date();
     const timeString = now.toLocaleTimeString('fr-FR', { 
         hour: '2-digit', 
@@ -2452,8 +2832,7 @@ document.addEventListener('visibilitychange', function() {
     }
 });
     </script>
-  
-  <!-- Page Bulletin de Notes -->
+    <!-- Page Bulletin de Notes -->
 <div id="grades-page" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
     <div class="flex items-center justify-between mb-6">
         <button onclick="closeGradesPage()" class="text-gray-500 hover:text-purple-600">
@@ -2551,7 +2930,7 @@ document.addEventListener('visibilitychange', function() {
 </button>
     </div>
 
-    <!-- Liste des bulletins sauvegardés -->
+    <!-- Liste des bulletins sauvegards -->
     <div class="bg-white rounded-xl shadow-sm p-6">
         <h3 class="text-lg font-semibold mb-4">Bulletins enregistrés</h3>
         <div id="saved-bulletins-list" class="space-y-3">
@@ -2559,6 +2938,5 @@ document.addEventListener('visibilitychange', function() {
         </div>
     </div>
 </div>
-  
 </body>
 </html>
