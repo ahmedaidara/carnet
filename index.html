@@ -138,7 +138,43 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+.dark {
+    background-color: #1f2937;
+    color: #f9fafb;
+}
 
+.dark .bg-white {
+    background-color: #374151;
+}
+
+.dark .text-gray-800 {
+    color: #f9fafb;
+}
+
+.dark .text-gray-600 {
+    color: #d1d5db;
+}
+      /* Mode sombre */
+.dark {
+    background-color: #111827 !important;
+    color: #f9fafb !important;
+}
+
+.dark .bg-white {
+    background-color: #1f2937 !important;
+}
+
+.dark .text-gray-800 {
+    color: #f9fafb !important;
+}
+
+.dark .text-gray-600 {
+    color: #d1d5db !important;
+}
+
+.dark .border-gray-200 {
+    border-color: #374151 !important;
+}
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -361,68 +397,39 @@ input[type=number] {
         </section>
 
         <!-- Trash Section -->
-        <section>
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold">Corbeille</h2>
-                <button id="emptyTrash" class="text-sm text-purple-600 flex items-center">
-                    <i data-feather="trash-2" class="mr-1 w-4 h-4"></i> Vider la corbeille
-                </button>
+      <section>
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">Corbeille</h2>
+        <button onclick="emptyTrash()" class="text-sm text-purple-600 flex items-center">
+            <i data-feather="trash-2" class="mr-1 w-4 h-4"></i> Vider la corbeille
+        </button>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div id="trashList">
+            <!-- Les éléments de la corbeille seront chargés ici DYNAMIQUEMENT -->
+        </div>
+        <div id="emptyTrashMessage" class="hidden text-center py-8">
+            <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                <i data-feather="check" class="text-gray-400 w-8 h-8"></i>
             </div>
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div id="trashList">
-                    <!-- Trash items will be loaded here -->
-                    <div class="trash-item px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-                        <div>
-                            <div class="font-medium">Mathématiques</div>
-                            <div class="text-sm text-gray-500">Matière supprimée le 10/06/2023</div>
-                        </div>
-                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
-                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                    <div class="trash-item px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-                        <div>
-                            <div class="font-medium">Cours Algèbre.pdf</div>
-                            <div class="text-sm text-gray-500">Document supprimé le 08/06/2023</div>
-                        </div>
-                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
-                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                    <div class="trash-item px-4 py-3 flex justify-between items-center">
-                        <div>
-                            <div class="font-medium">Photo tableau.png</div>
-                            <div class="text-sm text-gray-500">Photo supprimée le 05/06/2023</div>
-                        </div>
-                        <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
-                            <i data-feather="refresh-ccw" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="emptyTrashMessage" class="hidden text-center py-8">
-                    <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                        <i data-feather="check" class="text-gray-400 w-8 h-8"></i>
-                    </div>
-                    <h3 class="text-gray-700 font-medium">Corbeille vide</h3>
-                    <p class="text-gray-500 text-sm mt-1">Les éléments que vous supprimez apparaîtront ici</p>
-                </div>
-            </div>
-        </section>
-
+            <h3 class="text-gray-700 font-medium">Corbeille vide</h3>
+            <p class="text-gray-500 text-sm mt-1">Les éléments que vous supprimez apparaîtront ici</p>
+        </div>
+    </div>
+</section>
         <!-- Other Settings -->
         <section class="mt-8">
             <h2 class="text-lg font-semibold mb-4">Autres paramètres</h2>
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-                    <div>
-                        <div class="font-medium">Mode sombre</div>
-                        <div class="text-sm text-gray-500">Passer à l'interface sombre</div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                    </label>
-                </div>
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+    <div>
+        <div class="font-medium">Mode sombre</div>
+        <div class="text-sm text-gray-500">Activer le mode sombre</div>
+    </div>
+    <button onclick="toggleDarkMode()" class="px-4 py-2 bg-purple-600 text-white rounded-lg">
+        Activer
+    </button>
+</div>     
                 <div class="p-4 border-b border-gray-100 flex justify-between items-center">
                     <div>
                         <div class="font-medium">Notifications</div>
@@ -433,12 +440,14 @@ input[type=number] {
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                     </label>
                 </div>
-                <a href="javascript:void(0)" class="p-4 flex justify-between items-center text-red-600" onclick="logout()">
-                    <div>
-                        <div class="font-medium">Déconnexion</div>
-                    </div>
-                    <i data-feather="log-out" class="w-5 h-5"></i>
-                </a>
+               <!-- 
+<a href="javascript:void(0)" class="p-4 flex justify-between items-center text-red-600" onclick="logout()">
+    <div>
+        <div class="font-medium">Déconnexion</div>
+    </div>
+    <i data-feather="log-out" class="w-5 h-5"></i>
+</a>
+-->
             </div>
         </section>
 
@@ -592,6 +601,7 @@ input[type=number] {
                 loadUserProfile();
             } else if (pageId === 'settings-page') {
                 loadSettingsData();
+              loadTrash();
             }
         }
 
@@ -799,6 +809,8 @@ input[type=number] {
             loadNextSubjects();
             updateRemindersDisplay();
             
+           loadTrash();
+          
             // ⭐⭐ FORCER LE CHARGEMENT DES GRAPHIQUES APRÈS UN DELAI
             setTimeout(() => {
                 console.log("🎯 FORCAGE DU CHARGEMENT DES GRAPHIQUES");
@@ -1228,7 +1240,7 @@ function closeReminderPage() {
 }
 
 function deleteReminder(index) {
-    const reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+    const reminders = JSON.parse(localStorage.getItem('reminders') || []);
     const reminder = reminders[index];
     
     // Ajouter à la corbeille
@@ -1464,10 +1476,10 @@ function closeExamPage() {
 }
 
 function deleteExam(index) {
-    const exams = JSON.parse(localStorage.getItem('exams')) || [];
+    const exams = JSON.parse(localStorage.getItem('exams') || []);
     const exam = exams[index];
     
-    // Ajouter à la corbeille au lieu de supprimer directement
+    // Ajouter à la corbeille
     addToTrash({
         type: 'Examen',
         title: exam.name,
@@ -2988,10 +3000,30 @@ function addToTrash(item) {
     trash.push(trashItem);
     localStorage.setItem('trash', JSON.stringify(trash));
     
-    // Supprimer l'élément original
+    // Supprimer l'élément original selon son type
     deleteOriginalItem(item);
     
     showCustomAlert(`${item.type} déplacé vers la corbeille`);
+}
+
+function deleteOriginalItem(item) {
+    switch(item.type) {
+        case 'Examen':
+            const exams = JSON.parse(localStorage.getItem('exams') || '[]');
+            const filteredExams = exams.filter(exam => exam.name !== item.title);
+            localStorage.setItem('exams', JSON.stringify(filteredExams));
+            break;
+            
+        case 'Rappel':
+            const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+            const filteredReminders = reminders.filter(reminder => reminder.title !== item.title);
+            localStorage.setItem('reminders', JSON.stringify(filteredReminders));
+            break;
+            
+        case 'Matière':
+            // Pour les matières, c'est plus complexe - on garde juste dans la corbeille
+            break;
+    }
 }
 
 // Supprimer l'élément original selon son type
@@ -3021,6 +3053,8 @@ function loadTrash() {
     const trashList = document.getElementById('trashList');
     const emptyMessage = document.getElementById('emptyTrashMessage');
     
+    console.log("📦 Chargement corbeille:", trash.length, "éléments");
+    
     if (trash.length === 0) {
         trashList.innerHTML = '';
         emptyMessage.classList.remove('hidden');
@@ -3035,7 +3069,7 @@ function loadTrash() {
                 <div class="text-sm text-gray-500">${item.type} supprimé le ${item.deletedAt}</div>
                 ${item.description ? `<div class="text-xs text-gray-400">${item.description}</div>` : ''}
             </div>
-            <button class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600" onclick="restoreFromTrash('${item.id}')">
+            <button onclick="restoreFromTrash('${item.id}')" class="restore-item p-2 rounded-full hover:bg-gray-100 text-purple-600">
                 <i data-feather="refresh-ccw" class="w-4 h-4"></i>
             </button>
         </div>
@@ -3076,7 +3110,6 @@ function restoreFromTrash(itemId) {
     showCustomAlert(`${item.type} restauré avec succès`);
 }
 
-// Vider la corbeille
 function emptyTrash() {
     localStorage.setItem('trash', '[]');
     loadTrash();
@@ -3385,6 +3418,70 @@ function getRandomQuote() {
 }
 
 // Mettre à jour l'affichage du profil
+      // Mode sombre
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    
+    // Appliquer les couleurs du mode sombre
+    if (isDark) {
+        document.body.style.backgroundColor = '#0f172a';
+        document.body.style.color = '#e2e8f0';
+        
+        // Cartes et conteneurs
+        document.querySelectorAll('.bg-white').forEach(el => {
+            el.style.backgroundColor = '#1e293b';
+            el.style.color = '#e2e8f0';
+            el.style.borderColor = '#334155';
+        });
+        
+        // En-têtes
+        document.querySelectorAll('header').forEach(el => {
+            el.style.backgroundColor = '#1e293b';
+            el.style.borderColor = '#334155';
+        });
+        
+        // Navigation du bas
+        document.querySelectorAll('nav').forEach(el => {
+            el.style.backgroundColor = '#1e293b';
+            el.style.borderColor = '#334155';
+        });
+        
+        // Textes
+        document.querySelectorAll('.text-gray-800, .text-gray-700').forEach(el => {
+            el.style.color = '#f1f5f9';
+        });
+        
+        document.querySelectorAll('.text-gray-600, .text-gray-500').forEach(el => {
+            el.style.color = '#cbd5e1';
+        });
+        
+        showCustomAlert('Mode sombre activé ');
+    } else {
+        // Rétablir le mode clair
+        document.body.style.backgroundColor = '';
+        document.body.style.color = '';
+        
+        document.querySelectorAll('.bg-white').forEach(el => {
+            el.style.backgroundColor = '';
+            el.style.color = '';
+            el.style.borderColor = '';
+        });
+        
+        document.querySelectorAll('header, nav').forEach(el => {
+            el.style.backgroundColor = '';
+            el.style.borderColor = '';
+        });
+        
+        document.querySelectorAll('.text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500').forEach(el => {
+            el.style.color = '';
+        });
+        
+        showCustomAlert('Mode clair activé ');
+    }
+    
+    // Sauvegarder le choix
+    localStorage.setItem('darkMode', isDark);
+}
       // Fonction de recherche globale
 // Fonction de recherche globale en temps réel
 function performSearch(searchTerm) {
@@ -4188,6 +4285,22 @@ document.addEventListener('keydown', function(event) {
         closeSearchResults();
     }
 });
+      // Mode sombre
+document.getElementById('darkModeToggle').addEventListener('change', function() {
+    if (this.checked) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('darkMode', 'true');
+    } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('darkMode', 'false');
+    }
+});
+
+// Charger l'état au démarrage
+if (localStorage.getItem('darkMode') === 'true') {
+    document.getElementById('darkModeToggle').checked = true;
+    document.documentElement.classList.add('dark');
+}
     </script>
     <!-- Page Bulletin de Notes -->
 <div id="grades-page" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
