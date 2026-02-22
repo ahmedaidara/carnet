@@ -1965,6 +1965,380 @@ h1, h2, h3, h4, h5, h6, p, span, div, a, li {
 .timer-expired {
     color: #ff0000;
 }
+      
+      .chapter-card {
+    position: relative;
+}
+
+.locked-chapter {
+    opacity: 0.7;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+.lock-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
+    color: #ff6b6b;
+    background: rgba(255, 255, 255, 0.9);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Style pour le message d'achat */
+.purchase-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.purchase-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: slideIn 0.3s;
+}
+
+.purchase-content h3 {
+    color: #2e7d32;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.purchase-content .price {
+    font-size: 48px;
+    font-weight: bold;
+    color: #ff6b6b;
+    margin: 20px 0;
+}
+
+.purchase-content .price small {
+    font-size: 16px;
+    color: #666;
+}
+
+.purchase-content p {
+    margin-bottom: 20px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.purchase-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.purchase-btn {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.purchase-btn i {
+    font-size: 24px;
+}
+
+.close-purchase {
+    background: #666;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+      /* Styles pour la page de profil */
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-avatar-section {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+}
+
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2e7d32, #1e5f21);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 80px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.05);
+}
+
+.profile-avatar-actions {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.avatar-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    color: #2e7d32;
+    transition: all 0.3s ease;
+}
+
+.avatar-btn:hover {
+    background: #2e7d32;
+    color: white;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.profile-field {
+    margin-bottom: 20px;
+}
+
+.profile-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.profile-field label i {
+    margin-right: 5px;
+    color: #2e7d32;
+}
+
+.field-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 16px;
+}
+
+.verified-badge {
+    color: #28a745;
+    font-size: 14px;
+}
+
+.verified-badge i {
+    margin-right: 3px;
+}
+
+.profile-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.profile-input:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+}
+
+.profile-status {
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-badge.premium {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.free {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge i {
+    font-size: 16px;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 25px 0;
+    padding: 20px 0;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.profile-action-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+#resetPasswordBtn {
+    background: #f8f9fa;
+    color: #666;
+    border: 1px solid #e0e0e0;
+}
+
+#resetPasswordBtn:hover {
+    background: #e0e0e0;
+}
+
+#editProfileBtn {
+    background: #2e7d32;
+    color: white;
+}
+
+#editProfileBtn:hover {
+    background: #1e5f21;
+}
+
+.profile-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.profile-footer a {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.profile-footer a:hover {
+    color: #2e7d32;
+    text-decoration: underline;
+}
+
+/* Dark theme pour le profil */
+.dark-theme .profile-card {
+    background: #2d2d2d;
+}
+
+.dark-theme .profile-field label {
+    color: #aaa;
+}
+
+.dark-theme .field-value {
+    background: #3d3d3d;
+    border-color: #4d4d4d;
+    color: #fff;
+}
+
+.dark-theme .profile-input {
+    background: #3d3d3d;
+    border-color: #4d4d4d;
+    color: #fff;
+}
+
+.dark-theme .profile-status {
+    background: #3d3d3d;
+}
+
+.dark-theme .stat-label {
+    color: #aaa;
+}
+
+.dark-theme .stat-value {
+    color: #4caf50;
+}
     </style>
 </head>
 <body>
@@ -2355,30 +2729,87 @@ h1, h2, h3, h4, h5, h6, p, span, div, a, li {
 </div>
 
 <!-- Page Profil/Compte -->
+<!-- Page Profil/Compte améliorée -->
 <div class="page" id="profilePage">
     <div class="reading-header">
         <button class="header-btn" id="backFromProfile">
             <i class="fas fa-arrow-left"></i>
         </button>
-        <h2>Mon Compte</h2>
-        <button class="header-btn" id="logoutBtn">
+        <h2>Mon Profil</h2>
+        <button class="header-btn" id="logoutBtn" title="Se déconnecter">
             <i class="fas fa-sign-out-alt"></i>
         </button>
     </div>
     
-    <div class="profile-content">
-        <div class="profile-form">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="profileEmail" readonly disabled style="background: #f0f0f0;">
+    <div class="profile-container">
+        <!-- Photo de profil -->
+        <div class="profile-avatar-section">
+            <div class="profile-avatar" id="profileAvatar">
+                <i class="fas fa-user-circle"></i>
             </div>
-            <div class="form-group">
-                <label>Statut</label>
-                <div id="profileStatus" style="padding: 10px; border-radius: 5px; background: #f0f0f0;">
-                    Chargement...
+            <div class="profile-avatar-actions">
+                <button class="avatar-btn" id="changePhotoBtn">
+                    <i class="fas fa-camera"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Formulaire profil -->
+        <div class="profile-card">
+            <div class="profile-field">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <div class="field-value" id="profileEmailDisplay">
+                    <span id="profileEmail"></span>
+                    <span class="verified-badge" id="emailVerified">
+                        <i class="fas fa-check-circle"></i> Vérifié
+                    </span>
                 </div>
             </div>
-            <div class="profile-links">
+            
+            <div class="profile-field">
+                <label><i class="fas fa-user"></i> Nom complet</label>
+                <input type="text" id="profileName" placeholder="Votre nom" class="profile-input">
+            </div>
+            
+            <div class="profile-field">
+                <label><i class="fas fa-phone"></i> Téléphone</label>
+                <input type="tel" id="profilePhone" placeholder="+221 XX XXX XX XX" class="profile-input">
+            </div>
+            
+            <div class="profile-field">
+                <label><i class="fas fa-crown"></i> Statut du compte</label>
+                <div class="profile-status" id="profileStatus">
+                    <span class="status-badge" id="statusBadge">
+                        <i class="fas fa-spinner fa-spin"></i> Chargement...
+                    </span>
+                </div>
+            </div>
+            
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Chapitres gratuits</span>
+                    <span class="stat-value">12</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Chapitres totaux</span>
+                    <span class="stat-value">44</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Favoris</span>
+                    <span class="stat-value" id="favoritesCount">0</span>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <button class="profile-action-btn" id="resetPasswordBtn">
+                    <i class="fas fa-key"></i> Réinitialiser mot de passe
+                </button>
+                <button class="profile-action-btn" id="editProfileBtn">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+            </div>
+            
+            <div class="profile-footer">
                 <a href="#" id="privacyFromProfile">Politique de confidentialité</a>
             </div>
         </div>
@@ -2491,6 +2922,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentNoteId = null;
     let currentCategory = 'all';
     
+  // Liste des chapitres gratuits (12 chapitres)
+const FREE_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 38];
+const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
+  
     // CONTENU DES CHAPITRES (à remplacer par votre vrai contenu)
     const chapterContents = [
         {chapter: 1, title: {fr: "Introduction", en: "Introduction", ar: "مقدمة"}, text: {fr: "<p>Contenu du chapitre 1...</p>", en: "<p>Chapter 1 content...</p>", ar: "<p>محتوى الفصل الأول...</p>"}},
@@ -2510,29 +2945,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Écouter les changements d'état de connexion
     auth.onAuthStateChanged(async (user) => {
-        currentUser = user;
-        const profileNavItem = document.getElementById('profileNavItem');
+    currentUser = user;
+    const profileNavItem = document.getElementById('profileNavItem');
+    
+    if (user) {
+        profileNavItem.setAttribute('data-page', 'profilePage');
+        profileNavItem.querySelector('span').textContent = 'Profil';
         
-        if (user) {
-            // Utilisateur connecté
-            profileNavItem.setAttribute('data-page', 'profilePage');
-            profileNavItem.querySelector('span').textContent = 'Profil';
-            
-            // Charger les données depuis Firestore
-            await loadUserFromFirestore(user.uid);
-            
-            // Mettre à jour la dernière activité
-            updateLastActivity(user.uid);
-        } else {
-            // Utilisateur déconnecté
-            profileNavItem.setAttribute('data-page', 'loginPage');
-            profileNavItem.querySelector('span').textContent = 'Compte';
-            isPaidUser = false;
-            
-            // Mettre à jour l'interface
-            updateChapterAccess();
+        await loadUserFromFirestore(user.uid);
+        updateLastActivity(user.uid);
+        
+        // Charger les données du profil si on est sur la page profil
+        if (document.getElementById('profilePage').classList.contains('active')) {
+            loadProfileData();
         }
-    });
+    } else {
+        profileNavItem.setAttribute('data-page', 'loginPage');
+        profileNavItem.querySelector('span').textContent = 'Compte';
+        isPaidUser = false;
+        updateChaptersGrid();
+    }
+});
     
     // Charger les données utilisateur depuis Firestore
     async function loadUserFromFirestore(uid) {
@@ -2696,45 +3129,83 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function updateChaptersGrid() {
-        if (!chaptersGrid) return;
+  function updateChaptersGrid() {
+    if (!chaptersGrid) return;
+    
+    chaptersGrid.innerHTML = '';
+    
+    // Générer les chapitres de 1 à 44
+    for (let i = 1; i <= TOTAL_CHAPTERS; i++) {
+        // Chercher si le chapitre existe dans chapterContents
+        const chapterData = chapterContents.find(ch => ch.chapter === i) || {
+            chapter: i,
+            title: {
+                fr: `Chapitre ${i}`,
+                en: `Chapter ${i}`,
+                ar: `الفصل ${i}`
+            },
+            text: {
+                fr: "<p>Contenu à venir...</p>",
+                en: "<p>Content coming soon...</p>",
+                ar: "<p>المحتوى قريباً...</p>"
+            }
+        };
         
-        chaptersGrid.innerHTML = '';
+        const isFree = FREE_CHAPTERS.includes(i);
+        const isLocked = !isFree && !isPaidUser;
         
-        chapterContents.forEach(chapter => {
-            const chapterCard = document.createElement('div');
-            chapterCard.className = 'chapter-card';
-            chapterCard.setAttribute('lang', currentLanguage);
-            chapterCard.innerHTML = `
-                <div class="chapter-number">${chapter.chapter}</div>
-                <div class="chapter-title">${chapter.title[currentLanguage] || 'Chapitre ' + chapter.chapter}</div>
-                <div class="favorite-icon" id="favorite-${chapter.chapter}">
-                    ${favorites.includes(chapter.chapter) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}
-                </div>
-            `;
+        const chapterCard = document.createElement('div');
+        chapterCard.className = 'chapter-card';
+        chapterCard.setAttribute('lang', currentLanguage);
+        
+        // Ajouter une classe pour les chapitres verrouillés
+        if (isLocked) {
+            chapterCard.classList.add('locked-chapter');
+        }
+        
+        chapterCard.innerHTML = `
+            <div class="chapter-number">${i}</div>
+            <div class="chapter-title">${chapterData.title[currentLanguage] || 'Chapitre ' + i}</div>
+            ${isLocked ? '<div class="lock-icon"><i class="fas fa-lock"></i></div>' : ''}
+            <div class="favorite-icon" id="favorite-${i}">
+                ${favorites.includes(i) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}
+            </div>
+        `;
+        
+        chapterCard.addEventListener('click', (e) => {
+            // Ne pas déclencher si on clique sur l'icône favori
+            if (e.target.closest('.favorite-icon')) return;
             
-            chapterCard.addEventListener('click', () => {
-                if (chapter.chapter > 9 && !isPaidUser) {
-                    showNotification('Ce chapitre est réservé aux utilisateurs premium');
-                    return;
-                }
-                currentChapter = chapter.chapter;
-                updateChapterContent();
-                showPage('readingPage');
-            });
+            if (isLocked) {
+                showPurchaseModal();
+                return;
+            }
             
-            const favIcon = chapterCard.querySelector('.favorite-icon');
-            favIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorite(chapter.chapter);
-            });
+            currentChapter = i;
             
-            chaptersGrid.appendChild(chapterCard);
+            // Mettre à jour le contenu du chapitre
+            const selectedChapter = chapterContents.find(ch => ch.chapter === i);
+            if (selectedChapter) {
+                contentElement.innerHTML = selectedChapter.text[currentLanguage] || '<p>Contenu non disponible</p>';
+            } else {
+                contentElement.innerHTML = '<p>Chapitre en cours de rédaction...</p>';
+            }
+            
+            chapterIndicator.textContent = `Chapitre ${i}`;
+            showPage('readingPage');
         });
         
-        // Appliquer les restrictions
-        updateChapterAccess();
+        const favIcon = chapterCard.querySelector('.favorite-icon');
+        if (favIcon) {
+            favIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFavorite(i);
+            });
+        }
+        
+        chaptersGrid.appendChild(chapterCard);
     }
+}
     
     function updateChapterContent() {
         const chapter = chapterContents.find(ch => ch.chapter === currentChapter);
@@ -2930,7 +3401,21 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('backFromRegister')?.addEventListener('click', () => showPage('loginPage'));
         document.getElementById('backFromProfile')?.addEventListener('click', () => showPage('homePage'));
         document.getElementById('goToRegisterBtn')?.addEventListener('click', () => showPage('registerPage'));
-        
+        // Écouteurs pour la page de profil
+document.getElementById('changePhotoBtn')?.addEventListener('click', changeProfilePhoto);
+document.getElementById('resetPasswordBtn')?.addEventListener('click', resetPassword);
+document.getElementById('editProfileBtn')?.addEventListener('click', saveProfileChanges);
+
+// Mettre à jour l'affichage du profil quand on y accède
+document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (currentUser) {
+        loadProfileData();
+        showPage('profilePage');
+    } else {
+        showPage('loginPage');
+    }
+});
         document.getElementById('loginBtn')?.addEventListener('click', () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -3385,6 +3870,175 @@ document.addEventListener('DOMContentLoaded', function() {
     
     init();
 });
+  
+  // Fonction pour afficher le modal d'achat
+function showPurchaseModal() {
+    const modal = document.getElementById('purchaseModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+// Fonction pour fermer le modal d'achat
+function closePurchaseModal() {
+    const modal = document.getElementById('purchaseModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Fonction pour ouvrir WhatsApp avec le message d'achat
+function openPurchaseWhatsApp() {
+    const phoneNumber = "221781525106";
+    const message = encodeURIComponent(
+        "Bonjour, je souhaite acheter la version complète du livre 'La Voie du Salut' à 1500 FCFA.\n\n" +
+        "Mon email : " + (currentUser ? currentUser.email : "Non connecté") + "\n\n" +
+        "Merci de me donner les instructions pour le paiement."
+    );
+    const url = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(url, '_blank');
+    
+    // Fermer le modal
+    closePurchaseModal();
+}
+
+// Ajouter les écouteurs d'événements
+document.addEventListener('DOMContentLoaded', function() {
+    // ... votre code existant ...
+    
+    // Modal d'achat
+    const whatsappBtn = document.getElementById('whatsappPurchaseBtn');
+    const closePurchase = document.getElementById('closePurchaseModal');
+    
+    if (whatsappBtn) {
+        whatsappBtn.addEventListener('click', openPurchaseWhatsApp);
+    }
+    
+    if (closePurchase) {
+        closePurchase.addEventListener('click', closePurchaseModal);
+    }
+    
+    // Fermer en cliquant à l'extérieur
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('purchaseModal');
+        if (e.target === modal) {
+            closePurchaseModal();
+        }
+    });
+});
+  
+  
+  
+  // Charger les données du profil
+function loadProfileData() {
+    if (!currentUser) return;
+    
+    const emailSpan = document.getElementById('profileEmail');
+    const statusBadge = document.getElementById('statusBadge');
+    const favoritesCount = document.getElementById('favoritesCount');
+    
+    // Afficher l'email
+    emailSpan.textContent = currentUser.email;
+    
+    // Vérifier si l'email est vérifié
+    const verifiedBadge = document.querySelector('.verified-badge');
+    if (currentUser.emailVerified) {
+        verifiedBadge.style.display = 'inline';
+    } else {
+        verifiedBadge.style.display = 'none';
+    }
+    
+    // Charger les données depuis Firestore
+    db.collection('users').doc(currentUser.uid).get()
+        .then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                isPaidUser = userData.paid || false;
+                
+                // Mettre à jour le statut
+                if (isPaidUser) {
+                    statusBadge.innerHTML = '<i class="fas fa-crown"></i> Compte Premium';
+                    statusBadge.className = 'status-badge premium';
+                } else {
+                    statusBadge.innerHTML = '<i class="fas fa-clock"></i> Compte Gratuit';
+                    statusBadge.className = 'status-badge free';
+                }
+                
+                // Charger le nom et téléphone s'ils existent
+                if (userData.name) {
+                    document.getElementById('profileName').value = userData.name;
+                }
+                if (userData.phone) {
+                    document.getElementById('profilePhone').value = userData.phone;
+                }
+            }
+        })
+        .catch(error => {
+            console.error("Erreur chargement profil:", error);
+            statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur de chargement';
+        });
+    
+    // Mettre à jour le nombre de favoris
+    favoritesCount.textContent = favorites.length;
+}
+
+// Sauvegarder les modifications du profil
+function saveProfileChanges() {
+    if (!currentUser) return;
+    
+    const name = document.getElementById('profileName').value;
+    const phone = document.getElementById('profilePhone').value;
+    
+    db.collection('users').doc(currentUser.uid).update({
+        name: name,
+        phone: phone,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        showNotification('Profil mis à jour avec succès');
+    })
+    .catch(error => {
+        console.error("Erreur sauvegarde profil:", error);
+        showNotification('Erreur lors de la sauvegarde');
+    });
+}
+
+// Réinitialiser le mot de passe
+function resetPassword() {
+    if (!currentUser) return;
+    
+    auth.sendPasswordResetEmail(currentUser.email)
+        .then(() => {
+            showNotification('Email de réinitialisation envoyé');
+        })
+        .catch(error => {
+            console.error("Erreur envoi email:", error);
+            showNotification('Erreur lors de l\'envoi de l\'email');
+        });
+}
+
+// Changer la photo de profil (simulé pour l'instant)
+function changeProfilePhoto() {
+    // Créer un input file caché
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const avatar = document.getElementById('profileAvatar');
+                avatar.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                showNotification('Photo de profil mise à jour');
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    input.click();
+}
 </script>
 <!-- Modal de blocage -->
 <div class="block-modal" id="blockModal">
@@ -3415,6 +4069,31 @@ document.addEventListener('DOMContentLoaded', function() {
         <p style="margin-top: 20px; font-size: 14px; color: #666;">
             WhatsApp: +221 78 152 5106
         </p>
+    </div>
+</div>
+      
+      
+      <!-- Modal d'achat -->
+<div class="purchase-modal" id="purchaseModal">
+    <div class="purchase-content">
+        <i class="fas fa-lock" style="font-size: 50px; color: #ff6b6b; margin-bottom: 20px;"></i>
+        <h3>Version Complète</h3>
+        <div class="price">
+            1500 FCFA
+            <small>(paiement unique)</small>
+        </div>
+        <p>Débloquez l'accès à tous les 44 chapitres<br>et profitez du livre en entier !</p>
+        
+        <div class="purchase-buttons">
+            <button class="purchase-btn" id="whatsappPurchaseBtn">
+                <i class="fab fa-whatsapp"></i>
+                Acheter
+            </button>
+        </div>
+        
+        <button class="close-purchase" id="closePurchaseModal">
+            Fermer
+        </button>
     </div>
 </div>
 </body>
