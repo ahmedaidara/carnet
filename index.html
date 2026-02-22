@@ -2869,16 +2869,12 @@ const firebaseConfig = {
     measurementId: "G-MLXMVNSWVN"
 };
 
-// Initialiser Firebase
+// Initialiser Firebase (uniquement Firestore, pas d'Auth)
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Configuration de persistance
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Variables et constantes
+    // ========== VARIABLES GLOBALES ==========
     const pages = document.querySelectorAll('.page');
     const navItems = document.querySelectorAll('.nav-item');
     const themeToggle = document.getElementById('themeToggle');
@@ -2916,17 +2912,17 @@ document.addEventListener('DOMContentLoaded', function() {
     let globalTextColor = localStorage.getItem('globalTextColor') || '#000000';
     let showingFavorites = false;
     let currentUser = null;
-    let isPaidUser = false; // Statut payant depuis Firestore
+    let isPaidUser = false;
     let notes = JSON.parse(localStorage.getItem('notes')) || [];
     let categories = JSON.parse(localStorage.getItem('noteCategories')) || [];
     let currentNoteId = null;
     let currentCategory = 'all';
     
-  // Liste des chapitres gratuits (12 chapitres)
-const FREE_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 38];
-const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
-  
-    // CONTENU DES CHAPITRES (à remplacer par votre vrai contenu)
+    // Liste des chapitres gratuits
+    const FREE_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 38];
+    const TOTAL_CHAPTERS = 44;
+    
+    // CONTENU DES CHAPITRES (À REMPLACER PAR VOTRE VRAI CONTENU)
     const chapterContents = [
         {chapter: 1, title: {fr: "Introduction", en: "Introduction", ar: "مقدمة"}, text: {fr: "<p>Contenu du chapitre 1...</p>", en: "<p>Chapter 1 content...</p>", ar: "<p>محتوى الفصل الأول...</p>"}},
         {chapter: 2, title: {fr: "Chapitre 2", en: "Chapter 2", ar: "الفصل الثاني"}, text: {fr: "<p>Contenu du chapitre 2...</p>", en: "<p>Chapter 2 content...</p>", ar: "<p>محتوى الفصل الثاني...</p>"}},
@@ -2936,276 +2932,320 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
         {chapter: 6, title: {fr: "Chapitre 6", en: "Chapter 6", ar: "الفصل السادس"}, text: {fr: "<p>Contenu du chapitre 6...</p>", en: "<p>Chapter 6 content...</p>", ar: "<p>محتوى الفصل السادس...</p>"}},
         {chapter: 7, title: {fr: "Chapitre 7", en: "Chapter 7", ar: "الفصل السابع"}, text: {fr: "<p>Contenu du chapitre 7...</p>", en: "<p>Chapter 7 content...</p>", ar: "<p>محتوى الفصل السابع...</p>"}},
         {chapter: 8, title: {fr: "Chapitre 8", en: "Chapter 8", ar: "الفصل الثامن"}, text: {fr: "<p>Contenu du chapitre 8...</p>", en: "<p>Chapter 8 content...</p>", ar: "<p>محتوى الفصل الثامن...</p>"}},
-        {chapter: 9, title: {fr: "Chapitre 9", en: "Chapter 9", ar: "الفصل التاسع"}, text: {fr: "<p>Contenu du chapitre 9...</p>", en: "<p>Chapter 9 content...</p>", ar: "<p>محتوى الفصل التاسع...</p>"}}
+        {chapter: 9, title: {fr: "Chapitre 9", en: "Chapter 9", ar: "الفصل التاسع"}, text: {fr: "<p>Contenu du chapitre 9...</p>", en: "<p>Chapter 9 content...</p>", ar: "<p>محتوى الفصل التاسع...</p>"}},
+        {chapter: 10, title: {fr: "Chapitre 10", en: "Chapter 10", ar: "الفصل العاشر"}, text: {fr: "<p>Contenu du chapitre 10...</p>", en: "<p>Chapter 10 content...</p>", ar: "<p>محتوى الفصل العاشر...</p>"}},
+        {chapter: 11, title: {fr: "Chapitre 11", en: "Chapter 11", ar: "الفصل الحادي عشر"}, text: {fr: "<p>Contenu du chapitre 11...</p>", en: "<p>Chapter 11 content...</p>", ar: "<p>محتوى الفصل الحادي عشر...</p>"}},
+        {chapter: 12, title: {fr: "Chapitre 12", en: "Chapter 12", ar: "الفصل الثاني عشر"}, text: {fr: "<p>Contenu du chapitre 12...</p>", en: "<p>Chapter 12 content...</p>", ar: "<p>محتوى الفصل الثاني عشر...</p>"}},
+        {chapter: 13, title: {fr: "Chapitre 13", en: "Chapter 13", ar: "الفصل الثالث عشر"}, text: {fr: "<p>Contenu du chapitre 13...</p>", en: "<p>Chapter 13 content...</p>", ar: "<p>محتوى الفصل الثالث عشر...</p>"}},
+        {chapter: 14, title: {fr: "Chapitre 14", en: "Chapter 14", ar: "الفصل الرابع عشر"}, text: {fr: "<p>Contenu du chapitre 14...</p>", en: "<p>Chapter 14 content...</p>", ar: "<p>محتوى الفصل الرابع عشر...</p>"}},
+        {chapter: 15, title: {fr: "Chapitre 15", en: "Chapter 15", ar: "الفصل الخامس عشر"}, text: {fr: "<p>Contenu du chapitre 15...</p>", en: "<p>Chapter 15 content...</p>", ar: "<p>محتوى الفصل الخامس عشر...</p>"}},
+        {chapter: 16, title: {fr: "Chapitre 16", en: "Chapter 16", ar: "الفصل السادس عشر"}, text: {fr: "<p>Contenu du chapitre 16...</p>", en: "<p>Chapter 16 content...</p>", ar: "<p>محتوى الفصل السادس عشر...</p>"}},
+        {chapter: 17, title: {fr: "Chapitre 17", en: "Chapter 17", ar: "الفصل السابع عشر"}, text: {fr: "<p>Contenu du chapitre 17...</p>", en: "<p>Chapter 17 content...</p>", ar: "<p>محتوى الفصل السابع عشر...</p>"}},
+        {chapter: 18, title: {fr: "Chapitre 18", en: "Chapter 18", ar: "الفصل الثامن عشر"}, text: {fr: "<p>Contenu du chapitre 18...</p>", en: "<p>Chapter 18 content...</p>", ar: "<p>محتوى الفصل الثامن عشر...</p>"}},
+        {chapter: 19, title: {fr: "Chapitre 19", en: "Chapter 19", ar: "الفصل التاسع عشر"}, text: {fr: "<p>Contenu du chapitre 19...</p>", en: "<p>Chapter 19 content...</p>", ar: "<p>محتوى الفصل التاسع عشر...</p>"}},
+        {chapter: 20, title: {fr: "Chapitre 20", en: "Chapter 20", ar: "الفصل العشرون"}, text: {fr: "<p>Contenu du chapitre 20...</p>", en: "<p>Chapter 20 content...</p>", ar: "<p>محتوى الفصل العشرون...</p>"}},
+        {chapter: 21, title: {fr: "Chapitre 21", en: "Chapter 21", ar: "الفصل الحادي والعشرون"}, text: {fr: "<p>Contenu du chapitre 21...</p>", en: "<p>Chapter 21 content...</p>", ar: "<p>محتوى الفصل الحادي والعشرون...</p>"}},
+        {chapter: 22, title: {fr: "Chapitre 22", en: "Chapter 22", ar: "الفصل الثاني والعشرون"}, text: {fr: "<p>Contenu du chapitre 22...</p>", en: "<p>Chapter 22 content...</p>", ar: "<p>محتوى الفصل الثاني والعشرون...</p>"}},
+        {chapter: 23, title: {fr: "Chapitre 23", en: "Chapter 23", ar: "الفصل الثالث والعشرون"}, text: {fr: "<p>Contenu du chapitre 23...</p>", en: "<p>Chapter 23 content...</p>", ar: "<p>محتوى الفصل الثالث والعشرون...</p>"}},
+        {chapter: 24, title: {fr: "Chapitre 24", en: "Chapter 24", ar: "الفصل الرابع والعشرون"}, text: {fr: "<p>Contenu du chapitre 24...</p>", en: "<p>Chapter 24 content...</p>", ar: "<p>محتوى الفصل الرابع والعشرون...</p>"}},
+        {chapter: 25, title: {fr: "Chapitre 25", en: "Chapter 25", ar: "الفصل الخامس والعشرون"}, text: {fr: "<p>Contenu du chapitre 25...</p>", en: "<p>Chapter 25 content...</p>", ar: "<p>محتوى الفصل الخامس والعشرون...</p>"}},
+        {chapter: 26, title: {fr: "Chapitre 26", en: "Chapter 26", ar: "الفصل السادس والعشرون"}, text: {fr: "<p>Contenu du chapitre 26...</p>", en: "<p>Chapter 26 content...</p>", ar: "<p>محتوى الفصل السادس والعشرون...</p>"}},
+        {chapter: 27, title: {fr: "Chapitre 27", en: "Chapter 27", ar: "الفصل السابع والعشرون"}, text: {fr: "<p>Contenu du chapitre 27...</p>", en: "<p>Chapter 27 content...</p>", ar: "<p>محتوى الفصل السابع والعشرون...</p>"}},
+        {chapter: 28, title: {fr: "Chapitre 28", en: "Chapter 28", ar: "الفصل الثامن والعشرون"}, text: {fr: "<p>Contenu du chapitre 28...</p>", en: "<p>Chapter 28 content...</p>", ar: "<p>محتوى الفصل الثامن والعشرون...</p>"}},
+        {chapter: 29, title: {fr: "Chapitre 29", en: "Chapter 29", ar: "الفصل التاسع والعشرون"}, text: {fr: "<p>Contenu du chapitre 29...</p>", en: "<p>Chapter 29 content...</p>", ar: "<p>محتوى الفصل التاسع والعشرون...</p>"}},
+        {chapter: 30, title: {fr: "Chapitre 30", en: "Chapter 30", ar: "الفصل الثلاثون"}, text: {fr: "<p>Contenu du chapitre 30...</p>", en: "<p>Chapter 30 content...</p>", ar: "<p>محتوى الفصل الثلاثون...</p>"}},
+        {chapter: 31, title: {fr: "Chapitre 31", en: "Chapter 31", ar: "الفصل الحادي والثلاثون"}, text: {fr: "<p>Contenu du chapitre 31...</p>", en: "<p>Chapter 31 content...</p>", ar: "<p>محتوى الفصل الحادي والثلاثون...</p>"}},
+        {chapter: 32, title: {fr: "Chapitre 32", en: "Chapter 32", ar: "الفصل الثاني والثلاثون"}, text: {fr: "<p>Contenu du chapitre 32...</p>", en: "<p>Chapter 32 content...</p>", ar: "<p>محتوى الفصل الثاني والثلاثون...</p>"}},
+        {chapter: 33, title: {fr: "Chapitre 33", en: "Chapter 33", ar: "الفصل الثالث والثلاثون"}, text: {fr: "<p>Contenu du chapitre 33...</p>", en: "<p>Chapter 33 content...</p>", ar: "<p>محتوى الفصل الثالث والثلاثون...</p>"}},
+        {chapter: 34, title: {fr: "Chapitre 34", en: "Chapter 34", ar: "الفصل الرابع والثلاثون"}, text: {fr: "<p>Contenu du chapitre 34...</p>", en: "<p>Chapter 34 content...</p>", ar: "<p>محتوى الفصل الرابع والثلاثون...</p>"}},
+        {chapter: 35, title: {fr: "Chapitre 35", en: "Chapter 35", ar: "الفصل الخامس والثلاثون"}, text: {fr: "<p>Contenu du chapitre 35...</p>", en: "<p>Chapter 35 content...</p>", ar: "<p>محتوى الفصل الخامس والثلاثون...</p>"}},
+        {chapter: 36, title: {fr: "Chapitre 36", en: "Chapter 36", ar: "الفصل السادس والثلاثون"}, text: {fr: "<p>Contenu du chapitre 36...</p>", en: "<p>Chapter 36 content...</p>", ar: "<p>محتوى الفصل السادس والثلاثون...</p>"}},
+        {chapter: 37, title: {fr: "Chapitre 37", en: "Chapter 37", ar: "الفصل السابع والثلاثون"}, text: {fr: "<p>Contenu du chapitre 37...</p>", en: "<p>Chapter 37 content...</p>", ar: "<p>محتوى الفصل السابع والثلاثون...</p>"}},
+        {chapter: 38, title: {fr: "Chapitre 38", en: "Chapter 38", ar: "الفصل الثامن والثلاثون"}, text: {fr: "<p>Contenu du chapitre 38...</p>", en: "<p>Chapter 38 content...</p>", ar: "<p>محتوى الفصل الثامن والثلاثون...</p>"}},
+        {chapter: 39, title: {fr: "Chapitre 39", en: "Chapter 39", ar: "الفصل التاسع والثلاثون"}, text: {fr: "<p>Contenu du chapitre 39...</p>", en: "<p>Chapter 39 content...</p>", ar: "<p>محتوى الفصل التاسع والثلاثون...</p>"}},
+        {chapter: 40, title: {fr: "Chapitre 40", en: "Chapter 40", ar: "الفصل الأربعون"}, text: {fr: "<p>Contenu du chapitre 40...</p>", en: "<p>Chapter 40 content...</p>", ar: "<p>محتوى الفصل الأربعون...</p>"}},
+        {chapter: 41, title: {fr: "Chapitre 41", en: "Chapter 41", ar: "الفصل الحادي والأربعون"}, text: {fr: "<p>Contenu du chapitre 41...</p>", en: "<p>Chapter 41 content...</p>", ar: "<p>محتوى الفصل الحادي والأربعون...</p>"}},
+        {chapter: 42, title: {fr: "Chapitre 42", en: "Chapter 42", ar: "الفصل الثاني والأربعون"}, text: {fr: "<p>Contenu du chapitre 42...</p>", en: "<p>Chapter 42 content...</p>", ar: "<p>محتوى الفصل الثاني والأربعون...</p>"}},
+        {chapter: 43, title: {fr: "Chapitre 43", en: "Chapter 43", ar: "الفصل الثالث والأربعون"}, text: {fr: "<p>Contenu du chapitre 43...</p>", en: "<p>Chapter 43 content...</p>", ar: "<p>محتوى الفصل الثالث والأربعون...</p>"}},
+        {chapter: 44, title: {fr: "Chapitre 44", en: "Chapter 44", ar: "الفصل الرابع والأربعون"}, text: {fr: "<p>Contenu du chapitre 44...</p>", en: "<p>Chapter 44 content...</p>", ar: "<p>محتوى الفصل الرابع والأربعون...</p>"}}
     ];
+
+    // ========== FONCTIONS D'AUTHENTIFICATION (FIRESTORE UNIQUEMENT) ==========
     
-    const totalChapters = chapterContents.length;
-    
-    // ========== FONCTIONS D'AUTHENTIFICATION ==========
-    
-    // Écouter les changements d'état de connexion
-    auth.onAuthStateChanged(async (user) => {
-    currentUser = user;
-    const profileNavItem = document.getElementById('profileNavItem');
-    
-    if (user) {
-        profileNavItem.setAttribute('data-page', 'profilePage');
-        profileNavItem.querySelector('span').textContent = 'Profil';
+    // Charger l'utilisateur depuis localStorage au démarrage
+    function loadCurrentUser() {
+        const storedUser = localStorage.getItem('currentUser');
         
-        await loadUserFromFirestore(user.uid);
-        updateLastActivity(user.uid);
-        
-        // Charger les données du profil si on est sur la page profil
-        if (document.getElementById('profilePage').classList.contains('active')) {
-            loadProfileData();
-        }
-    } else {
-        profileNavItem.setAttribute('data-page', 'loginPage');
-        profileNavItem.querySelector('span').textContent = 'Compte';
-        isPaidUser = false;
-        updateChaptersGrid();
-    }
-});
-    
-    // Charger les données utilisateur depuis Firestore
-    async function loadUserFromFirestore(uid) {
-        try {
-            const docRef = db.collection('users').doc(uid);
-            const docSnap = await docRef.get();
-            
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
-                isPaidUser = userData.paid || false;
+        if (storedUser) {
+            try {
+                currentUser = JSON.parse(storedUser);
+                isPaidUser = currentUser.paid || false;
                 
-                // Mettre à jour l'affichage du profil
-                document.getElementById('profileEmail').value = currentUser.email;
-                const statusDiv = document.getElementById('profileStatus');
+                // Mettre à jour la navigation
+                const profileNavItem = document.getElementById('profileNavItem');
+                profileNavItem.setAttribute('data-page', 'profilePage');
+                profileNavItem.querySelector('span').textContent = 'Profil';
                 
-                if (isPaidUser) {
-                    statusDiv.textContent = '✅ Compte Premium - Accès complet';
-                    statusDiv.style.backgroundColor = '#d4edda';
-                    statusDiv.style.color = '#155724';
-                } else {
-                    statusDiv.textContent = '⏳ Compte Gratuit - Version d\'essai';
-                    statusDiv.style.backgroundColor = '#fff3cd';
-                    statusDiv.style.color = '#856404';
+                // Mettre à jour l'affichage du profil si on est sur la page
+                if (document.getElementById('profilePage').classList.contains('active')) {
+                    updateProfileDisplay();
                 }
-            } else {
-                // Si le document n'existe pas, le créer
-                await docRef.set({
-                    email: currentUser.email,
-                    paid: false,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
-                });
                 
+                // Mettre à jour l'accès aux chapitres
+                updateChaptersGrid();
+                
+            } catch (e) {
+                console.error("Erreur parsing utilisateur:", e);
+                localStorage.removeItem('currentUser');
+                currentUser = null;
                 isPaidUser = false;
-                document.getElementById('profileEmail').value = currentUser.email;
-                document.getElementById('profileStatus').textContent = '⏳ Compte Gratuit';
             }
+        } else {
+            currentUser = null;
+            isPaidUser = false;
             
-            // Mettre à jour l'accès aux chapitres
-            updateChapterAccess();
-            
-        } catch (error) {
-            console.error("Erreur chargement Firestore:", error);
-            showNotification('Erreur de chargement du profil');
+            const profileNavItem = document.getElementById('profileNavItem');
+            profileNavItem.setAttribute('data-page', 'loginPage');
+            profileNavItem.querySelector('span').textContent = 'Compte';
         }
-    }
-    
-    // Mettre à jour la dernière activité
-    function updateLastActivity(uid) {
-        db.collection('users').doc(uid).update({
-            lastActive: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(error => console.error("Erreur mise à jour activité:", error));
     }
     
     // Inscription
-    async function register(email, password) {
-        if (password.length < 6) {
-            showNotification('Le mot de passe doit contenir au moins 6 caractères');
-            return;
-        }
-        
+    async function register(email, password, name = '') {
         try {
-            // Créer l'utilisateur dans Firebase Auth
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
+            // Vérifier si l'email existe déjà
+            const existingUser = await db.collection('users')
+                .where('email', '==', email)
+                .get();
             
-            // Créer le document dans Firestore
-            await db.collection('users').doc(user.uid).set({
+            if (!existingUser.empty) {
+                showNotification('Cet email est déjà utilisé');
+                return;
+            }
+            
+            // Créer le nouvel utilisateur dans Firestore
+            const userData = {
+                email: email,
+                password: password, // Stocké en clair comme demandé
+                paid: false,
+                name: name,
+                phone: '',
+                createdAt: new Date().toISOString(),
+                lastActive: new Date().toISOString(),
+                favorites: []
+            };
+            
+            const docRef = await db.collection('users').add(userData);
+            
+            // Connecter l'utilisateur automatiquement
+            currentUser = {
+                id: docRef.id,
                 email: email,
                 paid: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastActive: firebase.firestore.FieldValue.serverTimestamp()
-            });
+                name: name,
+                phone: ''
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            isPaidUser = false;
             
             showNotification('Compte créé avec succès !');
+            
+            // Mettre à jour l'interface
+            const profileNavItem = document.getElementById('profileNavItem');
+            profileNavItem.setAttribute('data-page', 'profilePage');
+            profileNavItem.querySelector('span').textContent = 'Profil';
+            
             showPage('profilePage');
+            updateProfileDisplay();
+            updateChaptersGrid();
             
         } catch (error) {
             console.error("Erreur inscription:", error);
-            let message = 'Erreur lors de l\'inscription';
-            
-            switch(error.code) {
-                case 'auth/email-already-in-use':
-                    message = 'Cet email est déjà utilisé';
-                    break;
-                case 'auth/invalid-email':
-                    message = 'Email invalide';
-                    break;
-                case 'auth/weak-password':
-                    message = 'Mot de passe trop faible (minimum 6 caractères)';
-                    break;
-                default:
-                    message = error.message;
-            }
-            
-            showNotification(message);
+            showNotification('Erreur lors de l\'inscription: ' + error.message);
         }
     }
     
     // Connexion
     async function login(email, password) {
         try {
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            // Chercher l'utilisateur dans Firestore
+            const querySnapshot = await db.collection('users')
+                .where('email', '==', email)
+                .where('password', '==', password)
+                .get();
+            
+            if (querySnapshot.empty) {
+                showNotification('Email ou mot de passe incorrect');
+                return;
+            }
+            
+            // Récupérer les données de l'utilisateur
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
             
             // Mettre à jour la dernière activité
-            await db.collection('users').doc(userCredential.user.uid).update({
-                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            await db.collection('users').doc(userDoc.id).update({
+                lastActive: new Date().toISOString()
             });
             
+            // Connecter l'utilisateur
+            currentUser = {
+                id: userDoc.id,
+                email: email,
+                paid: userData.paid || false,
+                name: userData.name || '',
+                phone: userData.phone || ''
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            isPaidUser = userData.paid || false;
+            
             showNotification('Connexion réussie !');
+            
+            // Mettre à jour l'interface
+            const profileNavItem = document.getElementById('profileNavItem');
+            profileNavItem.setAttribute('data-page', 'profilePage');
+            profileNavItem.querySelector('span').textContent = 'Profil';
+            
             showPage('profilePage');
+            updateProfileDisplay();
+            updateChaptersGrid();
             
         } catch (error) {
             console.error("Erreur connexion:", error);
-            showNotification('Email ou mot de passe incorrect');
+            showNotification('Erreur lors de la connexion: ' + error.message);
         }
     }
     
     // Déconnexion
-    async function logout() {
+    function logout() {
+        localStorage.removeItem('currentUser');
+        currentUser = null;
+        isPaidUser = false;
+        
+        showNotification('Déconnexion réussie');
+        
+        // Mettre à jour l'interface
+        const profileNavItem = document.getElementById('profileNavItem');
+        profileNavItem.setAttribute('data-page', 'loginPage');
+        profileNavItem.querySelector('span').textContent = 'Compte';
+        
+        showPage('homePage');
+        updateChaptersGrid();
+    }
+    
+    // Mettre à jour l'affichage du profil
+    function updateProfileDisplay() {
+        if (!currentUser) return;
+        
+        document.getElementById('profileEmail').textContent = currentUser.email;
+        document.getElementById('profileName').value = currentUser.name || '';
+        document.getElementById('profilePhone').value = currentUser.phone || '';
+        
+        const statusBadge = document.getElementById('statusBadge');
+        if (isPaidUser) {
+            statusBadge.innerHTML = '<i class="fas fa-crown"></i> Compte Premium - Accès complet';
+            statusBadge.className = 'status-badge premium';
+        } else {
+            statusBadge.innerHTML = '<i class="fas fa-clock"></i> Compte Gratuit - 12 chapitres disponibles';
+            statusBadge.className = 'status-badge free';
+        }
+        
+        document.getElementById('favoritesCount').textContent = favorites.length;
+    }
+    
+    // Sauvegarder les modifications du profil
+    async function saveProfileChanges() {
+        if (!currentUser) return;
+        
+        const name = document.getElementById('profileName').value;
+        const phone = document.getElementById('profilePhone').value;
+        
         try {
-            await auth.signOut();
-            showNotification('Déconnexion réussie');
-            showPage('homePage');
+            await db.collection('users').doc(currentUser.id).update({
+                name: name,
+                phone: phone,
+                lastActive: new Date().toISOString()
+            });
+            
+            currentUser.name = name;
+            currentUser.phone = phone;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            showNotification('Profil mis à jour avec succès');
+            
         } catch (error) {
-            console.error("Erreur déconnexion:", error);
+            console.error("Erreur sauvegarde profil:", error);
+            showNotification('Erreur lors de la sauvegarde');
         }
     }
     
     // ========== GESTION DES CHAPITRES ==========
     
-    function updateChapterAccess() {
-        document.querySelectorAll('.chapter-card').forEach(card => {
-            const chapterNum = parseInt(card.querySelector('.chapter-number').textContent);
-            
-            if (chapterNum > 9 && !isPaidUser) {
-                // Chapitre bloqué pour les non-payants
-                card.style.opacity = '0.5';
-                card.style.pointerEvents = 'none';
-                
-                // Ajouter un cadenas
-                if (!card.querySelector('.lock-indicator')) {
-                    const lock = document.createElement('div');
-                    lock.className = 'lock-indicator';
-                    lock.innerHTML = '<i class="fas fa-lock"></i>';
-                    lock.style.position = 'absolute';
-                    lock.style.top = '50%';
-                    lock.style.left = '50%';
-                    lock.style.transform = 'translate(-50%, -50%)';
-                    lock.style.color = '#ff6b6b';
-                    lock.style.fontSize = '24px';
-                    card.appendChild(lock);
+    function updateChaptersGrid() {
+        if (!chaptersGrid) return;
+        
+        chaptersGrid.innerHTML = '';
+        
+        for (let i = 1; i <= TOTAL_CHAPTERS; i++) {
+            const chapterData = chapterContents.find(ch => ch.chapter === i) || {
+                chapter: i,
+                title: {
+                    fr: `Chapitre ${i}`,
+                    en: `Chapter ${i}`,
+                    ar: `الفصل ${i}`
+                },
+                text: {
+                    fr: "<p>Contenu à venir...</p>",
+                    en: "<p>Content coming soon...</p>",
+                    ar: "<p>المحتوى قريباً...</p>"
                 }
-            } else {
-                // Chapitre accessible
-                card.style.opacity = '1';
-                card.style.pointerEvents = 'auto';
-                const lock = card.querySelector('.lock-indicator');
-                if (lock) lock.remove();
-            }
-        });
-    }
-    
-  function updateChaptersGrid() {
-    if (!chaptersGrid) return;
-    
-    chaptersGrid.innerHTML = '';
-    
-    // Générer les chapitres de 1 à 44
-    for (let i = 1; i <= TOTAL_CHAPTERS; i++) {
-        // Chercher si le chapitre existe dans chapterContents
-        const chapterData = chapterContents.find(ch => ch.chapter === i) || {
-            chapter: i,
-            title: {
-                fr: `Chapitre ${i}`,
-                en: `Chapter ${i}`,
-                ar: `الفصل ${i}`
-            },
-            text: {
-                fr: "<p>Contenu à venir...</p>",
-                en: "<p>Content coming soon...</p>",
-                ar: "<p>المحتوى قريباً...</p>"
-            }
-        };
-        
-        const isFree = FREE_CHAPTERS.includes(i);
-        const isLocked = !isFree && !isPaidUser;
-        
-        const chapterCard = document.createElement('div');
-        chapterCard.className = 'chapter-card';
-        chapterCard.setAttribute('lang', currentLanguage);
-        
-        // Ajouter une classe pour les chapitres verrouillés
-        if (isLocked) {
-            chapterCard.classList.add('locked-chapter');
-        }
-        
-        chapterCard.innerHTML = `
-            <div class="chapter-number">${i}</div>
-            <div class="chapter-title">${chapterData.title[currentLanguage] || 'Chapitre ' + i}</div>
-            ${isLocked ? '<div class="lock-icon"><i class="fas fa-lock"></i></div>' : ''}
-            <div class="favorite-icon" id="favorite-${i}">
-                ${favorites.includes(i) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}
-            </div>
-        `;
-        
-        chapterCard.addEventListener('click', (e) => {
-            // Ne pas déclencher si on clique sur l'icône favori
-            if (e.target.closest('.favorite-icon')) return;
+            };
             
+            const isFree = FREE_CHAPTERS.includes(i);
+            const isLocked = !isFree && !isPaidUser;
+            
+            const chapterCard = document.createElement('div');
+            chapterCard.className = 'chapter-card';
             if (isLocked) {
-                showPurchaseModal();
-                return;
+                chapterCard.classList.add('locked-chapter');
             }
+            chapterCard.setAttribute('lang', currentLanguage);
             
-            currentChapter = i;
+            chapterCard.innerHTML = `
+                <div class="chapter-number">${i}</div>
+                <div class="chapter-title">${chapterData.title[currentLanguage] || 'Chapitre ' + i}</div>
+                ${isLocked ? '<div class="lock-icon"><i class="fas fa-lock"></i></div>' : ''}
+                <div class="favorite-icon" id="favorite-${i}">
+                    ${favorites.includes(i) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}
+                </div>
+            `;
             
-            // Mettre à jour le contenu du chapitre
-            const selectedChapter = chapterContents.find(ch => ch.chapter === i);
-            if (selectedChapter) {
-                contentElement.innerHTML = selectedChapter.text[currentLanguage] || '<p>Contenu non disponible</p>';
-            } else {
-                contentElement.innerHTML = '<p>Chapitre en cours de rédaction...</p>';
-            }
-            
-            chapterIndicator.textContent = `Chapitre ${i}`;
-            showPage('readingPage');
-        });
-        
-        const favIcon = chapterCard.querySelector('.favorite-icon');
-        if (favIcon) {
-            favIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorite(i);
+            chapterCard.addEventListener('click', (e) => {
+                if (e.target.closest('.favorite-icon')) return;
+                
+                if (isLocked) {
+                    showPurchaseModal();
+                    return;
+                }
+                
+                currentChapter = i;
+                updateChapterContent();
+                showPage('readingPage');
             });
+            
+            const favIcon = chapterCard.querySelector('.favorite-icon');
+            if (favIcon) {
+                favIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(i);
+                });
+            }
+            
+            chaptersGrid.appendChild(chapterCard);
         }
-        
-        chaptersGrid.appendChild(chapterCard);
     }
-}
     
     function updateChapterContent() {
         const chapter = chapterContents.find(ch => ch.chapter === currentChapter);
@@ -3216,15 +3256,15 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
         if (prevChapterBtn) prevChapterBtn.disabled = currentChapter === 1;
         if (nextChapterBtn) nextChapterBtn.disabled = currentChapter === chapterContents.length;
         
-        contentElement.innerHTML = chapter.text[currentLanguage] || 'Contenu non disponible';
+        contentElement.innerHTML = chapter.text[currentLanguage] || '<p>Contenu non disponible</p>';
         contentElement.setAttribute('lang', currentLanguage);
+        contentElement.scrollTop = 0;
     }
     
     function goToPrevChapter() {
         if (currentChapter > 1) {
             currentChapter--;
             updateChapterContent();
-            if (contentElement) contentElement.scrollTop = 0;
         }
     }
     
@@ -3232,7 +3272,6 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
         if (currentChapter < chapterContents.length) {
             currentChapter++;
             updateChapterContent();
-            if (contentElement) contentElement.scrollTop = 0;
         }
     }
     
@@ -3248,13 +3287,18 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
         localStorage.setItem('favorites', JSON.stringify(favorites));
         updateFavoriteIcon(chapterNumber);
         updateFavoritesPage();
+        document.getElementById('favoritesCount').textContent = favorites.length;
     }
     
     function updateFavoriteIcon(chapterNumber) {
-        const heartIcon = document.getElementById(`favorite-${chapterNumber}`);
-        if (heartIcon) {
-            heartIcon.classList.toggle('active', favorites.includes(chapterNumber));
-            heartIcon.innerHTML = favorites.includes(chapterNumber) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>';
+        const icon = document.getElementById(`favorite-${chapterNumber}`);
+        if (icon) {
+            icon.innerHTML = favorites.includes(chapterNumber) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>';
+        }
+        
+        const favIcon = document.getElementById(`favorite-fav-${chapterNumber}`);
+        if (favIcon) {
+            favIcon.innerHTML = favorites.includes(chapterNumber) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>';
         }
     }
     
@@ -3274,35 +3318,74 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
             const chapter = chapterContents.find(ch => ch.chapter === chapterNumber);
             if (!chapter) return;
             
+            const isFree = FREE_CHAPTERS.includes(chapterNumber);
+            const isLocked = !isFree && !isPaidUser;
+            
             const chapterCard = document.createElement('div');
             chapterCard.className = 'chapter-card';
-            chapterCard.setAttribute('lang', currentLanguage);
+            if (isLocked) {
+                chapterCard.classList.add('locked-chapter');
+            }
+            
             chapterCard.innerHTML = `
                 <div class="chapter-number">${chapterNumber}</div>
                 <div class="chapter-title">${chapter.title[currentLanguage] || 'Chapitre ' + chapterNumber}</div>
+                ${isLocked ? '<div class="lock-icon"><i class="fas fa-lock"></i></div>' : ''}
                 <div class="favorite-icon active" id="favorite-fav-${chapterNumber}">
                     <i class="fas fa-bookmark"></i>
                 </div>
             `;
             
-            chapterCard.addEventListener('click', () => {
-                if (chapterNumber > 9 && !isPaidUser) {
-                    showNotification('Ce chapitre est réservé aux utilisateurs premium');
+            chapterCard.addEventListener('click', (e) => {
+                if (e.target.closest('.favorite-icon')) return;
+                
+                if (isLocked) {
+                    showPurchaseModal();
                     return;
                 }
+                
                 currentChapter = chapterNumber;
                 updateChapterContent();
                 showPage('readingPage');
             });
             
             const favIcon = chapterCard.querySelector('.favorite-icon');
-            favIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorite(chapterNumber);
-            });
+            if (favIcon) {
+                favIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(chapterNumber);
+                });
+            }
             
             favoritesGrid.appendChild(chapterCard);
         });
+    }
+    
+    // ========== MODAL D'ACHAT ==========
+    
+    function showPurchaseModal() {
+        const modal = document.getElementById('purchaseModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+    
+    function closePurchaseModal() {
+        const modal = document.getElementById('purchaseModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+    
+    function openPurchaseWhatsApp() {
+        const phoneNumber = "221781525106";
+        const message = encodeURIComponent(
+            "Bonjour, je souhaite acheter la version complète du livre 'La Voie du Salut' à 1500 FCFA.\n\n" +
+            "Mon email : " + (currentUser ? currentUser.email : "Non connecté") + "\n\n" +
+            "Merci de me donner les instructions pour le paiement."
+        );
+        window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+        closePurchaseModal();
     }
     
     // ========== NAVIGATION ==========
@@ -3313,30 +3396,28 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
         
         navItems.forEach(item => {
             item.classList.remove('active');
-            if (item.getAttribute('data-page') === pageId || 
-                (pageId === 'profilePage' && item.id === 'profileNavItem')) {
+            if (item.getAttribute('data-page') === pageId) {
                 item.classList.add('active');
             }
         });
         
-        // Mettre à jour la dernière activité si connecté
-        if (currentUser && (pageId === 'readingPage' || pageId === 'chaptersPage')) {
-            updateLastActivity(currentUser.uid);
+        // Charger les données du profil si on va sur la page profil
+        if (pageId === 'profilePage' && currentUser) {
+            updateProfileDisplay();
         }
     }
     
     function toggleFavoritesView() {
         showingFavorites = !showingFavorites;
+        const btn = document.getElementById('toggleFavoritesView');
         
         if (showingFavorites) {
-            const favoriteChapters = chapterContents.filter(chapter => 
-                favorites.includes(chapter.chapter)
-            );
+            const favoriteChapters = chapterContents.filter(ch => favorites.includes(ch.chapter));
             renderChaptersGrid(favoriteChapters);
-            toggleFavoritesViewBtn.innerHTML = '<i class="fas fa-list"></i>';
+            if (btn) btn.innerHTML = '<i class="fas fa-list"></i>';
         } else {
             renderChaptersGrid(chapterContents);
-            toggleFavoritesViewBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+            if (btn) btn.innerHTML = '<i class="fas fa-bookmark"></i>';
         }
     }
     
@@ -3346,40 +3427,50 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
         chaptersGrid.innerHTML = '';
         
         chapters.forEach(chapter => {
+            const isFree = FREE_CHAPTERS.includes(chapter.chapter);
+            const isLocked = !isFree && !isPaidUser;
+            
             const chapterCard = document.createElement('div');
             chapterCard.className = 'chapter-card';
-            chapterCard.setAttribute('lang', currentLanguage);
+            if (isLocked) {
+                chapterCard.classList.add('locked-chapter');
+            }
+            
             chapterCard.innerHTML = `
                 <div class="chapter-number">${chapter.chapter}</div>
                 <div class="chapter-title">${chapter.title[currentLanguage] || 'Chapitre ' + chapter.chapter}</div>
+                ${isLocked ? '<div class="lock-icon"><i class="fas fa-lock"></i></div>' : ''}
                 <div class="favorite-icon" id="favorite-${chapter.chapter}">
                     ${favorites.includes(chapter.chapter) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}
                 </div>
             `;
             
-            chapterCard.addEventListener('click', () => {
-                if (chapter.chapter > 9 && !isPaidUser) {
-                    showNotification('Ce chapitre est réservé aux utilisateurs premium');
+            chapterCard.addEventListener('click', (e) => {
+                if (e.target.closest('.favorite-icon')) return;
+                
+                if (isLocked) {
+                    showPurchaseModal();
                     return;
                 }
+                
                 currentChapter = chapter.chapter;
                 updateChapterContent();
                 showPage('readingPage');
             });
             
             const favIcon = chapterCard.querySelector('.favorite-icon');
-            favIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorite(chapter.chapter);
-            });
+            if (favIcon) {
+                favIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(chapter.chapter);
+                });
+            }
             
             chaptersGrid.appendChild(chapterCard);
         });
-        
-        updateChapterAccess();
     }
     
-    // ========== CONFIGURATION DES ÉCOUTEURS ==========
+    // ========== CONFIGURATION ==========
     
     function setupEventListeners() {
         // Navigation
@@ -3401,21 +3492,7 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
         document.getElementById('backFromRegister')?.addEventListener('click', () => showPage('loginPage'));
         document.getElementById('backFromProfile')?.addEventListener('click', () => showPage('homePage'));
         document.getElementById('goToRegisterBtn')?.addEventListener('click', () => showPage('registerPage'));
-        // Écouteurs pour la page de profil
-document.getElementById('changePhotoBtn')?.addEventListener('click', changeProfilePhoto);
-document.getElementById('resetPasswordBtn')?.addEventListener('click', resetPassword);
-document.getElementById('editProfileBtn')?.addEventListener('click', saveProfileChanges);
-
-// Mettre à jour l'affichage du profil quand on y accède
-document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (currentUser) {
-        loadProfileData();
-        showPage('profilePage');
-    } else {
-        showPage('loginPage');
-    }
-});
+        
         document.getElementById('loginBtn')?.addEventListener('click', () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -3429,14 +3506,32 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
         document.getElementById('registerBtn')?.addEventListener('click', () => {
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName')?.value || '';
+            
             if (email && password) {
-                register(email, password);
+                if (password.length < 3) {
+                    showNotification('Mot de passe trop court (minimum 3 caractères)');
+                } else {
+                    register(email, password, name);
+                }
             } else {
                 showNotification('Veuillez remplir tous les champs');
             }
         });
         
         document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        document.getElementById('saveProfileBtn')?.addEventListener('click', saveProfileChanges);
+        
+        // Modal d'achat
+        document.getElementById('whatsappPurchaseBtn')?.addEventListener('click', openPurchaseWhatsApp);
+        document.getElementById('closePurchaseModal')?.addEventListener('click', closePurchaseModal);
+        
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('purchaseModal');
+            if (e.target === modal) {
+                closePurchaseModal();
+            }
+        });
         
         // Autres boutons
         if (startReadingBtn) {
@@ -3495,6 +3590,12 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
             searchButton.addEventListener('click', performSearch);
         }
         
+        if (searchInput) {
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+        }
+        
         if (privacyPolicyLink) {
             privacyPolicyLink.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -3510,7 +3611,7 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
         setupNotesListeners();
     }
     
-    // ========== FONCTIONS DE PERSONNALISATION ==========
+    // ========== PERSONNALISATION ==========
     
     function toggleCustomizationPanel() {
         customizationPanel.classList.toggle('open');
@@ -3544,32 +3645,25 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
     }
     
     function applySavedSettings() {
-        // Appliquer les couleurs
         document.querySelector('header').style.backgroundColor = headerColor;
         navBar.style.backgroundColor = footerColor;
         
-        if (fontSizeSlider) {
-            const savedFontSize = localStorage.getItem('fontSize') || '18';
-            fontSizeSlider.value = savedFontSize;
-            fontSizeValue.textContent = `${savedFontSize}px`;
-            document.documentElement.style.setProperty('--font-size', `${savedFontSize}px`);
-        }
+        const savedFontSize = localStorage.getItem('fontSize') || '18';
+        fontSizeSlider.value = savedFontSize;
+        fontSizeValue.textContent = `${savedFontSize}px`;
+        document.documentElement.style.setProperty('--font-size', `${savedFontSize}px`);
         
-        if (lineHeightSlider) {
-            const savedLineHeight = localStorage.getItem('lineHeight') || '1.8';
-            lineHeightSlider.value = savedLineHeight;
-            lineHeightValue.textContent = savedLineHeight;
-            document.documentElement.style.setProperty('--line-height', savedLineHeight);
-        }
+        const savedLineHeight = localStorage.getItem('lineHeight') || '1.8';
+        lineHeightSlider.value = savedLineHeight;
+        lineHeightValue.textContent = savedLineHeight;
+        document.documentElement.style.setProperty('--line-height', savedLineHeight);
         
-        if (fontFamilySelect) {
-            const savedFontFamily = localStorage.getItem('fontFamily') || 'Poppins';
-            fontFamilySelect.value = savedFontFamily;
-            document.documentElement.style.setProperty('--font-family', savedFontFamily);
-        }
+        const savedFontFamily = localStorage.getItem('fontFamily') || 'Poppins';
+        fontFamilySelect.value = savedFontFamily;
+        document.documentElement.style.setProperty('--font-family', savedFontFamily);
     }
     
-    // ========== FONCTIONS DE RECHERCHE ==========
+    // ========== RECHERCHE ==========
     
     function openSearchModal() {
         searchModal.classList.add('active');
@@ -3583,73 +3677,46 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
     }
     
     function performSearch() {
-        const searchTerm = searchInput.value.trim();
-        searchResults.innerHTML = '';
-        
-        if (searchTerm.length < 2) {
-            searchResults.innerHTML = '<div class="no-results">Veuillez entrer au moins 2 caractères</div>';
+        const term = searchInput.value.trim().toLowerCase();
+        if (term.length < 2) {
+            searchResults.innerHTML = '<div class="no-results">Entrez au moins 2 caractères</div>';
             return;
         }
         
-        let totalOccurrences = 0;
-        const results = chapterContents.filter(chapter => {
-            if (chapter.chapter > 9 && !isPaidUser) return false;
-            
-            const text = chapter.text[currentLanguage] || '';
-            const title = chapter.title[currentLanguage] || '';
-            
-            const textMatches = (text.match(new RegExp(searchTerm, 'gi')) || []).length;
-            const titleMatches = (title.match(new RegExp(searchTerm, 'gi')) || []).length;
-            totalOccurrences += textMatches + titleMatches;
-            
-            return (textMatches + titleMatches) > 0;
+        const results = chapterContents.filter(ch => {
+            if (ch.chapter > 9 && !isPaidUser) return false;
+            const text = (ch.text[currentLanguage] || '').toLowerCase();
+            const title = (ch.title[currentLanguage] || '').toLowerCase();
+            return text.includes(term) || title.includes(term);
         });
         
         if (results.length === 0) {
-            searchResults.innerHTML = `<div class="no-results">Aucun résultat trouvé pour "${searchTerm}"</div>`;
+            searchResults.innerHTML = `<div class="no-results">Aucun résultat pour "${term}"</div>`;
             return;
         }
         
-        const summary = document.createElement('div');
-        summary.className = 'search-summary';
-        summary.innerHTML = `
-            <div class="search-stats">
-                <p>Le terme "<strong>${searchTerm}</strong>" a été trouvé <strong>${totalOccurrences} fois</strong> 
-                dans ${results.length} chapitre(s)</p>
-            </div>
-        `;
-        searchResults.appendChild(summary);
+        let html = `<div class="search-summary">${results.length} résultat(s) trouvé(s)</div>`;
         
-        results.forEach(result => {
-            const text = result.text[currentLanguage] || '';
-            
-            const resultElement = document.createElement('div');
-            resultElement.className = 'search-result-item';
-            resultElement.innerHTML = `
-                <div class="result-chapter">
-                    Chapitre ${result.chapter}: ${result.title[currentLanguage]}
+        results.forEach(ch => {
+            html += `
+                <div class="search-result-item" onclick="goToChapter(${ch.chapter})">
+                    <div class="result-chapter">Chapitre ${ch.chapter}</div>
+                    <div class="result-text">${(ch.title[currentLanguage] || '').substring(0, 100)}</div>
                 </div>
-                <div class="result-text">${highlightText(text.substring(0, 200), searchTerm)}...</div>
             `;
-            
-            resultElement.addEventListener('click', () => {
-                currentChapter = result.chapter;
-                updateChapterContent();
-                showPage('readingPage');
-                closeSearchModal();
-            });
-            
-            searchResults.appendChild(resultElement);
         });
+        
+        searchResults.innerHTML = html;
     }
     
-    function highlightText(text, term) {
-        if (!text) return '';
-        const regex = new RegExp(`(${term})`, 'gi');
-        return text.replace(regex, '<span class="highlight">$1</span>');
-    }
+    window.goToChapter = function(chapter) {
+        currentChapter = chapter;
+        updateChapterContent();
+        showPage('readingPage');
+        closeSearchModal();
+    };
     
-    // ========== FONCTIONS POUR LES NOTES (simplifiées) ==========
+    // ========== NOTES ==========
     
     function setupNotesListeners() {
         document.getElementById('backFromNotes')?.addEventListener('click', () => showPage('homePage'));
@@ -3702,36 +3769,36 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
         document.getElementById('noteCategorySelect').value = note.category || '';
         document.getElementById('noteDate').textContent = `Créé le: ${formatDate(note.createdAt)}`;
         
-        const favoriteBtn = document.getElementById('toggleFavoriteNote');
-        favoriteBtn.innerHTML = note.isFavorite ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+        const favBtn = document.getElementById('toggleFavoriteNote');
+        favBtn.innerHTML = note.isFavorite ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
         updateNoteStats();
         document.getElementById('noteEditor').style.display = 'flex';
     }
     
     function renderNotesList() {
-        const notesList = document.getElementById('notesList');
-        let filteredNotes = [];
+        const list = document.getElementById('notesList');
+        let filtered = [];
         
-        if (currentCategory === 'all') filteredNotes = [...notes];
-        else if (currentCategory === 'favorites') filteredNotes = notes.filter(n => n.isFavorite);
-        else filteredNotes = notes.filter(n => n.category === currentCategory);
+        if (currentCategory === 'all') filtered = [...notes];
+        else if (currentCategory === 'favorites') filtered = notes.filter(n => n.isFavorite);
+        else filtered = notes.filter(n => n.category === currentCategory);
         
-        filteredNotes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         
-        if (filteredNotes.length === 0) {
-            notesList.innerHTML = '<div class="empty-notes"><i class="fas fa-sticky-note"></i><p>Aucune note</p><button class="btn" id="createFirstNote">Créer une note</button></div>';
+        if (filtered.length === 0) {
+            list.innerHTML = '<div class="empty-notes"><i class="fas fa-sticky-note"></i><p>Aucune note</p><button class="btn" id="createFirstNote">Créer une note</button></div>';
             document.getElementById('createFirstNote')?.addEventListener('click', createNewNote);
             document.getElementById('noteEditor').style.display = 'none';
             return;
         }
         
-        notesList.innerHTML = '';
-        filteredNotes.forEach(note => {
-            const noteItem = document.createElement('div');
-            noteItem.className = 'note-item';
-            if (note.id === currentNoteId) noteItem.classList.add('selected');
+        list.innerHTML = '';
+        filtered.forEach(note => {
+            const item = document.createElement('div');
+            item.className = 'note-item';
+            if (note.id === currentNoteId) item.classList.add('selected');
             
-            noteItem.innerHTML = `
+            item.innerHTML = `
                 <div class="note-item-header">
                     <div class="note-item-title">${note.title}</div>
                     <div class="note-item-date">${formatDate(note.updatedAt)}</div>
@@ -3741,36 +3808,36 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
                 ${note.isFavorite ? '<i class="fas fa-star" style="color:#ffc107; float:right;"></i>' : ''}
             `;
             
-            noteItem.addEventListener('click', () => {
+            item.addEventListener('click', () => {
                 currentNoteId = note.id;
                 renderNotesList();
                 openNoteEditor(note);
             });
             
-            notesList.appendChild(noteItem);
+            list.appendChild(item);
         });
     }
     
     function renderCategories() {
-        const categorySelect = document.getElementById('noteCategorySelect');
-        categorySelect.innerHTML = '<option value="">Sans catégorie</option>';
+        const select = document.getElementById('noteCategorySelect');
+        select.innerHTML = '<option value="">Sans catégorie</option>';
         categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            option.textContent = cat;
-            categorySelect.appendChild(option);
+            const opt = document.createElement('option');
+            opt.value = cat;
+            opt.textContent = cat;
+            select.appendChild(opt);
         });
     }
     
     function saveCurrentNote() {
         if (!currentNoteId) return;
-        const index = notes.findIndex(n => n.id === currentNoteId);
-        if (index === -1) return;
+        const idx = notes.findIndex(n => n.id === currentNoteId);
+        if (idx === -1) return;
         
-        notes[index].title = document.getElementById('noteTitleInput').value;
-        notes[index].content = document.getElementById('noteContentInput').value;
-        notes[index].category = document.getElementById('noteCategorySelect').value;
-        notes[index].updatedAt = new Date().toISOString();
+        notes[idx].title = document.getElementById('noteTitleInput').value;
+        notes[idx].content = document.getElementById('noteContentInput').value;
+        notes[idx].category = document.getElementById('noteCategorySelect').value;
+        notes[idx].updatedAt = new Date().toISOString();
         
         saveNotesToStorage();
         renderNotesList();
@@ -3789,12 +3856,12 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
     
     function toggleNoteFavorite() {
         if (!currentNoteId) return;
-        const index = notes.findIndex(n => n.id === currentNoteId);
-        if (index === -1) return;
+        const idx = notes.findIndex(n => n.id === currentNoteId);
+        if (idx === -1) return;
         
-        notes[index].isFavorite = !notes[index].isFavorite;
+        notes[idx].isFavorite = !notes[idx].isFavorite;
         saveNotesToStorage();
-        openNoteEditor(notes[index]);
+        openNoteEditor(notes[idx]);
         renderNotesList();
         updateNotesCount();
     }
@@ -3820,7 +3887,10 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
     }
     
     function formatDate(date) {
-        return new Date(date).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+        return new Date(date).toLocaleDateString('fr-FR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
     }
     
     function saveNotesToStorage() {
@@ -3831,21 +3901,21 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
         localStorage.setItem('noteCategories', JSON.stringify(categories));
     }
     
-    // ========== NOTIFICATIONS ==========
+    // ========== NOTIFICATION ==========
     
     function showNotification(message) {
         const toast = document.createElement('div');
         toast.textContent = message;
         toast.style.cssText = `
             position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: white; padding: 10px 20px;
-            border-radius: 25px; z-index: 1000; box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            background: #2e7d32; color: white; padding: 10px 20px;
+            border-radius: 25px; z-index: 9999; box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         `;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2000);
     }
     
-    // ========== PROTECTION CONTENU ==========
+    // ========== PROTECTION ==========
     
     document.addEventListener("contextmenu", e => e.preventDefault());
     document.addEventListener("selectstart", e => e.preventDefault());
@@ -3860,6 +3930,7 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
     // ========== INITIALISATION ==========
     
     function init() {
+        loadCurrentUser();
         updateChaptersGrid();
         updateChapterContent();
         updateFavoritesPage();
@@ -3870,175 +3941,6 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
     
     init();
 });
-  
-  // Fonction pour afficher le modal d'achat
-function showPurchaseModal() {
-    const modal = document.getElementById('purchaseModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
-}
-
-// Fonction pour fermer le modal d'achat
-function closePurchaseModal() {
-    const modal = document.getElementById('purchaseModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// Fonction pour ouvrir WhatsApp avec le message d'achat
-function openPurchaseWhatsApp() {
-    const phoneNumber = "221781525106";
-    const message = encodeURIComponent(
-        "Bonjour, je souhaite acheter la version complète du livre 'La Voie du Salut' à 1500 FCFA.\n\n" +
-        "Mon email : " + (currentUser ? currentUser.email : "Non connecté") + "\n\n" +
-        "Merci de me donner les instructions pour le paiement."
-    );
-    const url = `https://wa.me/${phoneNumber}?text=${message}`;
-    window.open(url, '_blank');
-    
-    // Fermer le modal
-    closePurchaseModal();
-}
-
-// Ajouter les écouteurs d'événements
-document.addEventListener('DOMContentLoaded', function() {
-    // ... votre code existant ...
-    
-    // Modal d'achat
-    const whatsappBtn = document.getElementById('whatsappPurchaseBtn');
-    const closePurchase = document.getElementById('closePurchaseModal');
-    
-    if (whatsappBtn) {
-        whatsappBtn.addEventListener('click', openPurchaseWhatsApp);
-    }
-    
-    if (closePurchase) {
-        closePurchase.addEventListener('click', closePurchaseModal);
-    }
-    
-    // Fermer en cliquant à l'extérieur
-    window.addEventListener('click', (e) => {
-        const modal = document.getElementById('purchaseModal');
-        if (e.target === modal) {
-            closePurchaseModal();
-        }
-    });
-});
-  
-  
-  
-  // Charger les données du profil
-function loadProfileData() {
-    if (!currentUser) return;
-    
-    const emailSpan = document.getElementById('profileEmail');
-    const statusBadge = document.getElementById('statusBadge');
-    const favoritesCount = document.getElementById('favoritesCount');
-    
-    // Afficher l'email
-    emailSpan.textContent = currentUser.email;
-    
-    // Vérifier si l'email est vérifié
-    const verifiedBadge = document.querySelector('.verified-badge');
-    if (currentUser.emailVerified) {
-        verifiedBadge.style.display = 'inline';
-    } else {
-        verifiedBadge.style.display = 'none';
-    }
-    
-    // Charger les données depuis Firestore
-    db.collection('users').doc(currentUser.uid).get()
-        .then(doc => {
-            if (doc.exists) {
-                const userData = doc.data();
-                isPaidUser = userData.paid || false;
-                
-                // Mettre à jour le statut
-                if (isPaidUser) {
-                    statusBadge.innerHTML = '<i class="fas fa-crown"></i> Compte Premium';
-                    statusBadge.className = 'status-badge premium';
-                } else {
-                    statusBadge.innerHTML = '<i class="fas fa-clock"></i> Compte Gratuit';
-                    statusBadge.className = 'status-badge free';
-                }
-                
-                // Charger le nom et téléphone s'ils existent
-                if (userData.name) {
-                    document.getElementById('profileName').value = userData.name;
-                }
-                if (userData.phone) {
-                    document.getElementById('profilePhone').value = userData.phone;
-                }
-            }
-        })
-        .catch(error => {
-            console.error("Erreur chargement profil:", error);
-            statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur de chargement';
-        });
-    
-    // Mettre à jour le nombre de favoris
-    favoritesCount.textContent = favorites.length;
-}
-
-// Sauvegarder les modifications du profil
-function saveProfileChanges() {
-    if (!currentUser) return;
-    
-    const name = document.getElementById('profileName').value;
-    const phone = document.getElementById('profilePhone').value;
-    
-    db.collection('users').doc(currentUser.uid).update({
-        name: name,
-        phone: phone,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-        showNotification('Profil mis à jour avec succès');
-    })
-    .catch(error => {
-        console.error("Erreur sauvegarde profil:", error);
-        showNotification('Erreur lors de la sauvegarde');
-    });
-}
-
-// Réinitialiser le mot de passe
-function resetPassword() {
-    if (!currentUser) return;
-    
-    auth.sendPasswordResetEmail(currentUser.email)
-        .then(() => {
-            showNotification('Email de réinitialisation envoyé');
-        })
-        .catch(error => {
-            console.error("Erreur envoi email:", error);
-            showNotification('Erreur lors de l\'envoi de l\'email');
-        });
-}
-
-// Changer la photo de profil (simulé pour l'instant)
-function changeProfilePhoto() {
-    // Créer un input file caché
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const avatar = document.getElementById('profileAvatar');
-                avatar.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-                showNotification('Photo de profil mise à jour');
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-    
-    input.click();
-}
 </script>
 <!-- Modal de blocage -->
 <div class="block-modal" id="blockModal">
