@@ -2776,14 +2776,12 @@ h1, h2, h3, h4, h5, h6, p, span, div, a, li {
                 <input type="tel" id="profilePhone" placeholder="+221 XX XXX XX XX" class="profile-input">
             </div>
             
-            <div class="profile-field">
-                <label><i class="fas fa-crown"></i> Statut du compte</label>
-                <div class="profile-status" id="profileStatus">
-                    <span class="status-badge" id="statusBadge">
-                        <i class="fas fa-spinner fa-spin"></i> Chargement...
-                    </span>
-                </div>
-            </div>
+        <div class="profile-field">
+    <label><i class="fas fa-crown"></i> Statut du compte</label>
+    <div class="profile-status" id="profileStatusContainer">
+        <!-- Le contenu sera généré par JavaScript -->
+    </div>
+</div>
             
             <div class="profile-stats">
                 <div class="stat-item">
@@ -2858,7 +2856,8 @@ h1, h2, h3, h4, h5, h6, p, span, div, a, li {
 
 
 <script>
-// Configuration Firebase
+ 
+      // Configuration Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyA6VxGekfO97Oo59OVkX6d1gDgbRiKczJw",
     authDomain: "la-voie-du-salut-51126.firebaseapp.com",
@@ -2922,10 +2921,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentNoteId = null;
     let currentCategory = 'all';
     
-  // Liste des chapitres gratuits (12 chapitres)
-const FREE_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 38];
-const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
-  
+    // Liste des chapitres gratuits (12 chapitres)
+    const FREE_CHAPTERS = [1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 38];
+    const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
+    
     // CONTENU DES CHAPITRES (à remplacer par votre vrai contenu)
     const chapterContents = [
         {chapter: 1, title: {fr: "Introduction", en: "Introduction", ar: "مقدمة"}, text: {fr: "<p>Contenu du chapitre 1...</p>", en: "<p>Chapter 1 content...</p>", ar: "<p>محتوى الفصل الأول...</p>"}},
@@ -2954,20 +2953,19 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
         // Charge les données et met à jour l'affichage
         await loadUserFromFirestore(user.uid);
         
-        // Force la mise à jour si on est sur la page profil
-        if (document.getElementById('profilePage').classList.contains('active')) {
-            document.getElementById('profileEmail').value = user.email;
-        }
+        // AJOUTER L'ÉCOUTEUR TEMPS RÉEL
+        listenToUserChanges();
+        
     } else {
         profileNavItem.setAttribute('data-page', 'loginPage');
         profileNavItem.querySelector('span').textContent = 'Compte';
         isPaidUser = false;
-        updateChapterAccess();
+        updateChaptersGrid();
     }
 });
     
     // Charger les données utilisateur depuis Firestore
-   async function loadUserFromFirestore(uid) {
+async function loadUserFromFirestore(uid) {
     try {
         const docRef = db.collection('users').doc(uid);
         const docSnap = await docRef.get();
@@ -2976,186 +2974,67 @@ const TOTAL_CHAPTERS = 44; // Nombre total de chapitres
             const userData = docSnap.data();
             isPaidUser = userData.paid || false;
             
-            // Met à jour l'affichage IMMÉDIATEMENT
-            document.getElementById('profileEmail').value = currentUser.email;
-            const statusDiv = document.getElementById('profileStatus');
-            
-            if (isPaidUser) {
-                statusDiv.innerHTML = '<span style="background: #d4edda; color: #155724; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-crown"></i> Compte Premium - Accès complet</span>';
-            } else {
-                statusDiv.innerHTML = '<span style="background: #fff3cd; color: #856404; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-clock"></i> Compte Gratuit - Version d\'essai</span>';
+            // Mettre à jour currentUser
+            if (currentUser) {
+                currentUser.paid = isPaidUser;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
             }
+            
+            // METTRE À JOUR L'AFFICHAGE DU STATUT
+            const profileStatusDiv = document.getElementById('profileStatus');
+            if (profileStatusDiv) {
+                if (isPaidUser) {
+                    profileStatusDiv.innerHTML = '<span style="background: #d4edda; color: #155724; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-crown"></i> Compte Premium - Accès complet</span>';
+                } else {
+                    profileStatusDiv.innerHTML = '<span style="background: #fff3cd; color: #856404; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-clock"></i> Compte Gratuit - Version d\'essai</span>';
+                }
+            }
+            
+            // METTRE À JOUR L'EMAIL
+            const profileEmail = document.getElementById('profileEmail');
+            if (profileEmail) {
+                profileEmail.textContent = currentUser.email;
+            }
+            
+            // METTRE À JOUR LES CHAPITRES
+            updateChaptersGrid();
+            
         } else {
             // Si le document n'existe pas, le créer
             await docRef.set({
                 email: currentUser.email,
                 paid: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             
             isPaidUser = false;
-            document.getElementById('profileEmail').value = currentUser.email;
-            document.getElementById('profileStatus').innerHTML = '<span style="background: #fff3cd; color: #856404; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-clock"></i> Compte Gratuit</span>';
+            
+            const profileStatusDiv = document.getElementById('profileStatus');
+            if (profileStatusDiv) {
+                profileStatusDiv.innerHTML = '<span style="background: #fff3cd; color: #856404; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-clock"></i> Compte Gratuit - Version d\'essai</span>';
+            }
+            
+            updateChaptersGrid();
         }
-        
-        updateChapterAccess();
         
     } catch (error) {
         console.error("Erreur chargement Firestore:", error);
-        document.getElementById('profileStatus').innerHTML = '<span style="background: #f8d7da; color: #721c24; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-exclamation-triangle"></i> Erreur de chargement</span>';
-    }
-}
-    
-    // Mettre à jour la dernière activité
-    function updateLastActivity(uid) {
-        db.collection('users').doc(uid).update({
-            lastActive: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(error => console.error("Erreur mise à jour activité:", error));
-    }
-    
-  async function register(email, password, name = '') {
-    try {
-        // Vérifier si l'email existe déjà
-        const existingUser = await db.collection('users')
-            .where('email', '==', email)
-            .get();
         
-        if (!existingUser.empty) {
-            showNotification('Cet email est déjà utilisé');
-            return;
+        const profileStatusDiv = document.getElementById('profileStatus');
+        if (profileStatusDiv) {
+            profileStatusDiv.innerHTML = '<span style="background: #f8d7da; color: #721c24; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-exclamation-triangle"></i> Erreur de chargement</span>';
         }
-        
-        // Créer le nouvel utilisateur dans Firestore
-        const userData = {
-            email: email,
-            password: password,
-            paid: false,
-            name: name,
-            phone: '',
-            createdAt: new Date().toISOString(),
-            lastActive: new Date().toISOString()
-        };
-        
-        const docRef = await db.collection('users').add(userData);
-        
-        // Connecter l'utilisateur automatiquement
-        currentUser = {
-            id: docRef.id,
-            email: email,
-            paid: false,
-            name: name,
-            phone: ''
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        isPaidUser = false;
-        
-        showNotification('Compte créé avec succès !');
-        
-        // Mettre à jour l'interface
-        const profileNavItem = document.getElementById('profileNavItem');
-        profileNavItem.setAttribute('data-page', 'profilePage');
-        profileNavItem.querySelector('span').textContent = 'Profil';
-        
-        showPage('profilePage');
-        updateProfileDisplay();
-        updateChaptersGrid();
-        
-        // Ajouter l'écouteur temps réel
-        listenToUserChanges();
-        
-    } catch (error) {
-        console.error("Erreur inscription:", error);
-        showNotification('Erreur lors de l\'inscription: ' + error.message);
     }
 }
     
-  async function login(email, password) {
-    try {
-        // Chercher l'utilisateur dans Firestore
-        const querySnapshot = await db.collection('users')
-            .where('email', '==', email)
-            .where('password', '==', password)
-            .get();
-        
-        if (querySnapshot.empty) {
-            showNotification('Email ou mot de passe incorrect');
-            return;
-        }
-        
-        // Récupérer les données
-        const userDoc = querySnapshot.docs[0];
-        const userData = userDoc.data();
-        
-        // Mettre à jour la dernière activité
-        await db.collection('users').doc(userDoc.id).update({
-            lastActive: new Date().toISOString()
-        });
-        
-        // Connecter l'utilisateur
-        currentUser = {
-            id: userDoc.id,
-            email: email,
-            paid: userData.paid || false,
-            name: userData.name || '',
-            phone: userData.phone || ''
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        isPaidUser = userData.paid || false;
-        
-        showNotification('Connexion réussie !');
-        
-        // Mettre à jour l'interface
-        const profileNavItem = document.getElementById('profileNavItem');
-        profileNavItem.setAttribute('data-page', 'profilePage');
-        profileNavItem.querySelector('span').textContent = 'Profil';
-        
-        showPage('profilePage');
-        updateProfileDisplay();
-        updateChaptersGrid();
-        
-        // Ajouter l'écouteur temps réel
-        listenToUserChanges();
-        
-    } catch (error) {
-        console.error("Erreur connexion:", error);
-        showNotification('Erreur lors de la connexion: ' + error.message);
-    }
-}
-    
- function logout() {
-    // Arrêter l'écouteur temps réel
-    if (window.userListener) {
-        window.userListener();
-        window.userListener = null;
-    }
-    
-    localStorage.removeItem('currentUser');
-    currentUser = null;
-    isPaidUser = false;
-    
-    showNotification('Déconnexion réussie');
-    
-    // Mettre à jour l'interface
-    const profileNavItem = document.getElementById('profileNavItem');
-    profileNavItem.setAttribute('data-page', 'loginPage');
-    profileNavItem.querySelector('span').textContent = 'Compte';
-    
-    showPage('homePage');
-    updateChaptersGrid();
-}
-    // ÉCOUTEUR TEMPS RÉEL (à ajouter)
+    // ÉCOUTEUR TEMPS RÉEL
 function listenToUserChanges() {
     if (!currentUser || !currentUser.id) return;
     
-    // Arrêter l'ancien écouteur
     if (window.userListener) {
         window.userListener();
     }
     
-    // Nouvel écouteur
     window.userListener = db.collection('users').doc(currentUser.id)
         .onSnapshot((doc) => {
             if (doc.exists) {
@@ -3168,142 +3047,264 @@ function listenToUserChanges() {
                     currentUser.paid = isPaidUser;
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
                     
-                    // Mettre à jour l'affichage
-                    const statusBadge = document.getElementById('statusBadge');
-                    if (statusBadge) {
+                    // METTRE À JOUR L'AFFICHAGE DU STATUT
+                    const profileStatusDiv = document.getElementById('profileStatus');
+                    if (profileStatusDiv) {
                         if (isPaidUser) {
-                            statusBadge.innerHTML = '<i class="fas fa-crown"></i> Compte Premium - Accès complet';
-                            statusBadge.className = 'status-badge premium';
+                            profileStatusDiv.innerHTML = '<span style="background: #d4edda; color: #155724; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-crown"></i> Compte Premium - Accès complet</span>';
                         } else {
-                            statusBadge.innerHTML = '<i class="fas fa-clock"></i> Compte Gratuit - 12 chapitres disponibles';
-                            statusBadge.className = 'status-badge free';
+                            profileStatusDiv.innerHTML = '<span style="background: #fff3cd; color: #856404; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-clock"></i> Compte Gratuit - Version d\'essai</span>';
                         }
                     }
                     
-                    // Reconstruire les chapitres
                     updateChaptersGrid();
                     updateFavoritesPage();
                     
-                    showNotification(isPaidUser ? 
-                        '🎉 Compte Premium activé ! Tous les chapitres sont débloqués.' : 
-                        '⏳ Compte gratuit');
+                    showNotification(isPaidUser ? '🎉 Compte Premium activé !' : '⏳ Compte gratuit');
                 }
             }
-        }, (error) => {
-            console.error("Erreur écouteur:", error);
         });
 }
-    // ========== GESTION DES CHAPITRES ==========
     
-    function updateChapterAccess() {
-        document.querySelectorAll('.chapter-card').forEach(card => {
-            const chapterNum = parseInt(card.querySelector('.chapter-number').textContent);
-            
-            if (chapterNum > 9 && !isPaidUser) {
-                // Chapitre bloqué pour les non-payants
-                card.style.opacity = '0.5';
-                card.style.pointerEvents = 'none';
-                
-                // Ajouter un cadenas
-                if (!card.querySelector('.lock-indicator')) {
-                    const lock = document.createElement('div');
-                    lock.className = 'lock-indicator';
-                    lock.innerHTML = '<i class="fas fa-lock"></i>';
-                    lock.style.position = 'absolute';
-                    lock.style.top = '50%';
-                    lock.style.left = '50%';
-                    lock.style.transform = 'translate(-50%, -50%)';
-                    lock.style.color = '#ff6b6b';
-                    lock.style.fontSize = '24px';
-                    card.appendChild(lock);
-                }
-            } else {
-                // Chapitre accessible
-                card.style.opacity = '1';
-                card.style.pointerEvents = 'auto';
-                const lock = card.querySelector('.lock-indicator');
-                if (lock) lock.remove();
-            }
-        });
+    // Mettre à jour la dernière activité
+    function updateLastActivity(uid) {
+        db.collection('users').doc(uid).update({
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(error => console.error("Erreur mise à jour activité:", error));
     }
     
-  function updateChaptersGrid() {
-    if (!chaptersGrid) return;
-    
-    chaptersGrid.innerHTML = '';
-    
-    // Générer les chapitres de 1 à 44
-    for (let i = 1; i <= TOTAL_CHAPTERS; i++) {
-        // Chercher si le chapitre existe dans chapterContents
-        const chapterData = chapterContents.find(ch => ch.chapter === i) || {
-            chapter: i,
-            title: {
-                fr: `Chapitre ${i}`,
-                en: `Chapter ${i}`,
-                ar: `الفصل ${i}`
-            },
-            text: {
-                fr: "<p>Contenu à venir...</p>",
-                en: "<p>Content coming soon...</p>",
-                ar: "<p>المحتوى قريباً...</p>"
-            }
-        };
-        
-        const isFree = FREE_CHAPTERS.includes(i);
-        const isLocked = !isFree && !isPaidUser;
-        
-        const chapterCard = document.createElement('div');
-        chapterCard.className = 'chapter-card';
-        chapterCard.setAttribute('lang', currentLanguage);
-        
-        // Ajouter une classe pour les chapitres verrouillés
-        if (isLocked) {
-            chapterCard.classList.add('locked-chapter');
-        }
-        
-        chapterCard.innerHTML = `
-            <div class="chapter-number">${i}</div>
-            <div class="chapter-title">${chapterData.title[currentLanguage] || 'Chapitre ' + i}</div>
-            ${isLocked ? '<div class="lock-icon"><i class="fas fa-lock"></i></div>' : ''}
-            <div class="favorite-icon" id="favorite-${i}">
-                ${favorites.includes(i) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}
-            </div>
-        `;
-        
-        chapterCard.addEventListener('click', (e) => {
-            // Ne pas déclencher si on clique sur l'icône favori
-            if (e.target.closest('.favorite-icon')) return;
+    async function register(email, password, name = '') {
+        try {
+            // Vérifier si l'email existe déjà
+            const existingUser = await db.collection('users')
+                .where('email', '==', email)
+                .get();
             
-            if (isLocked) {
-                showPurchaseModal();
+            if (!existingUser.empty) {
+                showNotification('Cet email est déjà utilisé');
                 return;
             }
             
-            currentChapter = i;
+            // Créer le nouvel utilisateur dans Firestore
+            const userData = {
+                email: email,
+                password: password,
+                paid: false,
+                name: name,
+                phone: '',
+                createdAt: new Date().toISOString(),
+                lastActive: new Date().toISOString()
+            };
             
-            // Mettre à jour le contenu du chapitre
-            const selectedChapter = chapterContents.find(ch => ch.chapter === i);
-            if (selectedChapter) {
-                contentElement.innerHTML = selectedChapter.text[currentLanguage] || '<p>Contenu non disponible</p>';
-            } else {
-                contentElement.innerHTML = '<p>Chapitre en cours de rédaction...</p>';
+            const docRef = await db.collection('users').add(userData);
+            
+            // Connecter l'utilisateur automatiquement
+            currentUser = {
+                id: docRef.id,
+                email: email,
+                paid: false,
+                name: name,
+                phone: ''
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            isPaidUser = false;
+            
+            showNotification('Compte créé avec succès !');
+            
+            // Mettre à jour l'interface
+            const profileNavItem = document.getElementById('profileNavItem');
+            profileNavItem.setAttribute('data-page', 'profilePage');
+            profileNavItem.querySelector('span').textContent = 'Profil';
+            
+            showPage('profilePage');
+            updateProfileDisplay();
+            updateChaptersGrid();
+            
+            // Ajouter l'écouteur temps réel
+            listenToUserChanges();
+            
+        } catch (error) {
+            console.error("Erreur inscription:", error);
+            showNotification('Erreur lors de l\'inscription: ' + error.message);
+        }
+    }
+    
+    async function login(email, password) {
+        try {
+            // Chercher l'utilisateur dans Firestore
+            const querySnapshot = await db.collection('users')
+                .where('email', '==', email)
+                .where('password', '==', password)
+                .get();
+            
+            if (querySnapshot.empty) {
+                showNotification('Email ou mot de passe incorrect');
+                return;
             }
             
-            chapterIndicator.textContent = `Chapitre ${i}`;
-            showPage('readingPage');
-        });
-        
-        const favIcon = chapterCard.querySelector('.favorite-icon');
-        if (favIcon) {
-            favIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorite(i);
+            // Récupérer les données
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
+            
+            // Mettre à jour la dernière activité
+            await db.collection('users').doc(userDoc.id).update({
+                lastActive: new Date().toISOString()
             });
+            
+            // Connecter l'utilisateur
+            currentUser = {
+                id: userDoc.id,
+                email: email,
+                paid: userData.paid || false,
+                name: userData.name || '',
+                phone: userData.phone || ''
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            isPaidUser = userData.paid || false;
+            
+            showNotification('Connexion réussie !');
+            
+            // Mettre à jour l'interface
+            const profileNavItem = document.getElementById('profileNavItem');
+            profileNavItem.setAttribute('data-page', 'profilePage');
+            profileNavItem.querySelector('span').textContent = 'Profil';
+            
+            showPage('profilePage');
+            updateProfileDisplay();
+            updateChaptersGrid();
+            
+            // Ajouter l'écouteur temps réel
+            listenToUserChanges();
+            
+        } catch (error) {
+            console.error("Erreur connexion:", error);
+            showNotification('Erreur lors de la connexion: ' + error.message);
+        }
+    }
+    
+  function logout() {
+    if (window.userListener) window.userListener();
+    localStorage.removeItem('currentUser');
+    currentUser = null;
+    isPaidUser = false;
+    
+    showNotification('Déconnexion réussie');
+    
+    const profileNavItem = document.getElementById('profileNavItem');
+    profileNavItem.setAttribute('data-page', 'loginPage');
+    profileNavItem.querySelector('span').textContent = 'Compte';
+    
+    showPage('homePage');
+    updateChaptersGrid();
+    
+    // 🔥 AJOUTEZ CETTE LIGNE 
+    updateAccountStatusDisplay('not-connected'); 
+}
+    
+ function updateProfileDisplay() {
+    if (!currentUser) return;
+    
+    const profileEmail = document.getElementById('profileEmail');
+    if (profileEmail) profileEmail.textContent = currentUser.email;
+    
+    const profileName = document.getElementById('profileName');
+    if (profileName) profileName.value = currentUser.name || '';
+    
+    const profilePhone = document.getElementById('profilePhone');
+    if (profilePhone) profilePhone.value = currentUser.phone || '';
+    
+    // 🔥 AJOUTEZ CETTE LIGNE
+    updateAccountStatusDisplay(isPaidUser ? 'premium' : 'free');
+    
+    const favoritesCount = document.getElementById('favoritesCount');
+    if (favoritesCount) favoritesCount.textContent = favorites.length;
+}
+    
+    // ========== GESTION DES CHAPITRES ==========
+    
+    function updateChaptersGrid() {
+        if (!chaptersGrid) return;
+        
+        chaptersGrid.innerHTML = '';
+        
+        // Générer les chapitres de 1 à 44
+        for (let i = 1; i <= TOTAL_CHAPTERS; i++) {
+            // Chercher si le chapitre existe dans chapterContents
+            const chapterData = chapterContents.find(ch => ch.chapter === i) || {
+                chapter: i,
+                title: {
+                    fr: `Chapitre ${i}`,
+                    en: `Chapter ${i}`,
+                    ar: `الفصل ${i}`
+                },
+                text: {
+                    fr: "<p>Contenu à venir...</p>",
+                    en: "<p>Content coming soon...</p>",
+                    ar: "<p>المحتوى قريباً...</p>"
+                }
+            };
+            
+            // LOGIQUE DE DÉVERROUILLAGE : si isPaidUser est TRUE, TOUS les chapitres sont débloqués
+            const isFree = FREE_CHAPTERS.includes(i);
+            const isLocked = !isPaidUser && !isFree; // Seulement verrouillé si l'utilisateur n'est PAS payant ET que ce n'est PAS un chapitre gratuit
+            
+            const chapterCard = document.createElement('div');
+            chapterCard.className = 'chapter-card';
+            chapterCard.setAttribute('lang', currentLanguage);
+            
+            // Ajouter une classe pour les chapitres verrouillés
+            if (isLocked) {
+                chapterCard.classList.add('locked-chapter');
+            }
+            
+            chapterCard.innerHTML = `
+                <div class="chapter-number">${i}</div>
+                <div class="chapter-title">${chapterData.title[currentLanguage] || 'Chapitre ' + i}</div>
+                ${isLocked ? '<div class="lock-icon"><i class="fas fa-lock"></i></div>' : ''}
+                <div class="favorite-icon" id="favorite-${i}">
+                    ${favorites.includes(i) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}
+                </div>
+            `;
+            
+            chapterCard.addEventListener('click', (e) => {
+                // Ne pas déclencher si on clique sur l'icône favori
+                if (e.target.closest('.favorite-icon')) return;
+                
+                // VÉRIFICATION D'ACCÈS AU CHAPITRE
+                if (isLocked) {
+                    showPurchaseModal();
+                    return;
+                }
+                
+                currentChapter = i;
+                
+                // Mettre à jour le contenu du chapitre
+                const selectedChapter = chapterContents.find(ch => ch.chapter === i);
+                if (selectedChapter) {
+                    contentElement.innerHTML = selectedChapter.text[currentLanguage] || '<p>Contenu non disponible</p>';
+                } else {
+                    contentElement.innerHTML = '<p>Chapitre en cours de rédaction...</p>';
+                }
+                
+                chapterIndicator.textContent = `Chapitre ${i}`;
+                showPage('readingPage');
+            });
+            
+            const favIcon = chapterCard.querySelector('.favorite-icon');
+            if (favIcon) {
+                favIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(i);
+                });
+            }
+            
+            chaptersGrid.appendChild(chapterCard);
         }
         
-        chaptersGrid.appendChild(chapterCard);
+        console.log(`📚 Chapitres mis à jour - Premium: ${isPaidUser ? 'OUI' : 'NON'}`);
     }
-}
     
     function updateChapterContent() {
         const chapter = chapterContents.find(ch => ch.chapter === currentChapter);
@@ -3421,6 +3422,11 @@ function listenToUserChanges() {
         if (currentUser && (pageId === 'readingPage' || pageId === 'chaptersPage')) {
             updateLastActivity(currentUser.uid);
         }
+        
+        // Si on est sur la page profil, mettre à jour l'affichage
+        if (pageId === 'profilePage' && currentUser) {
+            updateProfileDisplay();
+        }
     }
     
     function toggleFavoritesView() {
@@ -3473,8 +3479,6 @@ function listenToUserChanges() {
             
             chaptersGrid.appendChild(chapterCard);
         });
-        
-        updateChapterAccess();
     }
     
     // ========== CONFIGURATION DES ÉCOUTEURS ==========
@@ -3499,21 +3503,23 @@ function listenToUserChanges() {
         document.getElementById('backFromRegister')?.addEventListener('click', () => showPage('loginPage'));
         document.getElementById('backFromProfile')?.addEventListener('click', () => showPage('homePage'));
         document.getElementById('goToRegisterBtn')?.addEventListener('click', () => showPage('registerPage'));
+        
         // Écouteurs pour la page de profil
-document.getElementById('changePhotoBtn')?.addEventListener('click', changeProfilePhoto);
-document.getElementById('resetPasswordBtn')?.addEventListener('click', resetPassword);
-document.getElementById('editProfileBtn')?.addEventListener('click', saveProfileChanges);
-
-// Mettre à jour l'affichage du profil quand on y accède
-document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (currentUser) {
-        loadProfileData();
-        showPage('profilePage');
-    } else {
-        showPage('loginPage');
-    }
-});
+        document.getElementById('changePhotoBtn')?.addEventListener('click', changeProfilePhoto);
+        document.getElementById('resetPasswordBtn')?.addEventListener('click', resetPassword);
+        document.getElementById('editProfileBtn')?.addEventListener('click', saveProfileChanges);
+        
+        // Mettre à jour l'affichage du profil quand on y accède
+        document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentUser) {
+                loadProfileData();
+                showPage('profilePage');
+            } else {
+                showPage('loginPage');
+            }
+        });
+        
         document.getElementById('loginBtn')?.addEventListener('click', () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -3929,6 +3935,80 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
         localStorage.setItem('noteCategories', JSON.stringify(categories));
     }
     
+    // ========== FONCTIONS PROFIL ==========
+    
+    function loadProfileData() {
+        if (!currentUser) return;
+        
+        document.getElementById('profileEmail').textContent = currentUser.email;
+        document.getElementById('profileName').value = currentUser.name || '';
+        document.getElementById('profilePhone').value = currentUser.phone || '';
+        
+        // Mettre à jour le statut
+        const profileStatus = document.getElementById('profileStatus');
+        if (profileStatus) {
+            if (isPaidUser) {
+                profileStatus.innerHTML = '<span style="background: #d4edda; color: #155724; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-crown"></i> Compte Premium - Accès complet (44 chapitres)</span>';
+            } else {
+                profileStatus.innerHTML = '<span style="background: #fff3cd; color: #856404; padding: 8px 15px; border-radius: 20px;"><i class="fas fa-clock"></i> Compte Gratuit - 12 chapitres disponibles</span>';
+            }
+        }
+    }
+    
+    function saveProfileChanges() {
+        if (!currentUser) return;
+        
+        const name = document.getElementById('profileName').value;
+        const phone = document.getElementById('profilePhone').value;
+        
+        db.collection('users').doc(currentUser.id).update({
+            name: name,
+            phone: phone,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            currentUser.name = name;
+            currentUser.phone = phone;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            showNotification('Profil mis à jour avec succès');
+        })
+        .catch(error => {
+            console.error("Erreur sauvegarde profil:", error);
+            showNotification('Erreur lors de la sauvegarde');
+        });
+    }
+    
+    function resetPassword() {
+        if (!currentUser) return;
+        
+        // Pour Firebase Auth, il faudrait utiliser l'email
+        // Mais comme vous utilisez une collection users personnalisée,
+        // on va simplement afficher une notification
+        showNotification('Fonctionnalité de réinitialisation de mot de passe à implémenter');
+    }
+    
+    function changeProfilePhoto() {
+        // Créer un input file caché
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const avatar = document.getElementById('profileAvatar');
+                    avatar.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                    showNotification('Photo de profil mise à jour');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        
+        input.click();
+    }
+    
     // ========== NOTIFICATIONS ==========
     
     function showNotification(message) {
@@ -3968,8 +4048,8 @@ document.getElementById('profileNavItem')?.addEventListener('click', (e) => {
     
     init();
 });
-  
-  // Fonction pour afficher le modal d'achat
+
+// Fonction pour afficher le modal d'achat
 function showPurchaseModal() {
     const modal = document.getElementById('purchaseModal');
     if (modal) {
@@ -4002,8 +4082,6 @@ function openPurchaseWhatsApp() {
 
 // Ajouter les écouteurs d'événements
 document.addEventListener('DOMContentLoaded', function() {
-    // ... votre code existant ...
-    
     // Modal d'achat
     const whatsappBtn = document.getElementById('whatsappPurchaseBtn');
     const closePurchase = document.getElementById('closePurchaseModal');
@@ -4011,7 +4089,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (whatsappBtn) {
         whatsappBtn.addEventListener('click', openPurchaseWhatsApp);
     }
-    
+     
     if (closePurchase) {
         closePurchase.addEventListener('click', closePurchaseModal);
     }
@@ -4024,140 +4102,92 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-  
-  
-  
- function loadCurrentUser() {
-    const storedUser = localStorage.getItem('currentUser');
+      
+  // Fonction UNIQUE pour mettre à jour le statut
+function updateAccountStatusDisplay(status) {
+    const container = document.getElementById('profileStatusContainer');
+    if (!container) return;
     
-    if (storedUser) {
-        try {
-            currentUser = JSON.parse(storedUser);
-            isPaidUser = currentUser.paid || false;
-            
-            // Mettre à jour la navigation
-            const profileNavItem = document.getElementById('profileNavItem');
-            profileNavItem.setAttribute('data-page', 'profilePage');
-            profileNavItem.querySelector('span').textContent = 'Profil';
-            
-            // AJOUTER L'ÉCOUTEUR
-            listenToUserChanges();
-            
-            if (document.getElementById('profilePage').classList.contains('active')) {
-                updateProfileDisplay();
-            }
-            
-            updateChaptersGrid();
-            
-        } catch (e) {
-            console.error("Erreur:", e);
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            isPaidUser = false;
-        }
-    } else {
-        currentUser = null;
-        isPaidUser = false;
-        
-        const profileNavItem = document.getElementById('profileNavItem');
-        profileNavItem.setAttribute('data-page', 'loginPage');
-        profileNavItem.querySelector('span').textContent = 'Compte';
+    // Vider le conteneur
+    container.innerHTML = '';
+    
+    // Créer le nouveau span
+    const statusSpan = document.createElement('span');
+    statusSpan.className = 'status-badge';
+    
+    if (status === 'premium') {
+        statusSpan.style.cssText = 'background: #d4edda; color: #155724; padding: 8px 15px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px;';
+        statusSpan.innerHTML = '<i class="fas fa-crown"></i> Compte Premium - Accès complet (44 chapitres)';
+    } else if (status === 'free') {
+        statusSpan.style.cssText = 'background: #fff3cd; color: #856404; padding: 8px 15px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px;';
+        statusSpan.innerHTML = '<i class="fas fa-clock"></i> Compte Gratuit - 12 chapitres disponibles';
+    } else if (status === 'loading') {
+        statusSpan.style.cssText = 'background: #e2e3e5; color: #383d41; padding: 8px 15px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px;';
+        statusSpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement...';
+    } else if (status === 'error') {
+        statusSpan.style.cssText = 'background: #f8d7da; color: #721c24; padding: 8px 15px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px;';
+        statusSpan.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur de chargement';
+    } else if (status === 'not-connected') {
+        statusSpan.style.cssText = 'background: #fff3cd; color: #856404; padding: 8px 15px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px;';
+        statusSpan.innerHTML = '<i class="fas fa-user-slash"></i> Non connecté';
     }
+    
+    container.appendChild(statusSpan);
 }
 
-// Rafraîchir les données utilisateur depuis Firestore
-async function refreshUserData() {
-    if (!currentUser) return;
-    
+// Version simplifiée de loadUserFromFirestore
+async function loadUserFromFirestore(uid) {
     try {
-        const docRef = db.collection('users').doc(currentUser.id);
+        updateAccountStatusDisplay('loading');
+        
+        const docRef = db.collection('users').doc(uid);
         const docSnap = await docRef.get();
         
         if (docSnap.exists()) {
             const userData = docSnap.data();
             isPaidUser = userData.paid || false;
             
-            // Mettre à jour localStorage
-            currentUser.paid = isPaidUser;
-            currentUser.name = userData.name || '';
-            currentUser.phone = userData.phone || '';
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            // Mettre à jour currentUser
+            if (currentUser) {
+                currentUser.paid = isPaidUser;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
             
-            // Mettre à jour l'affichage du profil
-            updateProfileDisplay();
+            // Afficher le statut
+            updateAccountStatusDisplay(isPaidUser ? 'premium' : 'free');
+            
+            // Afficher l'email
+            const profileEmail = document.getElementById('profileEmail');
+            if (profileEmail) profileEmail.textContent = currentUser.email;
+            
+            // Reconstruire les chapitres
+            updateChaptersGrid();
+            
+        } else {
+            // Créer le document
+            await docRef.set({
+                email: currentUser.email,
+                paid: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            isPaidUser = false;
+            updateAccountStatusDisplay('free');
+            updateChaptersGrid();
         }
+        
     } catch (error) {
-        console.error("Erreur rafraîchissement:", error);
+        console.error("Erreur:", error);
+        updateAccountStatusDisplay('error');
     }
 }
 
-// Sauvegarder les modifications du profil
-function saveProfileChanges() {
-    if (!currentUser) return;
-    
-    const name = document.getElementById('profileName').value;
-    const phone = document.getElementById('profilePhone').value;
-    
-    db.collection('users').doc(currentUser.uid).update({
-        name: name,
-        phone: phone,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-        showNotification('Profil mis à jour avec succès');
-    })
-    .catch(error => {
-        console.error("Erreur sauvegarde profil:", error);
-        showNotification('Erreur lors de la sauvegarde');
-    });
-}
-
-// Réinitialiser le mot de passe
-function resetPassword() {
-    if (!currentUser) return;
-    
-    auth.sendPasswordResetEmail(currentUser.email)
-        .then(() => {
-            showNotification('Email de réinitialisation envoyé');
-        })
-        .catch(error => {
-            console.error("Erreur envoi email:", error);
-            showNotification('Erreur lors de l\'envoi de l\'email');
-        });
-}
-
-// Changer la photo de profil (simulé pour l'instant)
-function changeProfilePhoto() {
-    // Créer un input file caché
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const avatar = document.getElementById('profileAvatar');
-                avatar.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-                showNotification('Photo de profil mise à jour');
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-    
-    input.click();
-}
-  
+// Écouteur temps réel simplifié
 function listenToUserChanges() {
     if (!currentUser || !currentUser.id) return;
     
-    // Arrêter l'ancien écouteur s'il existe
-    if (window.userListener) {
-        window.userListener();
-    }
+    if (window.userListener) window.userListener();
     
-    // Nouvel écouteur
     window.userListener = db.collection('users').doc(currentUser.id)
         .onSnapshot((doc) => {
             if (doc.exists) {
@@ -4170,34 +4200,21 @@ function listenToUserChanges() {
                     currentUser.paid = isPaidUser;
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
                     
-                    // Mettre à jour le statut dans le profil
-                    const statusBadge = document.getElementById('statusBadge');
-                    if (statusBadge) {
-                        if (isPaidUser) {
-                            statusBadge.innerHTML = '<i class="fas fa-crown"></i> Compte Premium - Accès complet';
-                            statusBadge.className = 'status-badge premium';
-                        } else {
-                            statusBadge.innerHTML = '<i class="fas fa-clock"></i> Compte Gratuit - 12 chapitres disponibles';
-                            statusBadge.className = 'status-badge free';
-                        }
-                    }
+                    // METTRE À JOUR L'AFFICHAGE
+                    updateAccountStatusDisplay(isPaidUser ? 'premium' : 'free');
                     
-                    // 🔥 RECONSTRUCTION COMPLÈTE DES CHAPITRES
+                    // RECONSTRUIRE LES CHAPITRES
                     updateChaptersGrid();
                     updateFavoritesPage();
                     
                     showNotification(isPaidUser ? 
-                        '🎉 Félicitations ! Compte Premium activé. Tous les 44 chapitres sont maintenant disponibles.' : 
+                        '🎉 Compte Premium activé !' : 
                         '⏳ Compte gratuit');
-                    
-                    console.log('🔥 Statut premium changé en temps réel:', isPaidUser);
                 }
             }
-        }, (error) => {
-            console.error("Erreur écouteur:", error);
         });
 }
-</script>
+      </script>
 <!-- Modal de blocage -->
 <div class="block-modal" id="blockModal">
     <div class="block-content">
@@ -4255,4 +4272,4 @@ function listenToUserChanges() {
     </div>
 </div>
 </body>
-</html>   
+</html>    
