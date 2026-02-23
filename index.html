@@ -3448,7 +3448,7 @@ function listenToUserChanges() {
         if (!chaptersGrid) return;
         
         chaptersGrid.innerHTML = '';
-        
+         
         chapters.forEach(chapter => {
             const chapterCard = document.createElement('div');
             chapterCard.className = 'chapter-card';
@@ -3459,7 +3459,7 @@ function listenToUserChanges() {
                 <div class="favorite-icon" id="favorite-${chapter.chapter}">
                     ${favorites.includes(chapter.chapter) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}
                 </div>
-            `;
+            `; 
             
             chapterCard.addEventListener('click', () => {
                 if (chapter.chapter > 9 && !isPaidUser) {
